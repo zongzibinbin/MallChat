@@ -1,19 +1,28 @@
-# Compiled class file
-*.class
+
+### IntelliJ project files
+.idea/
+*.iml
+/target/*
+/**/target/
+
+
+# git
+*.orig
+.flattened-pom.xml
+demo-api/.flattened-pom.xml
+demo-client/.flattened-pom.xml
 
 # Log file
 *.log
+*_rpc_port.txt
 
 # BlueJ files
 *.ctxt
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
 
 # Package Files #
 *.jar
 *.war
-*.nar
 *.ear
 *.zip
 *.tar.gz
@@ -21,3 +30,42 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+### macOS files
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must end with two \r
+Icon
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Temporary File
+*CodeGenerator-Temporary
+*CodeGeneratorFile
+*temporary
+
+CodeGenerator.java
+TestController.java
+mybatis-generator-config.xml
+ChannelBizRankClient.java
+ChannelBizBrandWallClient.java
+/*/rebel.xml
