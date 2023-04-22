@@ -6,6 +6,7 @@ import com.abin.mallchat.common.common.exception.BusinessException;
 import com.abin.mallchat.common.common.exception.CommonErrorEnum;
 import com.abin.mallchat.common.common.utils.RedisUtils;
 import com.abin.mallchat.common.common.utils.RequestHolder;
+import com.abin.mallchat.common.common.utils.SpElUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -33,8 +34,6 @@ import java.util.*;
 public class FrequencyControlAspect {
     @Autowired
     private RedisUtils redisUtils;
-    private final ExpressionParser parser = new SpelExpressionParser();
-    private final DefaultParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
 
     @Around("@annotation(com.abin.mallchat.common.common.annotation.FrequencyControl)||@annotation(com.abin.mallchat.common.common.annotation.FrequencyControlContainer)")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -43,11 +42,11 @@ public class FrequencyControlAspect {
         Map<String, FrequencyControl> keyMap = new HashMap<>();
         for (int i = 0; i < annotationsByType.length; i++) {
             FrequencyControl frequencyControl = annotationsByType[i];
-            String prefix = StrUtil.isBlank(frequencyControl.prefixKey()) ? method.toGenericString() + ":index:" + i : frequencyControl.prefixKey();//默认方法限定名+注解排名（可能多个）
+            String prefix = StrUtil.isBlank(frequencyControl.prefixKey()) ? SpElUtils.getMethodKey(method) + ":index:" + i : frequencyControl.prefixKey();//默认方法限定名+注解排名（可能多个）
             String key = "";
             switch (frequencyControl.target()) {
                 case EL:
-                    key = parseSpEl(method, joinPoint.getArgs(), frequencyControl.spEl());
+                    key = SpElUtils.parseSpEl(method, joinPoint.getArgs(), frequencyControl.spEl());
                     break;
                 case IP:
                     key = RequestHolder.get().getIp();
@@ -79,13 +78,5 @@ public class FrequencyControlAspect {
         }
     }
 
-    private String parseSpEl(Method method, Object[] args, String spEl) {
-        String[] params = parameterNameDiscoverer.getParameterNames(method);//解析参数名
-        EvaluationContext context = new StandardEvaluationContext();//el解析需要的上下文对象
-        for (int i = 0; i < params.length; i++) {
-            context.setVariable(params[i], args[i]);//所有参数都作为原材料扔进去
-        }
-        Expression expression = parser.parseExpression(spEl);
-        return expression.getValue(context, String.class);
-    }
+
 }

@@ -1,5 +1,6 @@
 package com.abin.mallchat.common.user.service.impl;
 
+import com.abin.mallchat.common.common.annotation.RedissonLock;
 import com.abin.mallchat.common.common.domain.enums.IdempotentEnum;
 import com.abin.mallchat.common.common.domain.enums.YesOrNoEnum;
 import com.abin.mallchat.common.user.dao.ItemConfigDao;
@@ -32,6 +33,7 @@ public class UserBackpackServiceImpl implements IUserBackpackService {
     private ItemCache itemCache;
 
     @Override
+    @RedissonLock(key = "#uid")
     public void acquireItem(Long uid, Long itemId, IdempotentEnum idempotentEnum, String businessId) {//todo 分布式锁
         String idempotent = getIdempotent(itemId, idempotentEnum, businessId);
         UserBackpack userBackpack = userBackpackDao.getByIdp(idempotent);
