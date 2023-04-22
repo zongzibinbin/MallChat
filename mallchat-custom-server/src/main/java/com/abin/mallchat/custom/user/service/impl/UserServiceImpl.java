@@ -1,0 +1,108 @@
+package com.abin.mallchat.custom.user.service.impl;
+
+import com.abin.mallchat.common.common.domain.enums.IdempotentEnum;
+import com.abin.mallchat.common.common.utils.AssertUtil;
+import com.abin.mallchat.common.user.dao.ItemConfigDao;
+import com.abin.mallchat.common.user.dao.UserBackpackDao;
+import com.abin.mallchat.common.user.dao.UserDao;
+import com.abin.mallchat.common.user.domain.entity.ItemConfig;
+import com.abin.mallchat.common.user.domain.entity.User;
+import com.abin.mallchat.common.user.domain.entity.UserBackpack;
+import com.abin.mallchat.common.user.domain.enums.ItemEnum;
+import com.abin.mallchat.common.user.domain.enums.ItemTypeEnum;
+import com.abin.mallchat.common.user.service.IUserBackpackService;
+import com.abin.mallchat.common.user.service.cache.ItemCache;
+import com.abin.mallchat.common.user.service.cache.UserCache;
+import com.abin.mallchat.custom.common.event.UserRegisterEvent;
+import com.abin.mallchat.custom.user.domain.vo.request.user.ModifyNameReq;
+import com.abin.mallchat.custom.user.domain.vo.request.user.WearingBadgeReq;
+import com.abin.mallchat.custom.user.domain.vo.response.user.BadgeResp;
+import com.abin.mallchat.custom.user.domain.vo.response.user.UserInfoResp;
+import com.abin.mallchat.custom.user.service.UserService;
+import com.abin.mallchat.custom.user.service.adapter.UserAdapter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * Description: 用户基础操作类
+ * Author: <a href="https://github.com/zongzibinbin">abin</a>
+ * Date: 2023-03-19
+ */
+@Service
+@Slf4j
+public class UserServiceImpl implements UserService {
+
+    @Autowired
+    private UserCache userCache;
+    @Autowired
+    private UserBackpackDao userBackpackDao;
+    @Autowired
+    private UserDao userDao;
+    @Autowired
+    private ItemConfigDao itemConfigDao;
+    @Autowired
+    private IUserBackpackService iUserBackpackService;
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
+    @Autowired
+    private ItemCache itemCache;
+
+    @Override
+    public UserInfoResp getUserInfo(Long uid) {
+        User userInfo = userCache.getUserInfo(uid);
+        Integer countByValidItemId = userBackpackDao.getCountByValidItemId(uid, ItemEnum.MODIFY_NAME_CARD.getId());
+        return UserAdapter.buildUserInfoResp(userInfo, countByValidItemId);
+    }
+
+    @Override
+    @Transactional
+    public void modifyName(Long uid, ModifyNameReq req) {
+        //判断改名卡够不够
+        UserBackpack firstValidItem = userBackpackDao.getFirstValidItem(uid, ItemEnum.MODIFY_NAME_CARD.getId());
+        AssertUtil.isNotEmpty(firstValidItem, "改名次数不够了，等后续活动送改名卡哦");
+        //使用改名卡
+        boolean useSuccess = userBackpackDao.invalidItem(firstValidItem.getItemId());
+        if (useSuccess) {//用乐观锁，就不用分布式锁了
+            //改名
+            userDao.modifyName(uid, req.getName());
+        }
+    }
+
+    @Override
+    public List<BadgeResp> badges(Long uid) {
+        //查询所有徽章
+        List<ItemConfig> itemConfigs =itemCache.getByType(ItemTypeEnum.BADGE.getType());
+        //查询用户拥有的徽章
+        List<UserBackpack> backpacks = userBackpackDao.getByItemIds(uid, itemConfigs.stream().map(ItemConfig::getId).collect(Collectors.toList()));
+        //查询用户当前佩戴的标签
+        User user = userDao.getById(uid);
+        return UserAdapter.buildBadgeResp(itemConfigs, backpacks, user);
+    }
+
+    @Override
+    @Transactional
+    public void wearingBadge(Long uid, WearingBadgeReq req) {
+        //确保有这个徽章
+        UserBackpack firstValidItem = userBackpackDao.getFirstValidItem(uid, req.getBadgeId());
+        AssertUtil.isNotEmpty(firstValidItem, "您没有这个徽章哦，快去达成条件获取吧");
+        //确保物品类型是徽章
+        ItemConfig itemConfig = itemConfigDao.getById(firstValidItem.getItemId());
+        AssertUtil.equal(itemConfig.getType(), ItemTypeEnum.BADGE.getType(), "该徽章不可佩戴");
+        //佩戴徽章
+        userDao.wearingBadge(uid, req.getBadgeId());
+    }
+
+    @Override
+    @Transactional
+    public void register(String openId) {
+        User insert = User.builder().openId(openId).build();
+        userDao.save(insert);
+        applicationEventPublisher.publishEvent(new UserRegisterEvent(this,insert));
+    }
+}
