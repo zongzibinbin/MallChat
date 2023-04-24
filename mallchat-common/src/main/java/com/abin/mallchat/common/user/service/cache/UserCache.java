@@ -92,7 +92,7 @@ public class UserCache {
     public Map<Long, User> getUserInfoBatch(Set<Long> uids) {
         List<String> keys = uids.stream().map(a -> RedisKey.getKey(RedisKey.USER_INFO_STRING, a)).collect(Collectors.toList());
         List<User> mget = redisUtils.mget(keys, User.class);
-        Map<Long, User> map = mget.stream().collect(Collectors.toMap(User::getId, Function.identity()));
+        Map<Long, User> map = mget.stream().filter(Objects::nonNull).collect(Collectors.toMap(User::getId, Function.identity()));
         //还需要load更新的uid
         List<Long> needLoadUidList = uids.stream().filter(a -> !map.containsKey(a)).collect(Collectors.toList());
         if (CollUtil.isNotEmpty(needLoadUidList)) {

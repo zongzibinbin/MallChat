@@ -228,7 +228,7 @@ public class RedisUtils {
     }
 
     public <T> List<T> mget(Collection<String> keys, Class<T> tClass) {
-        List list = redisTemplate.opsForValue().multiGet(keys);
+        List list = stringRedisTemplate.opsForValue().multiGet(keys);
         return (List<T>) list.stream().map(o -> toBeanOrNull(o, tClass)).collect(Collectors.toList());
     }
 
@@ -242,9 +242,17 @@ public class RedisUtils {
             throw new UnsupportedOperationException(e);
         }
     }
+    public static String objToStr(Object o) {
+        try {
+            return jsonMapper.writeValueAsString(o);
+        } catch (Exception e) {
+            throw new UnsupportedOperationException(e);
+        }
+    }
 
     public <T> void mset(Map<String, T> map, long time) {
-        redisTemplate.opsForValue().multiSet(map);
+        Map<String, String> collect = map.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, (e) -> objToStr(e.getValue())));
+        stringRedisTemplate.opsForValue().multiSet(collect);
         map.forEach((key, value) -> {
             expire(key, time);
         });
@@ -915,7 +923,7 @@ public class RedisUtils {
      */
     public Set<TypedTuple<String>> zReverseRangeWithScores(String key,
                                                            long pageSize) {
-        return redisTemplate.opsForZSet().reverseRangeByScoreWithScores(key, Double.MIN_VALUE,
+        return stringRedisTemplate.opsForZSet().reverseRangeByScoreWithScores(key, Double.MIN_VALUE,
                 Double.MAX_VALUE, 0, pageSize);
     }
 
@@ -927,7 +935,7 @@ public class RedisUtils {
      */
     public Set<TypedTuple<String>> zReverseRangeByScoreWithScores(String key,
                                                                   double max, long pageSize) {
-        return redisTemplate.opsForZSet().reverseRangeByScoreWithScores(key, Double.MIN_VALUE, max,
+        return stringRedisTemplate.opsForZSet().reverseRangeByScoreWithScores(key, Double.MIN_VALUE, max,
                 1, pageSize);
     }
 

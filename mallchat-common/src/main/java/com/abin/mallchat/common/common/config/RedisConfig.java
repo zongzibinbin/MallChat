@@ -1,5 +1,9 @@
 package com.abin.mallchat.common.common.config;
 
+import cn.hutool.json.JSONUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
+import net.sf.json.util.JSONUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -49,10 +53,18 @@ public class RedisConfig {
             if (source == null || source.length == 0) {
                 return null;
             }
-            if (type.isInstance(String.class)  || type.isInstance(Character.class)) {
+            if (type.isAssignableFrom(String.class)  || type.isAssignableFrom(Character.class)) {
                 return (T) new String(source);
             }
             return super.deserialize(source, type);
         }
+    }
+
+    @SneakyThrows
+    public static void main(String[] args) {
+        ObjectMapper objectMapper =new ObjectMapper();
+        System.out.println(objectMapper.writeValueAsString(1));
+        System.out.println(objectMapper.writeValueAsString("1"));
+        System.out.println(objectMapper.writeValueAsString(Boolean.TRUE));
     }
 }

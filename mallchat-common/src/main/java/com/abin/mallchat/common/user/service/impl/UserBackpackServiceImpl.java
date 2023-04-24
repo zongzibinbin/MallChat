@@ -34,7 +34,7 @@ public class UserBackpackServiceImpl implements IUserBackpackService {
 
     @Override
     @RedissonLock(key = "#uid")
-    public void acquireItem(Long uid, Long itemId, IdempotentEnum idempotentEnum, String businessId) {//todo 分布式锁
+    public void acquireItem(Long uid, Long itemId, IdempotentEnum idempotentEnum, String businessId) {
         String idempotent = getIdempotent(itemId, idempotentEnum, businessId);
         UserBackpack userBackpack = userBackpackDao.getByIdp(idempotent);
         //幂等检查
