@@ -1,5 +1,6 @@
 package com.abin.mallchat.common.common.utils;
 
+import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.sf.json.util.JSONUtils;
@@ -12,6 +13,7 @@ import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.security.Key;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -24,11 +26,11 @@ public class RedisUtils {
     private static final ObjectMapper jsonMapper = new ObjectMapper();
     public RedisTemplate redisTemplate;
 
-    public StringRedisTemplate stringRedisTemplate;
+    private static StringRedisTemplate stringRedisTemplate;
 
-    public RedisUtils(RedisTemplate redisTemplate, StringRedisTemplate stringRedisTemplate) {
-        this.redisTemplate = redisTemplate;
-        this.stringRedisTemplate = stringRedisTemplate;
+    @PostConstruct
+    public void init() {
+        this.stringRedisTemplate = SpringUtil.getBean(StringRedisTemplate.class);
     }
 
     private static final String LUA_INCR_EXPIRE =
@@ -41,9 +43,9 @@ public class RedisUtils {
                     "  return tonumber(redis.call('INCR',key)) \n" +
                     "end ";
 
-    public Long inc(String key, int time, TimeUnit unit) {
+    public static Long inc(String key, int time, TimeUnit unit) {
         RedisScript<Long> redisScript = new DefaultRedisScript<>(LUA_INCR_EXPIRE, Long.class);
-        return (Long) redisTemplate.execute(redisScript, Collections.singletonList(key), unit.toSeconds(time));
+        return stringRedisTemplate.execute(redisScript, Collections.singletonList(key), unit.toSeconds(time));
     }
 
     /**
@@ -52,10 +54,10 @@ public class RedisUtils {
      * @param key  键
      * @param time 时间(秒)
      */
-    public boolean expire(String key, long time) {
+    public static boolean expire(String key, long time) {
         try {
             if (time > 0) {
-                redisTemplate.expire(key, time, TimeUnit.SECONDS);
+                stringRedisTemplate.expire(key, time, TimeUnit.SECONDS);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -89,8 +91,8 @@ public class RedisUtils {
      * @param key 键 不能为null
      * @return 时间(秒) 返回0代表为永久有效
      */
-    public long getExpire(Object key) {
-        return redisTemplate.getExpire(key, TimeUnit.SECONDS);
+    public static long getExpire(String key) {
+        return stringRedisTemplate.getExpire(key, TimeUnit.SECONDS);
     }
 
     /**
@@ -99,8 +101,8 @@ public class RedisUtils {
      * @param key 键 不能为null
      * @return 时间(秒) 返回0代表为永久有效
      */
-    public long getExpire(Object key, TimeUnit timeUnit) {
-        return redisTemplate.getExpire(key, timeUnit);
+    public static long getExpire(String key, TimeUnit timeUnit) {
+        return stringRedisTemplate.getExpire(key, timeUnit);
     }
 
     /**
@@ -185,19 +187,19 @@ public class RedisUtils {
      *
      * @param keys
      */
-    public void del(String... keys) {
+    public static void del(String... keys) {
         if (keys != null && keys.length > 0) {
             if (keys.length == 1) {
-                boolean result = redisTemplate.delete(keys[0]);
+                boolean result = stringRedisTemplate.delete(keys[0]);
                 log.debug("--------------------------------------------");
                 log.debug(new StringBuilder("删除缓存：").append(keys[0]).append("，结果：").append(result).toString());
                 log.debug("--------------------------------------------");
             } else {
-                Set<Object> keySet = new HashSet<>();
+                Set<String> keySet = new HashSet<>();
                 for (String key : keys) {
-                    keySet.addAll(redisTemplate.keys(key));
+                    keySet.addAll(stringRedisTemplate.keys(key));
                 }
-                long count = redisTemplate.delete(keySet);
+                long count = stringRedisTemplate.delete(keySet);
                 log.debug("--------------------------------------------");
                 log.debug("成功删除缓存：" + keySet.toString());
                 log.debug("缓存删除数量：" + count + "个");
@@ -214,34 +216,28 @@ public class RedisUtils {
      * @param key 键
      * @return 值
      */
-    public Object get(String key) {
-        return key == null ? null : redisTemplate.opsForValue().get(key);
+    public static String get(String key) {
+        return key == null ? null : stringRedisTemplate.opsForValue().get(key);
     }
 
-    public String getStr(String key) {
+    public static String getStr(String key) {
         return stringRedisTemplate.opsForValue().get(key);
     }
 
-    public <T> T get(String key, Class<T> tClass) {
-        Object o = get(key);
-        return toBeanOrNull(o, tClass);
+    public static <T> T get(String key, Class<T> tClass) {
+        String s = get(key);
+        return toBeanOrNull(s, tClass);
     }
 
-    public <T> List<T> mget(Collection<String> keys, Class<T> tClass) {
-        List list = stringRedisTemplate.opsForValue().multiGet(keys);
+    public static <T> List<T> mget(Collection<String> keys, Class<T> tClass) {
+        List<String> list = stringRedisTemplate.opsForValue().multiGet(keys);
         return (List<T>) list.stream().map(o -> toBeanOrNull(o, tClass)).collect(Collectors.toList());
     }
 
-    private <T> T toBeanOrNull(Object o, Class<T> tClass) {
-        return o == null ? null : toObj(o.toString(),tClass);
+    static <T> T toBeanOrNull(String json, Class<T> tClass) {
+        return json == null ? null : JsonUtils.toObj(json, tClass);
     }
-    public static  <T> T toObj(String str, Class<T> clz) {
-        try {
-            return jsonMapper.readValue(str, clz);
-        } catch (Exception e) {
-            throw new UnsupportedOperationException(e);
-        }
-    }
+
     public static String objToStr(Object o) {
         try {
             return jsonMapper.writeValueAsString(o);
@@ -250,7 +246,7 @@ public class RedisUtils {
         }
     }
 
-    public <T> void mset(Map<String, T> map, long time) {
+    public static <T> void mset(Map<String, T> map, long time) {
         Map<String, String> collect = map.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, (e) -> objToStr(e.getValue())));
         stringRedisTemplate.opsForValue().multiSet(collect);
         map.forEach((key, value) -> {
@@ -265,9 +261,9 @@ public class RedisUtils {
      * @param value 值
      * @return true成功 false失败
      */
-    public boolean set(String key, Object value) {
+    public static boolean set(String key, Object value) {
         try {
-            redisTemplate.opsForValue().set(key, value);
+            stringRedisTemplate.opsForValue().set(key, objToStr(value));
             return true;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -306,10 +302,10 @@ public class RedisUtils {
      * @param timeUnit 类型
      * @return true成功 false 失败
      */
-    public boolean set(String key, Object value, long time, TimeUnit timeUnit) {
+    public static boolean set(String key, Object value, long time, TimeUnit timeUnit) {
         try {
             if (time > 0) {
-                redisTemplate.opsForValue().set(key, value, time, timeUnit);
+                stringRedisTemplate.opsForValue().set(key, objToStr(value), time, timeUnit);
             } else {
                 set(key, value);
             }
@@ -756,11 +752,11 @@ public class RedisUtils {
      * @param score
      * @return
      */
-    public Boolean zAdd(String key, String value, double score) {
-        return redisTemplate.opsForZSet().add(key, value, score);
+    public static Boolean zAdd(String key, String value, double score) {
+        return stringRedisTemplate.opsForZSet().add(key, value, score);
     }
 
-    public Boolean zAdd(String key, Object value, double score) {
+    public static Boolean zAdd(String key, Object value, double score) {
         return zAdd(key, value.toString(), score);
     }
 
@@ -782,12 +778,12 @@ public class RedisUtils {
         return redisTemplate.opsForZSet().remove(key, values);
     }
 
-    public Long zRemove(String key, Object value) {
+    public static Long zRemove(String key, Object value) {
         return zRemove(key, value.toString());
     }
 
-    public Long zRemove(String key, String value) {
-        return redisTemplate.opsForZSet().remove(key, value);
+    public static Long zRemove(String key, String value) {
+        return stringRedisTemplate.opsForZSet().remove(key, value);
     }
 
     /**
@@ -921,8 +917,8 @@ public class RedisUtils {
      * @param pageSize
      * @return
      */
-    public Set<TypedTuple<String>> zReverseRangeWithScores(String key,
-                                                           long pageSize) {
+    public static Set<TypedTuple<String>> zReverseRangeWithScores(String key,
+                                                                  long pageSize) {
         return stringRedisTemplate.opsForZSet().reverseRangeByScoreWithScores(key, Double.MIN_VALUE,
                 Double.MAX_VALUE, 0, pageSize);
     }
@@ -933,8 +929,8 @@ public class RedisUtils {
      * @param pageSize
      * @return
      */
-    public Set<TypedTuple<String>> zReverseRangeByScoreWithScores(String key,
-                                                                  double max, long pageSize) {
+    public static Set<TypedTuple<String>> zReverseRangeByScoreWithScores(String key,
+                                                                         double max, long pageSize) {
         return stringRedisTemplate.opsForZSet().reverseRangeByScoreWithScores(key, Double.MIN_VALUE, max,
                 1, pageSize);
     }
@@ -995,8 +991,8 @@ public class RedisUtils {
      * @param key
      * @return
      */
-    public Long zCard(String key) {
-        return redisTemplate.opsForZSet().zCard(key);
+    public static Long zCard(String key) {
+        return stringRedisTemplate.opsForZSet().zCard(key);
     }
 
     /**

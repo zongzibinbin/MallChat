@@ -29,20 +29,18 @@ import java.util.stream.Stream;
 public class UserCache {
 
     @Autowired
-    private RedisUtils redisUtils;
-    @Autowired
     private CursorUtils cursorUtils;
     @Autowired
     private UserDao userDao;
 
     public Long getOnlineNum() {
         String onlineKey = RedisKey.getKey(RedisKey.ONLINE_UID_ZET);
-        return redisUtils.zCard(onlineKey);
+        return RedisUtils.zCard(onlineKey);
     }
 
     public Long getOfflineNum() {
         String offlineKey = RedisKey.getKey(RedisKey.OFFLINE_UID_ZET);
-        return redisUtils.zCard(offlineKey);
+        return RedisUtils.zCard(offlineKey);
     }
 
     //用户上线
@@ -50,9 +48,9 @@ public class UserCache {
         String onlineKey = RedisKey.getKey(RedisKey.ONLINE_UID_ZET);
         String offlineKey = RedisKey.getKey(RedisKey.OFFLINE_UID_ZET);
         //移除离线表
-        redisUtils.zRemove(offlineKey, uid);
+        RedisUtils.zRemove(offlineKey, uid);
         //更新上线表
-        redisUtils.zAdd(onlineKey, uid, optTime.getTime());
+        RedisUtils.zAdd(onlineKey, uid, optTime.getTime());
     }
 
     //用户下线
@@ -60,9 +58,9 @@ public class UserCache {
         String onlineKey = RedisKey.getKey(RedisKey.ONLINE_UID_ZET);
         String offlineKey = RedisKey.getKey(RedisKey.OFFLINE_UID_ZET);
         //移除上线线表
-        redisUtils.zRemove(onlineKey, uid);
+        RedisUtils.zRemove(onlineKey, uid);
         //更新上线表
-        redisUtils.zAdd(offlineKey, uid, optTime.getTime());
+        RedisUtils.zAdd(offlineKey, uid, optTime.getTime());
     }
 
     public CursorPageBaseResp<Pair<Long, Double>> getOnlineCursorPage(CursorPageBaseReq pageBaseReq) {
@@ -91,14 +89,14 @@ public class UserCache {
      */
     public Map<Long, User> getUserInfoBatch(Set<Long> uids) {
         List<String> keys = uids.stream().map(a -> RedisKey.getKey(RedisKey.USER_INFO_STRING, a)).collect(Collectors.toList());
-        List<User> mget = redisUtils.mget(keys, User.class);
+        List<User> mget = RedisUtils.mget(keys, User.class);
         Map<Long, User> map = mget.stream().filter(Objects::nonNull).collect(Collectors.toMap(User::getId, Function.identity()));
         //还需要load更新的uid
         List<Long> needLoadUidList = uids.stream().filter(a -> !map.containsKey(a)).collect(Collectors.toList());
         if (CollUtil.isNotEmpty(needLoadUidList)) {
             List<User> needLoadUserList = userDao.listByIds(needLoadUidList);
             Map<String, User> redisMap = needLoadUserList.stream().collect(Collectors.toMap(a -> RedisKey.getKey(RedisKey.USER_INFO_STRING, a.getId()), Function.identity()));
-            redisUtils.mset(redisMap, 5 * 60);
+            RedisUtils.mset(redisMap, 5 * 60);
             map.putAll(needLoadUserList.stream().collect(Collectors.toMap(User::getId, Function.identity())));
         }
         return map;
@@ -106,7 +104,7 @@ public class UserCache {
 
     public void delUserInfo(Long uid) {
         String key = RedisKey.getKey(RedisKey.USER_INFO_STRING, uid);
-        redisUtils.del(key);
+        RedisUtils.del(key);
     }
 
 }

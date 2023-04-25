@@ -32,8 +32,6 @@ import java.util.*;
 @Aspect
 @Component
 public class FrequencyControlAspect {
-    @Autowired
-    private RedisUtils redisUtils;
 
     @Around("@annotation(com.abin.mallchat.common.common.annotation.FrequencyControl)||@annotation(com.abin.mallchat.common.common.annotation.FrequencyControlContainer)")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -58,7 +56,7 @@ public class FrequencyControlAspect {
         }
         //批量获取redis统计的值
         ArrayList<String> keyList = new ArrayList<>(keyMap.keySet());
-        List<Integer> countList = redisUtils.mget(keyList, Integer.class);
+        List<Integer> countList = RedisUtils.mget(keyList, Integer.class);
         for (int i = 0; i < keyList.size(); i++) {
             String key = keyList.get(i);
             Integer count = countList.get(i);
@@ -73,7 +71,7 @@ public class FrequencyControlAspect {
         } finally {
             //不管成功还是失败，都增加次数
             keyMap.forEach((k, v) -> {
-                redisUtils.inc(k,v.time(),v.unit());
+                RedisUtils.inc(k,v.time(),v.unit());
             });
         }
     }
