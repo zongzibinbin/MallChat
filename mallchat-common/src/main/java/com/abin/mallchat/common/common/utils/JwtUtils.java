@@ -80,7 +80,7 @@ public class JwtUtils {
     public Long getUidOrNull(String token) {
         return Optional.ofNullable(verifyToken(token))
                 .map(map -> map.get(UID_CLAIM))
-                .map(Claim::asLong)
+                 .map(Claim::asLong)
                 .orElse(null);
     }
 

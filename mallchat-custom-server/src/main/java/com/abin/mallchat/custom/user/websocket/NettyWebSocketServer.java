@@ -46,11 +46,11 @@ public class NettyWebSocketServer {
      * 销毁
      */
     @PreDestroy
-    public void destroy() throws InterruptedException {
+    public void destroy() {
         Future<?> future = bossGroup.shutdownGracefully();
         Future<?> future1 = workerGroup.shutdownGracefully();
-        future.sync();
-        future1.sync();
+        future.syncUninterruptibly();
+        future1.syncUninterruptibly();
         log.info("关闭 ws server 成功");
     }
 

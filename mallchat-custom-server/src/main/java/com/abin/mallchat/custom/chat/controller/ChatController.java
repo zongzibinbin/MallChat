@@ -61,15 +61,16 @@ public class ChatController {
 
     @PostMapping("/msg")
     @ApiOperation("发送消息")
-    @FrequencyControl(time = 5,count = 2)
-    @FrequencyControl(time = 30,count = 5)
-    @FrequencyControl(time = 60,count = 10)
+    @FrequencyControl(time = 5,count = 2,target = FrequencyControl.Target.UID)
+    @FrequencyControl(time = 30,count = 5,target = FrequencyControl.Target.UID)
+    @FrequencyControl(time = 60,count = 10,target = FrequencyControl.Target.UID)
     public ApiResult<IdRespVO> sendMsg(@Valid @RequestBody ChatMessageReq request) {
         return ApiResult.success(IdRespVO.id(chatService.sendMsg(request, RequestHolder.get().getUid())));
     }
 
     @PutMapping("/msg/mark")
     @ApiOperation("消息标记")
+    @FrequencyControl(time = 20,count = 3,target = FrequencyControl.Target.UID)
     public ApiResult<Void> setMsgMark(@Valid @RequestBody ChatMessageMarkReq request) {//分布式锁
         chatService.setMsgMark(RequestHolder.get().getUid(),request);
         return ApiResult.success();

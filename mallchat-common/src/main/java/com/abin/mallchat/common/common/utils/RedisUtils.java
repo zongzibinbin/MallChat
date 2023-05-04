@@ -45,7 +45,7 @@ public class RedisUtils {
 
     public static Long inc(String key, int time, TimeUnit unit) {
         RedisScript<Long> redisScript = new DefaultRedisScript<>(LUA_INCR_EXPIRE, Long.class);
-        return stringRedisTemplate.execute(redisScript, Collections.singletonList(key), unit.toSeconds(time));
+        return stringRedisTemplate.execute(redisScript, Collections.singletonList(key), String.valueOf(unit.toSeconds(time)));
     }
 
     /**

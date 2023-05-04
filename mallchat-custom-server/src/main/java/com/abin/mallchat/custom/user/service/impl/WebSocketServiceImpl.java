@@ -51,6 +51,9 @@ public class WebSocketServiceImpl implements WebSocketService {
      * 所有已连接的websocket连接列表和一些额外参数
      */
     private static final ConcurrentHashMap<Channel, WSChannelExtraDTO> ONLINE_WS_MAP = new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<Channel, WSChannelExtraDTO> getOnlineMap(){
+        return ONLINE_WS_MAP;
+    }
 
     public static final int EXPIRE_SECONDS = 60 * 60;
     @Autowired

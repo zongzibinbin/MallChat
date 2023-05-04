@@ -77,6 +77,6 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public Long getValidUid(String token) {
-        return verify(token) ? jwtUtils.getUidOrNull(token) : null;
+        return jwtUtils.getUidOrNull(token);
     }
 }
