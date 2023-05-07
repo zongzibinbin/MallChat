@@ -3,6 +3,7 @@ package com.abin.mallchat.common.user.service.impl;
 import com.abin.mallchat.common.common.annotation.RedissonLock;
 import com.abin.mallchat.common.common.domain.enums.IdempotentEnum;
 import com.abin.mallchat.common.common.domain.enums.YesOrNoEnum;
+import com.abin.mallchat.common.common.event.ItemReceiveEvent;
 import com.abin.mallchat.common.user.dao.ItemConfigDao;
 import com.abin.mallchat.common.user.dao.UserBackpackDao;
 import com.abin.mallchat.common.user.domain.entity.ItemConfig;
@@ -11,7 +12,10 @@ import com.abin.mallchat.common.user.domain.enums.ItemTypeEnum;
 import com.abin.mallchat.common.user.service.IUserBackpackService;
 import com.abin.mallchat.common.user.service.cache.ItemCache;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.SpringApplicationEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
@@ -31,6 +35,8 @@ public class UserBackpackServiceImpl implements IUserBackpackService {
     private ItemConfigDao itemConfigDao;
     @Autowired
     private ItemCache itemCache;
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     @RedissonLock(key = "#uid")
@@ -56,6 +62,8 @@ public class UserBackpackServiceImpl implements IUserBackpackService {
                 .idempotent(idempotent)
                 .build();
         userBackpackDao.save(insert);
+        //用户收到物品的事件
+        applicationEventPublisher.publishEvent(new ItemReceiveEvent(this, insert));
     }
 
     private String getIdempotent(Long itemId, IdempotentEnum idempotentEnum, String businessId) {

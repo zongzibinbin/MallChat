@@ -1,4 +1,4 @@
-package com.abin.mallchat.custom.common.event;
+package com.abin.mallchat.common.common.event;
 
 import com.abin.mallchat.common.chat.domain.entity.Message;
 import lombok.Getter;

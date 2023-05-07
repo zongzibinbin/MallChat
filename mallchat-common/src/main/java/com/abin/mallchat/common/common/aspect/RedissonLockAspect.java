@@ -17,6 +17,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.DefaultParameterNameDiscoverer;
+import org.springframework.core.annotation.Order;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
@@ -35,6 +36,7 @@ import java.util.*;
 @Slf4j
 @Aspect
 @Component
+@Order(0)//确保比事务注解先执行，分布式锁在事务外
 public class RedissonLockAspect {
     @Autowired
     private LockService lockService;

@@ -39,6 +39,13 @@ public interface ChatService {
      * @return
      */
     ChatMessageResp getMsgResp(Message message,Long receiveUid);
+    /**
+     * 根据消息获取消息前端展示的物料
+     * @param msgId
+     * @param receiveUid 接受消息的uid，可null
+     * @return
+     */
+    ChatMessageResp getMsgResp(Long msgId,Long receiveUid);
 
     /**
      * 获取群成员列表

@@ -6,6 +6,7 @@ import cn.hutool.core.lang.Pair;
 import com.abin.mallchat.common.chat.dao.MessageDao;
 import com.abin.mallchat.common.chat.dao.MessageMarkDao;
 import com.abin.mallchat.common.chat.dao.RoomDao;
+import com.abin.mallchat.common.chat.domain.dto.ChatMessageMarkDTO;
 import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.chat.domain.entity.MessageMark;
 import com.abin.mallchat.common.chat.domain.entity.Room;
@@ -28,11 +29,12 @@ import com.abin.mallchat.custom.chat.domain.vo.response.ChatRoomResp;
 import com.abin.mallchat.custom.chat.service.adapter.MemberAdapter;
 import com.abin.mallchat.custom.chat.service.adapter.RoomAdapter;
 import com.abin.mallchat.custom.chat.service.helper.ChatMemberHelper;
-import com.abin.mallchat.custom.common.event.MessageMarkEvent;
-import com.abin.mallchat.custom.common.event.MessageSendEvent;
+import com.abin.mallchat.common.common.event.MessageMarkEvent;
+import com.abin.mallchat.common.common.event.MessageSendEvent;
 import com.abin.mallchat.custom.chat.service.ChatService;
 import com.abin.mallchat.custom.chat.service.adapter.MessageAdapter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -76,19 +78,19 @@ public class ChatServiceImpl implements ChatService {
     @Transactional
     public Long sendMsg(ChatMessageReq request, Long uid) {
         //校验下回复消息
-        Message replyMsg =null;
-        if(Objects.nonNull(request.getReplyMsgId())){
+        Message replyMsg = null;
+        if (Objects.nonNull(request.getReplyMsgId())) {
             replyMsg = messageDao.getById(request.getReplyMsgId());
-            AssertUtil.isNotEmpty(replyMsg,"回复消息不存在");
-            AssertUtil.equal(replyMsg.getRoomId(),request.getRoomId(),"只能回复相同会话内的消息");
+            AssertUtil.isNotEmpty(replyMsg, "回复消息不存在");
+            AssertUtil.equal(replyMsg.getRoomId(), request.getRoomId(), "只能回复相同会话内的消息");
 
         }
         Message insert = MessageAdapter.buildMsgSave(request, uid);
         messageDao.save(insert);
         //如果有回复消息
-        if(Objects.nonNull(replyMsg)){
+        if (Objects.nonNull(replyMsg)) {
             Integer gapCount = messageDao.getGapCount(request.getRoomId(), replyMsg.getId(), insert.getId());
-            messageDao.updateGapCount(insert.getId(),gapCount);
+            messageDao.updateGapCount(insert.getId(), gapCount);
         }
         //发布消息发送事件
         applicationEventPublisher.publishEvent(new MessageSendEvent(this, insert.getId()));
@@ -101,6 +103,12 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
+    public ChatMessageResp getMsgResp(Long msgId, Long receiveUid) {
+        Message msg = messageDao.getById(msgId);
+        return getMsgResp(msg, receiveUid);
+    }
+
+    @Override
     public CursorPageBaseResp<ChatMemberResp> getMemberPage(CursorPageBaseReq request) {
         Pair<ChatActiveStatusEnum, String> pair = ChatMemberHelper.getCursorPair(request.getCursor());
         ChatActiveStatusEnum activeStatusEnum = pair.getKey();
@@ -108,10 +116,10 @@ public class ChatServiceImpl implements ChatService {
         List<ChatMemberResp> resultList = new ArrayList<>();//最终列表
         Boolean isLast = Boolean.FALSE;
         if (activeStatusEnum == ChatActiveStatusEnum.ONLINE) {//在线列表
-             CursorPageBaseResp<Pair<Long, Double>> cursorPage = userCache.getOnlineCursorPage(new CursorPageBaseReq(request.getPageSize(), timeCursor));
+            CursorPageBaseResp<Pair<Long, Double>> cursorPage = userCache.getOnlineCursorPage(new CursorPageBaseReq(request.getPageSize(), timeCursor));
             resultList.addAll(memberAdapter.buildMember(cursorPage.getList(), ChatActiveStatusEnum.ONLINE));//添加在线列表
             if (cursorPage.getIsLast()) {//如果是最后一页,从离线列表再补点数据
-                 Integer leftSize = request.getPageSize() - cursorPage.getList().size();
+                Integer leftSize = request.getPageSize() - cursorPage.getList().size();
                 cursorPage = userCache.getOfflineCursorPage(new CursorPageBaseReq(leftSize, null));
                 resultList.addAll(memberAdapter.buildMember(cursorPage.getList(), ChatActiveStatusEnum.OFFLINE));//添加离线线列表
                 activeStatusEnum = ChatActiveStatusEnum.OFFLINE;
@@ -179,7 +187,9 @@ public class ChatServiceImpl implements ChatService {
                 .build();
         messageMarkDao.save(insert);
         //发布消息标记事件
-        applicationEventPublisher.publishEvent(new MessageMarkEvent(this,request));
+        ChatMessageMarkDTO dto = new ChatMessageMarkDTO();
+        BeanUtils.copyProperties(request, dto);
+        applicationEventPublisher.publishEvent(new MessageMarkEvent(this, dto));
     }
 
     private Integer transformAct(Integer actType) {
@@ -207,7 +217,7 @@ public class ChatServiceImpl implements ChatService {
         userMap = userCache.getUserInfoBatch(uidSet);
         //查询消息标志
         List<MessageMark> msgMark = messageMarkDao.getValidMarkByMsgIdBatch(messages.stream().map(Message::getId).collect(Collectors.toList()));
-        return MessageAdapter.buildMsgResp(messages, replyMap, userMap,msgMark,receiveUid);
+        return MessageAdapter.buildMsgResp(messages, replyMap, userMap, msgMark, receiveUid);
     }
 
 }

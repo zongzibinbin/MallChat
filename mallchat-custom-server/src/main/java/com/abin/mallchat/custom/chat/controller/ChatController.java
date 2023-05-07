@@ -36,11 +36,13 @@ import javax.validation.Valid;
 public class ChatController {
     @Autowired
     private ChatService chatService;
+
     @GetMapping("/public/room/page")
     @ApiOperation("会话列表")
     public ApiResult<CursorPageBaseResp<ChatRoomResp>> getRoomPage(CursorPageBaseReq request) {
         return ApiResult.success(chatService.getRoomPage(request, RequestHolder.get().getUid()));
     }
+
     @GetMapping("/public/member/page")
     @ApiOperation("群成员列表")
     public ApiResult<CursorPageBaseResp<ChatMemberResp>> getMemberPage(CursorPageBaseReq request) {
@@ -61,19 +63,22 @@ public class ChatController {
 
     @PostMapping("/msg")
     @ApiOperation("发送消息")
-    @FrequencyControl(time = 5,count = 2,target = FrequencyControl.Target.UID)
-    @FrequencyControl(time = 30,count = 5,target = FrequencyControl.Target.UID)
-    @FrequencyControl(time = 60,count = 10,target = FrequencyControl.Target.UID)
-    public ApiResult<IdRespVO> sendMsg(@Valid @RequestBody ChatMessageReq request) {
-        return ApiResult.success(IdRespVO.id(chatService.sendMsg(request, RequestHolder.get().getUid())));
+    @FrequencyControl(time = 5, count = 2, target = FrequencyControl.Target.UID)
+    @FrequencyControl(time = 30, count = 5, target = FrequencyControl.Target.UID)
+    @FrequencyControl(time = 60, count = 10, target = FrequencyControl.Target.UID)
+    public ApiResult<ChatMessageResp> sendMsg(@Valid @RequestBody ChatMessageReq request) {
+        Long msgId = chatService.sendMsg(request, RequestHolder.get().getUid());
+        //返回完整消息格式，方便前展示
+        return ApiResult.success(chatService.getMsgResp(msgId, RequestHolder.get().getUid()));
     }
 
     @PutMapping("/msg/mark")
     @ApiOperation("消息标记")
-    @FrequencyControl(time = 20,count = 3,target = FrequencyControl.Target.UID)
+    @FrequencyControl(time = 20, count = 3, target = FrequencyControl.Target.UID)
     public ApiResult<Void> setMsgMark(@Valid @RequestBody ChatMessageMarkReq request) {//分布式锁
-        chatService.setMsgMark(RequestHolder.get().getUid(),request);
+        chatService.setMsgMark(RequestHolder.get().getUid(), request);
         return ApiResult.success();
+
     }
 }
 
