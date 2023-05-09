@@ -216,12 +216,12 @@ public class RedisUtils {
      * @param key 键
      * @return 值
      */
-    public static String get(String key) {
+    private static String get(String key) {
         return key == null ? null : stringRedisTemplate.opsForValue().get(key);
     }
 
     public static String getStr(String key) {
-        return stringRedisTemplate.opsForValue().get(key);
+        return get(key,String.class);
     }
 
     public static <T> T get(String key, Class<T> tClass) {
