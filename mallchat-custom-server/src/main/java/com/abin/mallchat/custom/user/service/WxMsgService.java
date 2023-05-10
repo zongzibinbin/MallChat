@@ -1,6 +1,7 @@
 package com.abin.mallchat.custom.user.service;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.abin.mallchat.common.common.config.ThreadPoolConfig;
 import com.abin.mallchat.common.user.dao.UserDao;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
@@ -70,7 +72,7 @@ public class WxMsgService {
         //保存openid和场景code的关系，后续才能通知到前端
         OPENID_EVENT_CODE_MAP.put(fromUser, eventKey);
         //授权流程,给用户发送授权消息，并且异步通知前端扫码成功
-        threadPoolTaskExecutor.execute(()->webSocketService.scanSuccess(eventKey));
+        threadPoolTaskExecutor.execute(() -> webSocketService.scanSuccess(eventKey));
         String skipUrl = String.format(URL, wxMpService.getWxMpConfigStorage().getAppId(), URLEncoder.encode(callback + "/wx/portal/public/callBack"));
         WxMpXmlOutMessage.TEXT().build();
         return new TextBuilder().build("请点击链接授权：<a href=\"" + skipUrl + "\">登录</a>", wxMpXmlMessage, wxMpService);
@@ -88,12 +90,27 @@ public class WxMsgService {
      */
     public void authorize(WxOAuth2UserInfo userInfo) {
         User user = userDao.getByOpenId(userInfo.getOpenid());
-        User update = UserAdapter.buildAuthorizeUser(user.getId(), userInfo);
         //更新用户信息
-        userDao.updateById(update);
+        fillUserInfo(user.getId(), userInfo);
         //触发用户登录成功操作
         Integer eventKey = OPENID_EVENT_CODE_MAP.get(userInfo.getOpenid());
         login(user.getId(), eventKey);
+    }
+
+    private void fillUserInfo(Long uid, WxOAuth2UserInfo userInfo) {
+        User update = UserAdapter.buildAuthorizeUser(uid, userInfo);
+        for (int i = 0; i < 5; i++) {
+            try {
+                userDao.updateById(update);
+                update.setName("名字重置" + RandomUtil.randomInt(100000));
+                return;
+            } catch (DuplicateKeyException e) {
+                log.info("fill userInfo duplicate uid:{},info:{}", uid, userInfo);
+            } catch (Exception e) {
+                log.error("fill userInfo fail uid:{},info:{}", uid, userInfo);
+            }
+        }
+
     }
 
     private void login(Long uid, Integer eventKey) {

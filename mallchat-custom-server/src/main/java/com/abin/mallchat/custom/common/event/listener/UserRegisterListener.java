@@ -36,7 +36,7 @@ public class UserRegisterListener {
 
     @Async
     @EventListener(classes = UserRegisterEvent.class)
-    public void sendBadge(UserOnlineEvent event) {
+    public void sendBadge(UserRegisterEvent event) {
         User user = event.getUser();
         int count = userDao.count();
         if (count <= 10) {
