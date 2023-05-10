@@ -39,7 +39,7 @@ public class UserBackpackServiceImpl implements IUserBackpackService {
     private ApplicationEventPublisher applicationEventPublisher;
 
     @Override
-    @RedissonLock(key = "#uid")
+    @RedissonLock(key = "#uid",waitTime = 5000)//相同用户会同时发奖，需要排队不能直接拒绝
     public void acquireItem(Long uid, Long itemId, IdempotentEnum idempotentEnum, String businessId) {
         String idempotent = getIdempotent(itemId, idempotentEnum, businessId);
         UserBackpack userBackpack = userBackpackDao.getByIdp(idempotent);
@@ -57,6 +57,7 @@ public class UserBackpackServiceImpl implements IUserBackpackService {
         }
         //发物品
         UserBackpack insert = UserBackpack.builder()
+                .uid(uid)
                 .itemId(itemId)
                 .status(YesOrNoEnum.NO.getStatus())
                 .idempotent(idempotent)

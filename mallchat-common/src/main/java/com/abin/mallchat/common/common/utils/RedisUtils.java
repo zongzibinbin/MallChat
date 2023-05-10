@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class RedisUtils {
-    private static final ObjectMapper jsonMapper = new ObjectMapper();
     public RedisTemplate redisTemplate;
 
     private static StringRedisTemplate stringRedisTemplate;
@@ -219,9 +218,24 @@ public class RedisUtils {
     private static String get(String key) {
         return key == null ? null : stringRedisTemplate.opsForValue().get(key);
     }
-
+    /**
+     * 普通缓存放入
+     *
+     * @param key   键
+     * @param value 值
+     * @return true成功 false失败
+     */
+    public static boolean set(String key, Object value) {
+        try {
+            stringRedisTemplate.opsForValue().set(key, objToStr(value));
+            return true;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return false;
+        }
+    }
     public static String getStr(String key) {
-        return get(key,String.class);
+        return get(key, String.class);
     }
 
     public static <T> T get(String key, Class<T> tClass) {
@@ -239,11 +253,7 @@ public class RedisUtils {
     }
 
     public static String objToStr(Object o) {
-        try {
-            return jsonMapper.writeValueAsString(o);
-        } catch (Exception e) {
-            throw new UnsupportedOperationException(e);
-        }
+        return JsonUtils.toStr(o);
     }
 
     public static <T> void mset(Map<String, T> map, long time) {
@@ -254,22 +264,7 @@ public class RedisUtils {
         });
     }
 
-    /**
-     * 普通缓存放入
-     *
-     * @param key   键
-     * @param value 值
-     * @return true成功 false失败
-     */
-    public static boolean set(String key, Object value) {
-        try {
-            stringRedisTemplate.opsForValue().set(key, objToStr(value));
-            return true;
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return false;
-        }
-    }
+
 
     /**
      * 普通缓存放入并设置时间

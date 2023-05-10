@@ -38,7 +38,7 @@ public class UserRegisterListener {
     @EventListener(classes = UserRegisterEvent.class)
     public void sendBadge(UserRegisterEvent event) {
         User user = event.getUser();
-        int count = userDao.count();
+        int count = userDao.count();//todo 性能瓶颈，等注册用户多了直接删掉
         if (count <= 10) {
             iUserBackpackService.acquireItem(user.getId(), ItemEnum.REG_TOP10_BADGE.getId(), IdempotentEnum.UID, user.getId().toString());
         } else if (count <= 100) {
