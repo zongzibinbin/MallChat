@@ -1,5 +1,7 @@
 package com.abin.mallchat.common.common.annotation;
 
+import org.springframework.core.annotation.AliasFor;
+
 import java.lang.annotation.*;
 import java.util.concurrent.TimeUnit;
 

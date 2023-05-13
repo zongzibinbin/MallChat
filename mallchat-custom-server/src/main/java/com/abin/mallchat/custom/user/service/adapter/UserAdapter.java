@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import me.chanjar.weixin.mp.bean.result.WxMpUser;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -54,6 +55,8 @@ public class UserAdapter {
             resp.setObtain(obtainItemSet.contains(a.getId()) ? YesOrNoEnum.YES.getStatus() : YesOrNoEnum.NO.getStatus());
             resp.setWearing(ObjectUtil.equal(a.getId(), user.getItemId()) ? YesOrNoEnum.YES.getStatus() : YesOrNoEnum.NO.getStatus());
             return resp;
-        }).collect(Collectors.toList());
+        }).sorted(Comparator.comparing(BadgeResp::getWearing, Comparator.reverseOrder())
+                .thenComparing(BadgeResp::getObtain, Comparator.reverseOrder()))
+                .collect(Collectors.toList());
     }
 }

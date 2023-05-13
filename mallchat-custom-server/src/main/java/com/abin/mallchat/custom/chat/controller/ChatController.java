@@ -2,6 +2,7 @@ package com.abin.mallchat.custom.chat.controller;
 
 
 import com.abin.mallchat.common.common.annotation.FrequencyControl;
+import com.abin.mallchat.common.common.annotation.FrequencyControlContainer;
 import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
 import com.abin.mallchat.common.common.domain.vo.response.ApiResult;
 import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
@@ -68,14 +69,14 @@ public class ChatController {
     @FrequencyControl(time = 60, count = 10, target = FrequencyControl.Target.UID)
     public ApiResult<ChatMessageResp> sendMsg(@Valid @RequestBody ChatMessageReq request) {
         Long msgId = chatService.sendMsg(request, RequestHolder.get().getUid());
-        //返回完整消息格式，方便前展示
+        //返回完整消息格式，方便前端展示
         return ApiResult.success(chatService.getMsgResp(msgId, RequestHolder.get().getUid()));
     }
 
     @PutMapping("/msg/mark")
     @ApiOperation("消息标记")
     @FrequencyControl(time = 20, count = 3, target = FrequencyControl.Target.UID)
-    public ApiResult<Void> setMsgMark(@Valid @RequestBody ChatMessageMarkReq request) {//分布式锁
+    public ApiResult<Void> setMsgMark(@Valid @RequestBody ChatMessageMarkReq request) {
         chatService.setMsgMark(RequestHolder.get().getUid(), request);
         return ApiResult.success();
 

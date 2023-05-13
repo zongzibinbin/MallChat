@@ -10,6 +10,7 @@ import com.abin.mallchat.common.chat.domain.dto.ChatMessageMarkDTO;
 import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.chat.domain.entity.MessageMark;
 import com.abin.mallchat.common.chat.domain.entity.Room;
+import com.abin.mallchat.common.common.annotation.RedissonLock;
 import com.abin.mallchat.common.common.domain.enums.YesOrNoEnum;
 import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
 import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
@@ -168,6 +169,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
+    @RedissonLock(key = "#uid")
     public void setMsgMark(Long uid, ChatMessageMarkReq request) {
         //用户对该消息的标记
         MessageMark messageMark = messageMarkDao.get(uid, request.getMsgId(), request.getMarkType());
