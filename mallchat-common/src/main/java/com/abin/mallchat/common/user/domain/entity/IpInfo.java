@@ -16,7 +16,6 @@ import java.util.Optional;
  * @since 2023-03-19
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
 public class IpInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -53,10 +52,10 @@ public class IpInfo implements Serializable {
     }
 
     public void refreshIpDetail(IpDetail ipDetail) {
-        if (Objects.equals(createIp, ipDetail)) {
+        if (Objects.equals(createIp, ipDetail.getIp())) {
             createIpDetail = ipDetail;
         }
-        if (Objects.equals(updateIp, ipDetail)) {
+        if (Objects.equals(updateIp, ipDetail.getIp())) {
             updateIpDetail = ipDetail;
         }
     }

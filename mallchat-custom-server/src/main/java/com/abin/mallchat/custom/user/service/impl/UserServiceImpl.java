@@ -98,7 +98,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public void register(String openId) {
         User insert = User.builder().openId(openId).build();
         userDao.save(insert);
