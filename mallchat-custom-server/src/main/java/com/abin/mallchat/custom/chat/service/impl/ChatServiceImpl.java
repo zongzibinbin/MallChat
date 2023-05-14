@@ -179,6 +179,7 @@ public class ChatServiceImpl implements ChatService {
                     .status(transformAct(request.getActType()))
                     .build();
             messageMarkDao.updateById(update);
+            return;
         }
         //没标记过消息，插入一条新消息
         MessageMark insert = MessageMark.builder()

@@ -4,7 +4,7 @@ public interface IpService {
     /**
      * 异步更新用户ip详情
      *
-     * @param id
+     * @param uid
      */
-    void refreshIpDetailAsync(Long id);
+    void refreshIpDetailAsync(Long uid);
 }
