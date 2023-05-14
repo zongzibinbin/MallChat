@@ -102,15 +102,14 @@ public class WxMsgService {
         for (int i = 0; i < 5; i++) {
             try {
                 userDao.updateById(update);
-                update.setName("名字重置" + RandomUtil.randomInt(100000));
                 return;
             } catch (DuplicateKeyException e) {
                 log.info("fill userInfo duplicate uid:{},info:{}", uid, userInfo);
             } catch (Exception e) {
                 log.error("fill userInfo fail uid:{},info:{}", uid, userInfo);
             }
+            update.setName("名字重置" + RandomUtil.randomInt(100000));
         }
-
     }
 
     private void login(Long uid, Integer eventKey) {
@@ -119,6 +118,5 @@ public class WxMsgService {
         String token = loginService.login(uid);
         //推送前端登录成功
         webSocketService.scanLoginSuccess(eventKey, user, token);
-
     }
 }

@@ -62,21 +62,26 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void modifyName(Long uid, ModifyNameReq req) {
+        //判断名字是不是重复
+        User oldUser = userDao.getByName(req.getName());
+        AssertUtil.isEmpty(oldUser,"名字已经被抢占了，请换一个哦~~");
         //判断改名卡够不够
         UserBackpack firstValidItem = userBackpackDao.getFirstValidItem(uid, ItemEnum.MODIFY_NAME_CARD.getId());
         AssertUtil.isNotEmpty(firstValidItem, "改名次数不够了，等后续活动送改名卡哦");
         //使用改名卡
-        boolean useSuccess = userBackpackDao.invalidItem(firstValidItem.getItemId());
+        boolean useSuccess = userBackpackDao.invalidItem(firstValidItem.getId());
         if (useSuccess) {//用乐观锁，就不用分布式锁了
             //改名
             userDao.modifyName(uid, req.getName());
+            //删除缓存
+            userCache.delUserInfo(uid);
         }
     }
 
     @Override
     public List<BadgeResp> badges(Long uid) {
         //查询所有徽章
-        List<ItemConfig> itemConfigs =itemCache.getByType(ItemTypeEnum.BADGE.getType());
+        List<ItemConfig> itemConfigs = itemCache.getByType(ItemTypeEnum.BADGE.getType());
         //查询用户拥有的徽章
         List<UserBackpack> backpacks = userBackpackDao.getByItemIds(uid, itemConfigs.stream().map(ItemConfig::getId).collect(Collectors.toList()));
         //查询用户当前佩戴的标签
@@ -101,6 +106,6 @@ public class UserServiceImpl implements UserService {
     public void register(String openId) {
         User insert = User.builder().openId(openId).build();
         userDao.save(insert);
-        applicationEventPublisher.publishEvent(new UserRegisterEvent(this,insert));
+        applicationEventPublisher.publishEvent(new UserRegisterEvent(this, insert));
     }
 }

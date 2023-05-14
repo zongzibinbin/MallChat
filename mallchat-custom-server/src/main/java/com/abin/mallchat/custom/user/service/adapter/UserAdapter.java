@@ -2,6 +2,7 @@ package com.abin.mallchat.custom.user.service.adapter;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.RandomUtil;
 import com.abin.mallchat.common.common.domain.enums.YesOrNoEnum;
 import com.abin.mallchat.common.user.domain.entity.ItemConfig;
 import com.abin.mallchat.common.user.domain.entity.User;
@@ -37,6 +38,11 @@ public class UserAdapter {
         user.setAvatar(userInfo.getHeadImgUrl());
         user.setName(userInfo.getNickname());
         user.setSex(userInfo.getSex());
+        if(userInfo.getNickname().length()>6){
+            user.setName("名字过长"+RandomUtil.randomInt(100000));
+        }else {
+            user.setName(userInfo.getNickname());
+        }
         return user;
     }
 

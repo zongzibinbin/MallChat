@@ -7,6 +7,7 @@ import com.abin.mallchat.common.common.exception.ErrorEnum;
 import com.abin.mallchat.common.user.domain.entity.UserBackpack;
 import org.apache.commons.lang3.StringUtils;
 
+import java.text.MessageFormat;
 import java.util.Objects;
 
 /**
@@ -71,7 +72,7 @@ public class AssertUtil {
         if (Objects.isNull(errorEnum)) {
             errorEnum = BusinessErrorEnum.BUSINESS_ERROR;
         }
-        throw new BusinessException(errorEnum.getErrorCode(), String.format(errorEnum.getErrorMsg(), arg));
+        throw new BusinessException(errorEnum.getErrorCode(), MessageFormat.format(errorEnum.getErrorMsg(), arg));
     }
 
 

@@ -40,9 +40,9 @@ public class UserBackpackDao extends ServiceImpl<UserBackpackMapper, UserBackpac
         return getOne(wrapper);
     }
 
-    public boolean invalidItem(Long itemId) {
+    public boolean invalidItem(Long id) {
         UserBackpack update = new UserBackpack();
-        update.setItemId(itemId);
+        update.setId(id);
         update.setStatus(YesOrNoEnum.YES.getStatus());
         return updateById(update);
     }
