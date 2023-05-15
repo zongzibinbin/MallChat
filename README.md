@@ -67,15 +67,15 @@ MallChat的后端项目，是一个既能购物又能即时聊天的电商系统
 
 更多有趣功能在持续更新中。。。
 
-[![p92Qa2q.png](https://s1.ax1x.com/2023/05/15/p92Qa2q.png)]
+![p92Qa2q.png](https://s1.ax1x.com/2023/05/15/p92Qa2q.png)
 
 ## star 趋势图
 
-[![Stargazers over time](https://starchart.cc/zongzibinbin/MallChat.svg)]
+![Stargazers over time](https://starchart.cc/zongzibinbin/MallChat.svg)
 
 ## 公众号
 
 微信搜索 **阿斌Java之路** 关注我的原创公众号，后台回复「**抹茶**」即可加入抹茶交流群，一些做过公司万人群聊，高并发的小伙伴都在里面讨论方案。公众号也会经常更新项目相关的文档，等你来撩~~
 
-[![p9211Ag.png](https://s1.ax1x.com/2023/05/15/p9211Ag.png)]
+![p9211Ag.png](https://s1.ax1x.com/2023/05/15/p9211Ag.png)
 
