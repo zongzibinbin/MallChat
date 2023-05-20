@@ -754,6 +754,9 @@ public class RedisUtils {
     public static Boolean zAdd(String key, Object value, double score) {
         return zAdd(key, value.toString(), score);
     }
+    public static Boolean zIsMember(String key, Object value) {
+        return Objects.nonNull(stringRedisTemplate.opsForZSet().score(key,value.toString()));
+    }
 
     /**
      * @param key

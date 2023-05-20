@@ -53,6 +53,11 @@ public class UserCache {
         RedisUtils.zAdd(onlineKey, uid, optTime.getTime());
     }
 
+    public boolean isOnline(Long uid) {
+        String onlineKey = RedisKey.getKey(RedisKey.ONLINE_UID_ZET);
+        return RedisUtils.zIsMember(onlineKey, uid);
+    }
+
     //用户下线
     public void offline(Long uid, Date optTime) {
         String onlineKey = RedisKey.getKey(RedisKey.ONLINE_UID_ZET);

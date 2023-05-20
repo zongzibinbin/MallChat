@@ -1,6 +1,8 @@
 package com.abin.mallchat.custom.user.service.handler;
 
 import cn.hutool.json.JSONUtil;
+import com.abin.mallchat.common.chat.dao.WxMsgDao;
+import com.abin.mallchat.common.chat.domain.entity.WxMsg;
 import com.abin.mallchat.custom.user.service.adapter.TextBuilder;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.common.session.WxSessionManager;
@@ -9,6 +11,7 @@ import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutTextMessage;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -21,12 +24,18 @@ import static me.chanjar.weixin.common.api.WxConsts.XmlMsgType;
 @Component
 public class MsgHandler extends AbstractHandler {
 
+    @Autowired
+    private WxMsgDao wxMsgDao;
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage,
                                     Map<String, Object> context, WxMpService weixinService,
                                     WxSessionManager sessionManager) {
         if (true) {
-            return WxMpXmlOutMessage.TEXT().build();
+            WxMsg msg =new WxMsg();
+            msg.setOpenId(wxMessage.getFromUser());
+            msg.setMsg(wxMessage.getContent());
+            wxMsgDao.save(msg);
+            return null;
         }
         if (!wxMessage.getMsgType().equals(XmlMsgType.EVENT)) {
             //可以选择将消息保存到本地

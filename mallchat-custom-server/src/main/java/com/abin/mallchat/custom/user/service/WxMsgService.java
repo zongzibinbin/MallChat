@@ -91,7 +91,9 @@ public class WxMsgService {
     public void authorize(WxOAuth2UserInfo userInfo) {
         User user = userDao.getByOpenId(userInfo.getOpenid());
         //更新用户信息
-        fillUserInfo(user.getId(), userInfo);
+        if(Objects.isNull(user.getName())){
+            fillUserInfo(user.getId(), userInfo);
+        }
         //触发用户登录成功操作
         Integer eventKey = OPENID_EVENT_CODE_MAP.get(userInfo.getOpenid());
         login(user.getId(), eventKey);

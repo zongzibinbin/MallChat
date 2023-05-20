@@ -7,6 +7,7 @@ import com.abin.mallchat.common.chat.domain.enums.MessageMarkTypeEnum;
 import com.abin.mallchat.common.chat.domain.enums.MessageStatusEnum;
 import com.abin.mallchat.common.chat.domain.enums.MessageTypeEnum;
 import com.abin.mallchat.common.common.domain.enums.YesOrNoEnum;
+import com.abin.mallchat.common.user.domain.entity.ItemConfig;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessageReq;
 import com.abin.mallchat.custom.chat.domain.vo.response.ChatMessageResp;
@@ -35,11 +36,11 @@ public class MessageAdapter {
 
     }
 
-    public static List<ChatMessageResp> buildMsgResp(List<Message> messages, Map<Long, Message> replyMap, Map<Long, User> userMap, List<MessageMark> msgMark, Long receiveUid) {
+    public static List<ChatMessageResp> buildMsgResp(List<Message> messages, Map<Long, Message> replyMap, Map<Long, User> userMap, List<MessageMark> msgMark, Long receiveUid, Map<Long, ItemConfig> itemMap) {
         Map<Long, List<MessageMark>> markMap = msgMark.stream().collect(Collectors.groupingBy(MessageMark::getMsgId));
         return messages.stream().map(a -> {
             ChatMessageResp resp = new ChatMessageResp();
-            resp.setFromUser(buildFromUser(userMap.get(a.getFromUid())));
+            resp.setFromUser(buildFromUser(userMap.get(a.getFromUid()),itemMap));
             resp.setMessage(buildMessage(a, replyMap, userMap, markMap.getOrDefault(a.getId(), new ArrayList<>()), receiveUid));
             return resp;
         })
@@ -80,11 +81,18 @@ public class MessageAdapter {
         return mark;
     }
 
-    private static ChatMessageResp.UserInfo buildFromUser(User fromUser) {
+    private static ChatMessageResp.UserInfo buildFromUser(User fromUser, Map<Long, ItemConfig> itemMap) {
         ChatMessageResp.UserInfo userInfo = new ChatMessageResp.UserInfo();
         userInfo.setUsername(fromUser.getName());
         userInfo.setAvatar(fromUser.getAvatar());
         userInfo.setUid(fromUser.getId());
+        if(Objects.nonNull(fromUser.getItemId())){
+            ChatMessageResp.Badge badge =new ChatMessageResp.Badge();
+            ItemConfig itemConfig = itemMap.get(fromUser.getItemId());
+            badge.setImg(itemConfig.getImg());
+            badge.setDescribe(itemConfig.getDescribe());
+            userInfo.setBadge(badge);
+        }
         return userInfo;
     }
 

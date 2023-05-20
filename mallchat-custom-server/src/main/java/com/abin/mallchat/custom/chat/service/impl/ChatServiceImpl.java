@@ -17,8 +17,10 @@ import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
 import com.abin.mallchat.common.common.exception.BusinessException;
 import com.abin.mallchat.common.common.utils.AssertUtil;
 import com.abin.mallchat.common.user.dao.UserDao;
+import com.abin.mallchat.common.user.domain.entity.ItemConfig;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.domain.enums.ChatActiveStatusEnum;
+import com.abin.mallchat.common.user.service.cache.ItemCache;
 import com.abin.mallchat.common.user.service.cache.UserCache;
 import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessageMarkReq;
 import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessagePageReq;
@@ -69,6 +71,8 @@ public class ChatServiceImpl implements ChatService {
     private RoomDao roomDao;
     @Autowired
     private MessageMarkDao messageMarkDao;
+    @Autowired
+    private ItemCache itemCache;
 
     /**
      * 发送消息
@@ -209,7 +213,8 @@ public class ChatServiceImpl implements ChatService {
             return new ArrayList<>();
         }
         Map<Long, Message> replyMap = new HashMap<>();
-        Map<Long, User> userMap = new HashMap<>();
+        Map<Long, User> userMap;
+        Map<Long, ItemConfig> itemMap;
         //批量查出回复的消息
         List<Long> replyIds = messages.stream().map(Message::getReplyMsgId).filter(Objects::nonNull).distinct().collect(Collectors.toList());
         if (CollectionUtil.isNotEmpty(replyIds)) {
@@ -218,9 +223,11 @@ public class ChatServiceImpl implements ChatService {
         //批量查询消息关联用户
         Set<Long> uidSet = Stream.concat(replyMap.values().stream().map(Message::getFromUid), messages.stream().map(Message::getFromUid)).collect(Collectors.toSet());
         userMap = userCache.getUserInfoBatch(uidSet);
+        //批量查询item信息
+        itemMap = userMap.values().stream().map(User::getItemId).distinct().filter(Objects::nonNull).map(itemCache::getById).collect(Collectors.toMap(ItemConfig::getId,Function.identity()));
         //查询消息标志
         List<MessageMark> msgMark = messageMarkDao.getValidMarkByMsgIdBatch(messages.stream().map(Message::getId).collect(Collectors.toList()));
-        return MessageAdapter.buildMsgResp(messages, replyMap, userMap, msgMark, receiveUid);
+        return MessageAdapter.buildMsgResp(messages, replyMap, userMap, msgMark, receiveUid,itemMap);
     }
 
 }

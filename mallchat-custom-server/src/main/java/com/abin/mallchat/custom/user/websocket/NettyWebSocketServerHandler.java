@@ -86,17 +86,18 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
     // 读取客户端发送的请求报文
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) throws Exception {
-        log.info("服务器端收到消息 = " + msg.text());
         WSBaseReq wsBaseReq = JSONUtil.toBean(msg.text(), WSBaseReq.class);
         WSReqTypeEnum wsReqTypeEnum = WSReqTypeEnum.of(wsBaseReq.getType());
         switch (wsReqTypeEnum) {
             case LOGIN:
                 getService().handleLoginReq(ctx.channel());
+                log.info("请求二维码 = " + msg.text());
                 break;
             case HEARTBEAT:
                 break;
             case AUTHORIZE:
                 getService().authorize(ctx.channel(), JSONUtil.toBean(wsBaseReq.getData(), WSAuthorize.class));
+                log.info("主动认证 = " + msg.text());
             default:
                 log.info("未知类型");
         }

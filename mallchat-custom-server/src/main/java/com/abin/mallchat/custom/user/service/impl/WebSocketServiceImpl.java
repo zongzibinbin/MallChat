@@ -7,6 +7,7 @@ import com.abin.mallchat.common.common.config.ThreadPoolConfig;
 import com.abin.mallchat.common.user.dao.UserDao;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.common.event.UserOfflineEvent;
+import com.abin.mallchat.common.user.service.cache.UserCache;
 import com.abin.mallchat.custom.user.domain.dto.ws.WSChannelExtraDTO;
 import com.abin.mallchat.custom.user.domain.vo.request.ws.WSAuthorize;
 import com.abin.mallchat.custom.user.domain.vo.response.ws.WSBaseResp;
@@ -51,7 +52,8 @@ public class WebSocketServiceImpl implements WebSocketService {
      * 所有已连接的websocket连接列表和一些额外参数
      */
     private static final ConcurrentHashMap<Channel, WSChannelExtraDTO> ONLINE_WS_MAP = new ConcurrentHashMap<>();
-    public static ConcurrentHashMap<Channel, WSChannelExtraDTO> getOnlineMap(){
+
+    public static ConcurrentHashMap<Channel, WSChannelExtraDTO> getOnlineMap() {
         return ONLINE_WS_MAP;
     }
 
@@ -67,6 +69,8 @@ public class WebSocketServiceImpl implements WebSocketService {
     @Autowired
     @Qualifier(ThreadPoolConfig.WS_EXECUTOR)
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
+    @Autowired
+    private UserCache userCache;
 
     /**
      * 处理用户登录请求，需要返回一张带code的二维码
@@ -144,11 +148,13 @@ public class WebSocketServiceImpl implements WebSocketService {
         //返回给用户登录成功
         sendMsg(channel, WSAdapter.buildLoginSuccessResp(user, token));
         //发送用户上线事件
-        user.setLastOptTime(new Date());
-        user.getIpInfo().refreshIp(NettyUtil.getAttr(channel, NettyUtil.IP));
-        applicationEventPublisher.publishEvent(new UserOnlineEvent(this, user));
+        boolean online = userCache.isOnline(user.getId());
+        if (!online) {
+            user.setLastOptTime(new Date());
+            user.getIpInfo().refreshIp(NettyUtil.getAttr(channel, NettyUtil.IP));
+            applicationEventPublisher.publishEvent(new UserOnlineEvent(this, user));
+        }
     }
-
 
     /**
      * 用户上线

@@ -85,7 +85,7 @@ public class ChatMessageResp {
         private Integer userDislike;
     }
     @Data
-    private static class Badge {
+    public static class Badge {
         @ApiModelProperty("徽章图像")
         private String img;
         @ApiModelProperty("徽章说明")
