@@ -1,5 +1,6 @@
 package com.abin.mallchat.custom.user.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -52,6 +54,10 @@ public class WebSocketServiceImpl implements WebSocketService {
      * 所有已连接的websocket连接列表和一些额外参数
      */
     private static final ConcurrentHashMap<Channel, WSChannelExtraDTO> ONLINE_WS_MAP = new ConcurrentHashMap<>();
+    /**
+     * 所有在线的用户和对应的socket
+     */
+    private static final ConcurrentHashMap<Long, CopyOnWriteArrayList<Channel>> ONLINE_UID_MAP = new ConcurrentHashMap<>();
 
     public static ConcurrentHashMap<Channel, WSChannelExtraDTO> getOnlineMap() {
         return ONLINE_WS_MAP;
@@ -118,8 +124,8 @@ public class WebSocketServiceImpl implements WebSocketService {
         WSChannelExtraDTO wsChannelExtraDTO = ONLINE_WS_MAP.get(channel);
         Optional<Long> uidOptional = Optional.ofNullable(wsChannelExtraDTO)
                 .map(WSChannelExtraDTO::getUid);
-        ONLINE_WS_MAP.remove(channel);
-        if (uidOptional.isPresent()) {//已登录用户断连，需要下线通知
+        boolean offlineAll = offline(channel, uidOptional);
+        if (uidOptional.isPresent() && offlineAll) {//已登录用户断连,并且全下线成功
             User user = new User();
             user.setId(uidOptional.get());
             user.setLastOptTime(new Date());
@@ -161,8 +167,25 @@ public class WebSocketServiceImpl implements WebSocketService {
      */
     private void online(Channel channel, Long uid) {
         getOrInitChannelExt(channel).setUid(uid);
+        ONLINE_UID_MAP.putIfAbsent(uid, new CopyOnWriteArrayList<>());
+        ONLINE_UID_MAP.get(uid).add(channel);
     }
 
+    /**
+     * 用户下线
+     * return 是否全下线成功
+     */
+    private boolean offline(Channel channel, Optional<Long> uidOptional) {
+        ONLINE_WS_MAP.remove(channel);
+        if (uidOptional.isPresent()) {
+            CopyOnWriteArrayList<Channel> channels = ONLINE_UID_MAP.get(uidOptional.get());
+            if (CollectionUtil.isNotEmpty(channels)) {
+                channels.removeIf(channel1 -> channel1.equals(channel));
+            }
+            return CollectionUtil.isEmpty(ONLINE_UID_MAP.get(uidOptional.get()));
+        }
+        return true;
+    }
 
     @Override
     public Boolean scanLoginSuccess(Integer loginCode, User user, String token) {

@@ -66,6 +66,7 @@ Temporary Items
 CodeGenerator.java
 TestController.java
 application-my-prod.properties
+application-remote-prod.properties
 mybatis-generator-config.xml
 ChannelBizRankClient.java
 ChannelBizBrandWallClient.java
