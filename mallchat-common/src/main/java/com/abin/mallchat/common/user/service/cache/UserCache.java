@@ -8,15 +8,20 @@ import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
 import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
 import com.abin.mallchat.common.common.utils.CursorUtils;
 import com.abin.mallchat.common.common.utils.RedisUtils;
+import com.abin.mallchat.common.user.dao.BlackDao;
 import com.abin.mallchat.common.user.dao.UserDao;
+import com.abin.mallchat.common.user.domain.entity.Black;
 import com.abin.mallchat.common.user.domain.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.security.PublicKey;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -32,6 +37,8 @@ public class UserCache {
     private CursorUtils cursorUtils;
     @Autowired
     private UserDao userDao;
+    @Autowired
+    private BlackDao blackDao;
 
     public Long getOnlineNum() {
         String onlineKey = RedisKey.getKey(RedisKey.ONLINE_UID_ZET);
@@ -112,4 +119,17 @@ public class UserCache {
         RedisUtils.del(key);
     }
 
+    @Cacheable(cacheNames = "user", key = "'blackList'")
+    public Map<Integer, Set<String>> getBlackMap() {
+        Map<Integer, List<Black>> collect = blackDao.list().stream().collect(Collectors.groupingBy(Black::getType));
+        Map<Integer, Set<String>> result =new HashMap<>();
+        for (Map.Entry<Integer, List<Black>> entry : collect.entrySet()) {
+            result.put(entry.getKey(),entry.getValue().stream().map(Black::getTarget).collect(Collectors.toSet()));
+        }
+        return result;
+    }
+    @CacheEvict(cacheNames = "user", key = "'blackList'")
+    public Map<Integer, Set<String>> evictBlackMap() {
+        return null;
+    }
 }

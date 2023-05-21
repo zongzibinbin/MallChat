@@ -1,9 +1,6 @@
 package com.abin.mallchat.custom.user.domain.enums;
 
-import com.abin.mallchat.custom.user.domain.vo.response.ws.WSLoginSuccess;
-import com.abin.mallchat.custom.user.domain.vo.response.ws.WSLoginUrl;
-import com.abin.mallchat.custom.user.domain.vo.response.ws.WSMessage;
-import com.abin.mallchat.custom.user.domain.vo.response.ws.WSOnlineOfflineNotify;
+import com.abin.mallchat.custom.user.domain.vo.response.ws.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -26,6 +23,7 @@ public enum WSRespTypeEnum {
     MESSAGE(4, "新消息", WSMessage.class),
     ONLINE_OFFLINE_NOTIFY(5, "上下线通知", WSOnlineOfflineNotify.class),
     INVALIDATE_TOKEN(6, "使前端的token失效，意味着前端需要重新登录", null),
+    BLACK(7, "拉黑用户", WSBlack.class),
     ;
 
     private final Integer type;

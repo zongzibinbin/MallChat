@@ -21,7 +21,7 @@ public class CacheConfig extends CachingConfigurerSupport {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager();
         // 方案一(常用)：定制化缓存Cache
         cacheManager.setCaffeine(Caffeine.newBuilder()
-                .expireAfterWrite(10, TimeUnit.MINUTES)
+                .expireAfterWrite(5, TimeUnit.MINUTES)
                 .initialCapacity(100)
                 .maximumSize(200));
         return cacheManager;

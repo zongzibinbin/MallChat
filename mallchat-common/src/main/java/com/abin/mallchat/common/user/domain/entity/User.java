@@ -82,6 +82,12 @@ public class User implements Serializable {
     private Long itemId;
 
     /**
+     * 用户状态 0正常 1拉黑
+     */
+    @TableField("status")
+    private Integer status;
+
+    /**
      * 创建时间
      */
     @TableField("create_time")

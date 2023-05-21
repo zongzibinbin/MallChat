@@ -117,6 +117,7 @@ CREATE TABLE `user`  (
   `last_opt_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '最后上下线时间',
   `ip_info` json NULL COMMENT 'ip信息',
   `item_id` bigint(20) NULL DEFAULT NULL COMMENT '佩戴的徽章id',
+  `status` int(11) DEFAULT "0" COMMENT '使用状态 0.正常 1拉黑',
   `create_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
   `update_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE,
@@ -158,4 +159,14 @@ CREATE TABLE `wx_msg`  (
   INDEX `idx_update_time`(`update_time`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '微信消息表' ROW_FORMAT = Dynamic;
 
+DROP TABLE IF EXISTS `black`;
+CREATE TABLE `black`  (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `type` int(11) NOT NULL COMMENT '拉黑目标类型 1.ip 2uid',
+  `target` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '拉黑目标',
+  `create_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
+  `update_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '修改时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `idx_type_target`(`type`, `target`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '黑名单' ROW_FORMAT = Dynamic;
 SET FOREIGN_KEY_CHECKS = 1;

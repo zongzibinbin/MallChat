@@ -17,16 +17,10 @@ import java.util.Optional;
 /**
  * 信息收集的拦截器
  */
-@Order
+@Order(1)
 @Slf4j
 @Component
-public class CollectorInterceptor implements HandlerInterceptor, WebMvcConfigurer {
-
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(this)
-                .addPathPatterns("/**");
-    }
+public class CollectorInterceptor implements HandlerInterceptor{
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {

@@ -7,6 +7,9 @@ import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
 import com.abin.mallchat.common.common.domain.vo.response.ApiResult;
 import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
 import com.abin.mallchat.common.common.domain.vo.response.IdRespVO;
+import com.abin.mallchat.common.user.dao.UserDao;
+import com.abin.mallchat.common.user.domain.enums.BlackTypeEnum;
+import com.abin.mallchat.common.user.service.cache.UserCache;
 import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessageMarkReq;
 import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessagePageReq;
 import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessageReq;
@@ -22,6 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <p>
@@ -37,6 +42,8 @@ import javax.validation.Valid;
 public class ChatController {
     @Autowired
     private ChatService chatService;
+    @Autowired
+    private UserCache userCache;
 
     @GetMapping("/public/room/page")
     @ApiOperation("会话列表")
@@ -47,7 +54,16 @@ public class ChatController {
     @GetMapping("/public/member/page")
     @ApiOperation("群成员列表")
     public ApiResult<CursorPageBaseResp<ChatMemberResp>> getMemberPage(CursorPageBaseReq request) {
-        return ApiResult.success(chatService.getMemberPage(request));
+        CursorPageBaseResp<ChatMemberResp> memberPage = chatService.getMemberPage(request);
+        filterBlackMember(memberPage);
+        return ApiResult.success(memberPage);
+    }
+
+    private void filterBlackMember(CursorPageBaseResp<ChatMemberResp> memberPage) {
+        memberPage.getList().removeIf(a->getBlackUidSet().contains(a.getUid().toString()));
+    }
+    private Set<String> getBlackUidSet(){
+        return userCache.getBlackMap().get(BlackTypeEnum.UID.getType());
     }
 
     @GetMapping("/public/member/statistic")
@@ -59,9 +75,14 @@ public class ChatController {
     @GetMapping("/public/msg/page")
     @ApiOperation("消息列表")
     public ApiResult<CursorPageBaseResp<ChatMessageResp>> getMsgPage(ChatMessagePageReq request) {
-        return ApiResult.success(chatService.getMsgPage(request, RequestHolder.get().getUid()));
+        CursorPageBaseResp<ChatMessageResp> msgPage = chatService.getMsgPage(request, RequestHolder.get().getUid());
+        filterBlackMsg(msgPage);
+        return ApiResult.success(msgPage);
     }
-
+    private void filterBlackMsg(CursorPageBaseResp<ChatMessageResp> memberPage) {
+        memberPage.getList().removeIf(a->getBlackUidSet().contains(a.getFromUser().getUid().toString()));
+        System.out.println(1);
+    }
     @PostMapping("/msg")
     @ApiOperation("发送消息")
     @FrequencyControl(time = 5, count = 2, target = FrequencyControl.Target.UID)
