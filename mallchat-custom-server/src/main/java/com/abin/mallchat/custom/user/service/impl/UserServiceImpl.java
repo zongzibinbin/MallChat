@@ -90,7 +90,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public void wearingBadge(Long uid, WearingBadgeReq req) {
         //确保有这个徽章
         UserBackpack firstValidItem = userBackpackDao.getFirstValidItem(uid, req.getBadgeId());
@@ -100,6 +99,8 @@ public class UserServiceImpl implements UserService {
         AssertUtil.equal(itemConfig.getType(), ItemTypeEnum.BADGE.getType(), "该徽章不可佩戴");
         //佩戴徽章
         userDao.wearingBadge(uid, req.getBadgeId());
+        //删除用户缓存
+        userCache.delUserInfo(uid);
     }
 
     @Override

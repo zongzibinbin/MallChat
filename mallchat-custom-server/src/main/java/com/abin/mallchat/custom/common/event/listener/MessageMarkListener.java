@@ -38,7 +38,7 @@ public class MessageMarkListener {
     public void changeMsgType(MessageMarkEvent event) {
         ChatMessageMarkDTO dto = event.getDto();
         Message msg = messageDao.getById(dto.getMsgId());
-        if (!Objects.equals(msg, MessageTypeEnum.NORMAL.getType())) {//普通消息才需要升级
+        if (!Objects.equals(msg.getType(), MessageTypeEnum.NORMAL.getType())) {//普通消息才需要升级
             return;
         }
         //消息被标记次数
