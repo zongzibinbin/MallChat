@@ -75,7 +75,7 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
     // 处理异常
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        log.warn("异常发生，异常消息 ={}" + cause.getMessage());
+        log.warn("异常发生，异常消息 ={}" , cause.getMessage());
         ctx.channel().close();
     }
 

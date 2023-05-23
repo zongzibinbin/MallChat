@@ -67,16 +67,24 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public String login(Long uid) {
-        //获取用户token
-        String token = jwtUtils.createToken(uid);
-        //存储到redis
         String key = RedisKey.getKey(RedisKey.USER_TOKEN_STRING, uid);
-        redisUtils.set(key, token, TOKEN_EXPIRE_DAYS, TimeUnit.DAYS);//token过期用redis中心化控制，初期采用5天过期，剩1天自动续期的方案。后续可以用双token实现
+        String token = redisUtils.getStr(key);
+        if (StrUtil.isNotBlank(token)) {
+            return token;
+        }
+        //获取用户token
+        token = jwtUtils.createToken(uid);
+        RedisUtils.set(key, token, TOKEN_EXPIRE_DAYS, TimeUnit.DAYS);//token过期用redis中心化控制，初期采用5天过期，剩1天自动续期的方案。后续可以用双token实现
         return token;
     }
 
     @Override
     public Long getValidUid(String token) {
-        return jwtUtils.getUidOrNull(token);
+        boolean verify = verify(token);
+        return verify ? jwtUtils.getUidOrNull(token) : null;
+    }
+
+    public static void main(String[] args) {
+        System.out.println();
     }
 }
