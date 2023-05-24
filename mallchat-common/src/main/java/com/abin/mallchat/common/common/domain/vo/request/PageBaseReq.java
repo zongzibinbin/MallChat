@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.Max;
+
 /**
  * @author <a href="https://github.com/zongzibinbin">abin</a>
  * @since 2023-03-19
@@ -14,6 +16,7 @@ import lombok.Data;
 public class PageBaseReq{
 
     @ApiModelProperty("页面大小")
+    @Max(50)
     private Integer pageSize = 10;
 
     @ApiModelProperty("页面索引（从1开始）")
