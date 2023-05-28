@@ -1,17 +1,14 @@
 package com.abin.mallchat.common.chat.domain.entity;
 
-import com.abin.mallchat.common.user.domain.entity.IpInfo;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.TableField;
-import java.io.Serializable;
-import java.util.Date;
-
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
-import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>
@@ -23,7 +20,7 @@ import lombok.experimental.Accessors;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName(value = "message",autoResultMap = true)
+@TableName(value = "message", autoResultMap = true)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -34,7 +31,7 @@ public class Message implements Serializable {
     /**
      * id
      */
-      @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
@@ -63,6 +60,7 @@ public class Message implements Serializable {
 
     /**
      * 消息状态 0正常 1删除
+     *
      * @see com.abin.mallchat.common.chat.domain.enums.MessageStatusEnum
      */
     @TableField("status")
@@ -76,6 +74,7 @@ public class Message implements Serializable {
 
     /**
      * 消息类型 1正常文本 2.爆赞 （点赞超过10）3.危险发言（举报超5）
+     *
      * @see com.abin.mallchat.common.chat.domain.enums.MessageTypeEnum
      */
     @TableField("type")

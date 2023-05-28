@@ -11,8 +11,8 @@ import com.abin.mallchat.custom.user.domain.vo.response.user.BadgeResp;
 import com.abin.mallchat.custom.user.domain.vo.response.user.UserInfoResp;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
-import me.chanjar.weixin.mp.bean.result.WxMpUser;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -38,9 +38,9 @@ public class UserAdapter {
         user.setAvatar(userInfo.getHeadImgUrl());
         user.setName(userInfo.getNickname());
         user.setSex(userInfo.getSex());
-        if(userInfo.getNickname().length()>6){
-            user.setName("名字过长"+RandomUtil.randomInt(100000));
-        }else {
+        if (userInfo.getNickname().length() > 6) {
+            user.setName("名字过长" + RandomUtil.randomInt(100000));
+        } else {
             user.setName(userInfo.getNickname());
         }
         return user;
@@ -54,6 +54,10 @@ public class UserAdapter {
     }
 
     public static List<BadgeResp> buildBadgeResp(List<ItemConfig> itemConfigs, List<UserBackpack> backpacks, User user) {
+        if (ObjectUtil.isNull(user)) {
+            return Collections.emptyList();
+        }
+
         Set<Long> obtainItemSet = backpacks.stream().map(UserBackpack::getItemId).collect(Collectors.toSet());
         return itemConfigs.stream().map(a -> {
             BadgeResp resp = new BadgeResp();

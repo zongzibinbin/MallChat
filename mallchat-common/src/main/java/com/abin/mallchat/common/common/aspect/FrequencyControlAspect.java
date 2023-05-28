@@ -12,14 +12,8 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.DefaultParameterNameDiscoverer;
-import org.springframework.expression.EvaluationContext;
-import org.springframework.expression.Expression;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Component;
+
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -71,7 +65,7 @@ public class FrequencyControlAspect {
         } finally {
             //不管成功还是失败，都增加次数
             keyMap.forEach((k, v) -> {
-                RedisUtils.inc(k,v.time(),v.unit());
+                RedisUtils.inc(k, v.time(), v.unit());
             });
         }
     }

@@ -1,6 +1,5 @@
 package com.abin.mallchat.common.chat.domain.entity;
 
-import com.abin.mallchat.common.user.domain.entity.IpDetail;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +19,8 @@ import java.util.Map;
 @NoArgsConstructor
 public class MessageExtra implements Serializable {
     private static final long serialVersionUID = 1L;
-    //注册时的ip
+    /**
+     * 注册时的ip
+     */
     private Map<String, String> urlTitleMap;
 }

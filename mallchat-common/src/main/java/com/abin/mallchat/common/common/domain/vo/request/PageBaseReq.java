@@ -13,7 +13,8 @@ import javax.validation.constraints.Max;
  */
 @Data
 @ApiModel("基础翻页请求")
-public class PageBaseReq{
+@SuppressWarnings("rawtypes")
+public class PageBaseReq {
 
     @ApiModelProperty("页面大小")
     @Max(50)
@@ -25,7 +26,7 @@ public class PageBaseReq{
     /**
      * 获取mybatisPlus的page
      *
-     * @return
+     * @return {@link Page}
      */
     public Page plusPage() {
         return new Page(pageNo, pageSize);

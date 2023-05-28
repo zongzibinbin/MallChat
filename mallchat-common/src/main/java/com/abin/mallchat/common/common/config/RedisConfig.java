@@ -1,9 +1,7 @@
 package com.abin.mallchat.common.common.config;
 
-import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
-import net.sf.json.util.JSONUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -11,12 +9,15 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.SerializationException;
-import org.springframework.data.redis.serializer.SerializationUtils;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
-import java.net.UnknownHostException;
 import java.util.Objects;
 
+/**
+ * @author Real
+ * @date 2023/05/28 18:56
+ */
 @Configuration
 public class RedisConfig {
     @Bean
@@ -26,8 +27,7 @@ public class RedisConfig {
         // 设置连接工厂
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         // 设置序列化工具
-        MyRedisSerializerCustomized jsonRedisSerializer =
-                new MyRedisSerializerCustomized();
+        MyRedisSerializerCustomized jsonRedisSerializer = new MyRedisSerializerCustomized();
         // key和 hashKey采用 string序列化
         redisTemplate.setKeySerializer(RedisSerializer.string());
         redisTemplate.setHashKeySerializer(RedisSerializer.string());
@@ -36,7 +36,8 @@ public class RedisConfig {
         redisTemplate.setHashValueSerializer(jsonRedisSerializer);
         return redisTemplate;
     }
-    public class MyRedisSerializerCustomized extends GenericJackson2JsonRedisSerializer {
+
+    public static class MyRedisSerializerCustomized extends GenericJackson2JsonRedisSerializer {
         @Override
         public byte[] serialize(Object source) throws SerializationException {
             if (Objects.nonNull(source)) {
@@ -46,14 +47,16 @@ public class RedisConfig {
             }
             return super.serialize(source);
         }
+
         @Override
-        public <T> T deserialize(byte[] source, Class<T> type) throws SerializationException {
+        @SuppressWarnings("unchecked")
+        public <T> T deserialize(byte[] source, @Nullable Class<T> type) throws SerializationException {
             Assert.notNull(type,
                     "Deserialization type must not be null! Please provide Object.class to make use of Jackson2 default typing.");
             if (source == null || source.length == 0) {
                 return null;
             }
-            if (type.isAssignableFrom(String.class)  || type.isAssignableFrom(Character.class)) {
+            if (type.isAssignableFrom(String.class) || type.isAssignableFrom(Character.class)) {
                 return (T) new String(source);
             }
             return super.deserialize(source, type);
@@ -62,7 +65,7 @@ public class RedisConfig {
 
     @SneakyThrows
     public static void main(String[] args) {
-        ObjectMapper objectMapper =new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper();
         System.out.println(objectMapper.writeValueAsString(1));
         System.out.println(objectMapper.writeValueAsString("1"));
         System.out.println(objectMapper.writeValueAsString(Boolean.TRUE));

@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class IdRespVO {
     @ApiModelProperty("id")
-    private long id;
+    private Long id;
 
     public static IdRespVO id(Long id) {
         IdRespVO idRespVO = new IdRespVO();

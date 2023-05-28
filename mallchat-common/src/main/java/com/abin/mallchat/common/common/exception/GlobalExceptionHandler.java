@@ -7,6 +7,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 
+/**
+ * 全局异常处理程序
+ *
+ * @author Real
+ * @date 2023/05/28 19:01
+ */
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
@@ -22,19 +28,21 @@ public class GlobalExceptionHandler {
         log.info("validation parameters error！The reason is:{}", message);
         return ApiResult.fail(-1, message.substring(0, message.length() - 1));
     }
+
     /**
      * 处理空指针的异常
      */
     @ExceptionHandler(value = NullPointerException.class)
-    public ApiResult exceptionHandler( NullPointerException e) {
+    public ApiResult exceptionHandler(NullPointerException e) {
         log.error("null point exception！The reason is:{}", e.getMessage(), e);
         return ApiResult.fail(CommonErrorEnum.SYSTEM_ERROR);
     }
+
     /**
      * 未知异常
      */
     @ExceptionHandler(value = Exception.class)
-    public ApiResult systemExceptionHandler( Exception e) {
+    public ApiResult systemExceptionHandler(Exception e) {
         log.error("system exception！The reason is：{}", e.getMessage(), e);
         return ApiResult.fail(CommonErrorEnum.SYSTEM_ERROR);
     }

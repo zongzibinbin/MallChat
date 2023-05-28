@@ -35,7 +35,6 @@ public class PageBaseResp<T> {
     @ApiModelProperty("数据列表")
     private List<T> list;
 
-
     public static PageBaseResp empty() {
         PageBaseResp r = new PageBaseResp();
         r.setPageNo(1);
@@ -74,6 +73,6 @@ public class PageBaseResp<T> {
             return false;
         }
         long pageTotal = totalRecords / pageSize + (totalRecords % pageSize == 0 ? 0 : 1);
-        return pageNo >= pageTotal ? true : false;
+        return pageNo >= pageTotal;
     }
 }

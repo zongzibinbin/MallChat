@@ -16,7 +16,13 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Getter
 public enum YesOrNoEnum {
+    /**
+     * 否
+     */
     NO(0, "否"),
+    /**
+     * 是
+     */
     YES(1, "是"),
     ;
 
@@ -33,7 +39,7 @@ public enum YesOrNoEnum {
         return cache.get(type);
     }
 
-    public static Integer toStatus(Boolean bool){
-        return bool?YES.getStatus():NO.getStatus();
+    public static Integer toStatus(Boolean bool) {
+        return bool ? YES.getStatus() : NO.getStatus();
     }
 }
