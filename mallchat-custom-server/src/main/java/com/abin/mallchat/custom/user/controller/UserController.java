@@ -6,8 +6,8 @@ import com.abin.mallchat.common.common.utils.RequestHolder;
 import com.abin.mallchat.custom.user.domain.vo.request.user.ModifyNameReq;
 import com.abin.mallchat.custom.user.domain.vo.request.user.WearingBadgeReq;
 import com.abin.mallchat.custom.user.domain.vo.response.user.BadgeResp;
-import com.abin.mallchat.custom.user.service.UserService;
 import com.abin.mallchat.custom.user.domain.vo.response.user.UserInfoResp;
+import com.abin.mallchat.custom.user.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +53,7 @@ public class UserController {
     @PutMapping("/badge")
     @ApiOperation("佩戴徽章")
     public ApiResult<Void> wearingBadge(@Valid @RequestBody WearingBadgeReq req) {
-        userService.wearingBadge(RequestHolder.get().getUid(),req);
+        userService.wearingBadge(RequestHolder.get().getUid(), req);
         return ApiResult.success();
     }
 }

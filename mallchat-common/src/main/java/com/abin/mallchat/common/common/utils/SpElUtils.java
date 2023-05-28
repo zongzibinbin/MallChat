@@ -6,7 +6,6 @@ import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 
@@ -29,7 +28,7 @@ public class SpElUtils {
         return expression.getValue(context, String.class);
     }
 
-    public static String getMethodKey(Method method){
-        return method.getDeclaringClass()+"#"+method.getName();
+    public static String getMethodKey(Method method) {
+        return method.getDeclaringClass() + "#" + method.getName();
     }
 }

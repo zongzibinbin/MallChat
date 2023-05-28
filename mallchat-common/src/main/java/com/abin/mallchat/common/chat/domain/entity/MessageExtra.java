@@ -1,6 +1,5 @@
 package com.abin.mallchat.common.chat.domain.entity;
 
-import com.abin.mallchat.common.user.domain.entity.IpDetail;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

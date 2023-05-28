@@ -13,7 +13,7 @@ import javax.validation.constraints.Max;
  */
 @Data
 @ApiModel("基础翻页请求")
-public class PageBaseReq{
+public class PageBaseReq {
 
     @ApiModelProperty("页面大小")
     @Max(50)

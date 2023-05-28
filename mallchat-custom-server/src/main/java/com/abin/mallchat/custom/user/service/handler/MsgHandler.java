@@ -9,7 +9,6 @@ import me.chanjar.weixin.common.session.WxSessionManager;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
-import me.chanjar.weixin.mp.bean.message.WxMpXmlOutTextMessage;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,12 +25,13 @@ public class MsgHandler extends AbstractHandler {
 
     @Autowired
     private WxMsgDao wxMsgDao;
+
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage,
                                     Map<String, Object> context, WxMpService weixinService,
                                     WxSessionManager sessionManager) {
         if (true) {
-            WxMsg msg =new WxMsg();
+            WxMsg msg = new WxMsg();
             msg.setOpenId(wxMessage.getFromUser());
             msg.setMsg(wxMessage.getContent());
             wxMsgDao.save(msg);

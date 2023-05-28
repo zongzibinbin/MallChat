@@ -6,17 +6,12 @@ import com.abin.mallchat.custom.user.domain.enums.WSReqTypeEnum;
 import com.abin.mallchat.custom.user.domain.vo.request.ws.WSAuthorize;
 import com.abin.mallchat.custom.user.domain.vo.request.ws.WSBaseReq;
 import com.abin.mallchat.custom.user.service.WebSocketService;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
-
-import java.net.SocketAddress;
-import java.util.HashSet;
-import java.util.Set;
 
 
 @Slf4j
@@ -75,7 +70,7 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
     // 处理异常
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        log.warn("异常发生，异常消息 ={}" , cause.getMessage());
+        log.warn("异常发生，异常消息 ={}", cause.getMessage());
         ctx.channel().close();
     }
 

@@ -4,8 +4,6 @@ import cn.hutool.core.util.ObjectUtil;
 import com.abin.mallchat.common.common.exception.BusinessErrorEnum;
 import com.abin.mallchat.common.common.exception.BusinessException;
 import com.abin.mallchat.common.common.exception.ErrorEnum;
-import com.abin.mallchat.common.user.domain.entity.UserBackpack;
-import org.apache.commons.lang3.StringUtils;
 
 import java.text.MessageFormat;
 import java.util.Objects;
@@ -48,14 +46,16 @@ public class AssertUtil {
             throwException(msg);
         }
     }
+
     //如果不是非空对象，则抛异常
     public static void isEmpty(Object obj, String msg) {
         if (!isEmpty(obj)) {
             throwException(msg);
         }
     }
-    public static void equal(Object o1,Object o2, String msg) {
-        if (!ObjectUtil.equal(o1,o2)) {
+
+    public static void equal(Object o1, Object o2, String msg) {
+        if (!ObjectUtil.equal(o1, o2)) {
             throwException(msg);
         }
     }

@@ -2,30 +2,21 @@ package com.abin.mallchat.common.common.utils;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Pair;
-import cn.hutool.core.lang.Tuple;
 import cn.hutool.core.util.StrUtil;
-import com.abin.mallchat.common.chat.dao.MessageDao;
-import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
-import com.abin.mallchat.common.common.domain.vo.request.PageBaseReq;
 import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
-import com.abin.mallchat.common.common.domain.vo.response.PageBaseResp;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.google.errorprone.annotations.Var;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
-import reactor.util.function.Tuple2;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**

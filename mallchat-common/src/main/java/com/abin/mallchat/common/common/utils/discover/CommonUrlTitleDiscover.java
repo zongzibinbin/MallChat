@@ -1,6 +1,5 @@
 package com.abin.mallchat.common.common.utils.discover;
 
-import cn.hutool.core.util.StrUtil;
 import org.jsoup.nodes.Document;
 
 /**

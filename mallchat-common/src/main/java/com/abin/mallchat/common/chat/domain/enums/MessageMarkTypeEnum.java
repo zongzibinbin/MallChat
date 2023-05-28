@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Getter
 public enum MessageMarkTypeEnum {
-    LIKE(1, "点赞",10,MessageTypeEnum.LIKE),
-    DISLIKE(2, "点踩",5,MessageTypeEnum.DISLIKE),
+    LIKE(1, "点赞", 10, MessageTypeEnum.LIKE),
+    DISLIKE(2, "点踩", 5, MessageTypeEnum.DISLIKE),
     ;
 
     private final Integer type;

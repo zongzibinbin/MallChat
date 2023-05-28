@@ -2,15 +2,10 @@ package com.abin.mallchat.custom.common.intecepter;
 
 import com.abin.mallchat.common.common.constant.MDCKey;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.*;
-import javax.servlet.FilterConfig;
 import javax.servlet.annotation.WebFilter;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.UUID;
 

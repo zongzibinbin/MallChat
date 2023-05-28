@@ -1,12 +1,10 @@
 package com.abin.mallchat.custom.chat.domain.vo.request;
 
-import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotNull;
 
@@ -19,7 +17,7 @@ import javax.validation.constraints.NotNull;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChatMessageMarkReq{
+public class ChatMessageMarkReq {
     @NotNull
     @ApiModelProperty("消息id")
     private Long msgId;

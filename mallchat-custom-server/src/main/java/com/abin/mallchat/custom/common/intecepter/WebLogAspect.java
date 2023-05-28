@@ -2,8 +2,8 @@ package com.abin.mallchat.custom.common.intecepter;
 
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.json.JSONUtil;
-import com.abin.mallchat.common.common.utils.RequestHolder;
 import com.abin.mallchat.common.common.domain.dto.RequestInfo;
+import com.abin.mallchat.common.common.utils.RequestHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

@@ -5,13 +5,11 @@ import com.abin.mallchat.common.common.constant.RedisKey;
 import com.abin.mallchat.common.common.utils.JwtUtils;
 import com.abin.mallchat.common.common.utils.RedisUtils;
 import com.abin.mallchat.custom.user.service.LoginService;
-import com.auth0.jwt.interfaces.Claim;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 

@@ -1,9 +1,9 @@
 package com.abin.mallchat.custom.common.event.listener;
 
+import com.abin.mallchat.common.common.event.UserOfflineEvent;
 import com.abin.mallchat.common.user.dao.UserDao;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.service.cache.UserCache;
-import com.abin.mallchat.common.common.event.UserOfflineEvent;
 import com.abin.mallchat.custom.user.service.WebSocketService;
 import com.abin.mallchat.custom.user.service.adapter.WSAdapter;
 import lombok.extern.slf4j.Slf4j;

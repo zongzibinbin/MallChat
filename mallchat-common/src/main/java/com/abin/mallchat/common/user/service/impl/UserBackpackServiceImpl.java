@@ -12,10 +12,8 @@ import com.abin.mallchat.common.user.domain.enums.ItemTypeEnum;
 import com.abin.mallchat.common.user.service.IUserBackpackService;
 import com.abin.mallchat.common.user.service.cache.ItemCache;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.event.SpringApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
@@ -39,7 +37,7 @@ public class UserBackpackServiceImpl implements IUserBackpackService {
     private ApplicationEventPublisher applicationEventPublisher;
 
     @Override
-    @RedissonLock(key = "#uid",waitTime = 5000)//相同用户会同时发奖，需要排队不能直接拒绝
+    @RedissonLock(key = "#uid", waitTime = 5000)//相同用户会同时发奖，需要排队不能直接拒绝
     public void acquireItem(Long uid, Long itemId, IdempotentEnum idempotentEnum, String businessId) {
         String idempotent = getIdempotent(itemId, idempotentEnum, businessId);
         UserBackpack userBackpack = userBackpackDao.getByIdp(idempotent);

@@ -2,12 +2,10 @@ package com.abin.mallchat.custom.chat.controller;
 
 
 import com.abin.mallchat.common.common.annotation.FrequencyControl;
-import com.abin.mallchat.common.common.annotation.FrequencyControlContainer;
 import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
 import com.abin.mallchat.common.common.domain.vo.response.ApiResult;
 import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
-import com.abin.mallchat.common.common.domain.vo.response.IdRespVO;
-import com.abin.mallchat.common.user.dao.UserDao;
+import com.abin.mallchat.common.common.utils.RequestHolder;
 import com.abin.mallchat.common.user.domain.enums.BlackTypeEnum;
 import com.abin.mallchat.common.user.service.cache.UserCache;
 import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessageMarkReq;
@@ -18,17 +16,14 @@ import com.abin.mallchat.custom.chat.domain.vo.response.ChatMemberStatisticResp;
 import com.abin.mallchat.custom.chat.domain.vo.response.ChatMessageResp;
 import com.abin.mallchat.custom.chat.domain.vo.response.ChatRoomResp;
 import com.abin.mallchat.custom.chat.service.ChatService;
-import com.abin.mallchat.common.common.utils.RequestHolder;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * <p>
@@ -62,10 +57,11 @@ public class ChatController {
     }
 
     private void filterBlackMember(CursorPageBaseResp<ChatMemberResp> memberPage) {
-        memberPage.getList().removeIf(a->getBlackUidSet().contains(a.getUid().toString()));
+        memberPage.getList().removeIf(a -> getBlackUidSet().contains(a.getUid().toString()));
     }
-    private Set<String> getBlackUidSet(){
-        return userCache.getBlackMap().get(BlackTypeEnum.UID.getType());
+
+    private Set<String> getBlackUidSet() {
+        return userCache.getBlackMap().getOrDefault(BlackTypeEnum.UID.getType(), new HashSet<>());
     }
 
     @GetMapping("public/member/statistic/")
@@ -81,10 +77,12 @@ public class ChatController {
         filterBlackMsg(msgPage);
         return ApiResult.success(msgPage);
     }
+
     private void filterBlackMsg(CursorPageBaseResp<ChatMessageResp> memberPage) {
-        memberPage.getList().removeIf(a->getBlackUidSet().contains(a.getFromUser().getUid().toString()));
+        memberPage.getList().removeIf(a -> getBlackUidSet().contains(a.getFromUser().getUid().toString()));
         System.out.println(1);
     }
+
     @PostMapping("/msg")
     @ApiOperation("发送消息")
     @FrequencyControl(time = 5, count = 2, target = FrequencyControl.Target.UID)

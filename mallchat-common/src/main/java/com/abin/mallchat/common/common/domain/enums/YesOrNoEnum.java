@@ -33,7 +33,7 @@ public enum YesOrNoEnum {
         return cache.get(type);
     }
 
-    public static Integer toStatus(Boolean bool){
-        return bool?YES.getStatus():NO.getStatus();
+    public static Integer toStatus(Boolean bool) {
+        return bool ? YES.getStatus() : NO.getStatus();
     }
 }

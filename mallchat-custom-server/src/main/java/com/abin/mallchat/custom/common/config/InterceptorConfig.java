@@ -22,6 +22,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
     private CollectorInterceptor collectorInterceptor;
     @Autowired
     private BlackInterceptor blackInterceptor;
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(tokenInterceptor)

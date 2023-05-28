@@ -2,7 +2,6 @@ package com.abin.mallchat.common.common.utils.discover;
 
 import cn.hutool.core.util.StrUtil;
 import org.jsoup.nodes.Document;
-import org.springframework.core.ParameterNameDiscoverer;
 
 import java.util.ArrayList;
 import java.util.List;

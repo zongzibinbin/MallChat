@@ -1,7 +1,6 @@
 package com.abin.mallchat.common.user.service.cache;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Pair;
 import com.abin.mallchat.common.common.constant.RedisKey;
 import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
@@ -16,14 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
-import java.security.PublicKey;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Description: 用户相关缓存
@@ -122,12 +117,13 @@ public class UserCache {
     @Cacheable(cacheNames = "user", key = "'blackList'")
     public Map<Integer, Set<String>> getBlackMap() {
         Map<Integer, List<Black>> collect = blackDao.list().stream().collect(Collectors.groupingBy(Black::getType));
-        Map<Integer, Set<String>> result =new HashMap<>();
+        Map<Integer, Set<String>> result = new HashMap<>();
         for (Map.Entry<Integer, List<Black>> entry : collect.entrySet()) {
-            result.put(entry.getKey(),entry.getValue().stream().map(Black::getTarget).collect(Collectors.toSet()));
+            result.put(entry.getKey(), entry.getValue().stream().map(Black::getTarget).collect(Collectors.toSet()));
         }
         return result;
     }
+
     @CacheEvict(cacheNames = "user", key = "'blackList'")
     public Map<Integer, Set<String>> evictBlackMap() {
         return null;

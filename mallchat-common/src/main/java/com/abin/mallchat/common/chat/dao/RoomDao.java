@@ -1,8 +1,6 @@
 package com.abin.mallchat.common.chat.dao;
 
-import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.chat.domain.entity.Room;
-import com.abin.mallchat.common.chat.domain.enums.MessageStatusEnum;
 import com.abin.mallchat.common.chat.domain.enums.RoomTypeEnum;
 import com.abin.mallchat.common.chat.mapper.RoomMapper;
 import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;

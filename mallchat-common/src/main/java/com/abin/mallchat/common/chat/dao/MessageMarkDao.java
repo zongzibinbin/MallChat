@@ -2,7 +2,6 @@ package com.abin.mallchat.common.chat.dao;
 
 import com.abin.mallchat.common.chat.domain.entity.MessageMark;
 import com.abin.mallchat.common.chat.mapper.MessageMarkMapper;
-import com.abin.mallchat.common.chat.service.IMessageMarkService;
 import com.abin.mallchat.common.common.domain.enums.YesOrNoEnum;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;

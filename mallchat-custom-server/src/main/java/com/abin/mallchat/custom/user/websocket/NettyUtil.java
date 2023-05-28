@@ -1,10 +1,8 @@
 package com.abin.mallchat.custom.user.websocket;
 
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
-import org.omg.CORBA.PUBLIC_MEMBER;
 
 /**
  * Description: netty工具类

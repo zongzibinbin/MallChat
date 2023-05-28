@@ -1,12 +1,11 @@
 package com.abin.mallchat.custom.common.event.listener;
 
 import com.abin.mallchat.common.common.domain.enums.IdempotentEnum;
+import com.abin.mallchat.common.common.event.UserRegisterEvent;
 import com.abin.mallchat.common.user.dao.UserDao;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.domain.enums.ItemEnum;
 import com.abin.mallchat.common.user.service.IUserBackpackService;
-import com.abin.mallchat.common.common.event.UserOnlineEvent;
-import com.abin.mallchat.common.common.event.UserRegisterEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;

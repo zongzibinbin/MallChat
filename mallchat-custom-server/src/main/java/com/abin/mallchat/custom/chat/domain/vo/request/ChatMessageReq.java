@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotNull;
@@ -23,7 +22,7 @@ import javax.validation.constraints.NotNull;
 public class ChatMessageReq {
 
     @NotNull
-    @Length( max = 10000,message = "消息内容过长，服务器扛不住啊，兄dei")
+    @Length(max = 10000, message = "消息内容过长，服务器扛不住啊，兄dei")
     @ApiModelProperty("消息内容")
     private String content;
 

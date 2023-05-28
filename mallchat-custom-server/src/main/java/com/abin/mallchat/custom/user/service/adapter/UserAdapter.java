@@ -11,7 +11,6 @@ import com.abin.mallchat.custom.user.domain.vo.response.user.BadgeResp;
 import com.abin.mallchat.custom.user.domain.vo.response.user.UserInfoResp;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
-import me.chanjar.weixin.mp.bean.result.WxMpUser;
 
 import java.util.Comparator;
 import java.util.List;
@@ -38,9 +37,9 @@ public class UserAdapter {
         user.setAvatar(userInfo.getHeadImgUrl());
         user.setName(userInfo.getNickname());
         user.setSex(userInfo.getSex());
-        if(userInfo.getNickname().length()>6){
-            user.setName("名字过长"+RandomUtil.randomInt(100000));
-        }else {
+        if (userInfo.getNickname().length() > 6) {
+            user.setName("名字过长" + RandomUtil.randomInt(100000));
+        } else {
             user.setName(userInfo.getNickname());
         }
         return user;

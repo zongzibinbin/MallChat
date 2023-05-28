@@ -1,14 +1,12 @@
 package com.abin.mallchat.custom.common.intecepter;
 
 import cn.hutool.extra.servlet.ServletUtil;
-import com.abin.mallchat.common.common.utils.RequestHolder;
 import com.abin.mallchat.common.common.domain.dto.RequestInfo;
+import com.abin.mallchat.common.common.utils.RequestHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,7 +18,7 @@ import java.util.Optional;
 @Order(1)
 @Slf4j
 @Component
-public class CollectorInterceptor implements HandlerInterceptor{
+public class CollectorInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {

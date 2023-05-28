@@ -1,5 +1,6 @@
 package com.abin.mallchat.custom.user.service.impl;
 
+import com.abin.mallchat.common.common.event.UserRegisterEvent;
 import com.abin.mallchat.common.common.utils.AssertUtil;
 import com.abin.mallchat.common.user.dao.ItemConfigDao;
 import com.abin.mallchat.common.user.dao.UserBackpackDao;
@@ -12,7 +13,6 @@ import com.abin.mallchat.common.user.domain.enums.ItemTypeEnum;
 import com.abin.mallchat.common.user.service.IUserBackpackService;
 import com.abin.mallchat.common.user.service.cache.ItemCache;
 import com.abin.mallchat.common.user.service.cache.UserCache;
-import com.abin.mallchat.common.common.event.UserRegisterEvent;
 import com.abin.mallchat.custom.user.domain.vo.request.user.ModifyNameReq;
 import com.abin.mallchat.custom.user.domain.vo.request.user.WearingBadgeReq;
 import com.abin.mallchat.custom.user.domain.vo.response.user.BadgeResp;
@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
     public void modifyName(Long uid, ModifyNameReq req) {
         //判断名字是不是重复
         User oldUser = userDao.getByName(req.getName());
-        AssertUtil.isEmpty(oldUser,"名字已经被抢占了，请换一个哦~~");
+        AssertUtil.isEmpty(oldUser, "名字已经被抢占了，请换一个哦~~");
         //判断改名卡够不够
         UserBackpack firstValidItem = userBackpackDao.getFirstValidItem(uid, ItemEnum.MODIFY_NAME_CARD.getId());
         AssertUtil.isNotEmpty(firstValidItem, "改名次数不够了，等后续活动送改名卡哦");

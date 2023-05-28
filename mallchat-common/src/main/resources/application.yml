@@ -56,7 +56,7 @@ jwt:
   secret: ${mallchat.jwt.secret}
 wx:
   mp:
-#    callback: http://f4cd-113-92-129-127.ngrok.io
+    #    callback: http://f4cd-113-92-129-127.ngrok.io
     callback: ${mallchat.wx.callback}
     configs:
       - appId: ${mallchat.wx.appId} # 第一个公众号的appid

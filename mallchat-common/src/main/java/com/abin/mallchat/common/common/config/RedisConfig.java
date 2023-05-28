@@ -1,9 +1,7 @@
 package com.abin.mallchat.common.common.config;
 
-import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
-import net.sf.json.util.JSONUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -11,10 +9,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.SerializationException;
-import org.springframework.data.redis.serializer.SerializationUtils;
 import org.springframework.util.Assert;
 
-import java.net.UnknownHostException;
 import java.util.Objects;
 
 @Configuration
@@ -36,6 +32,7 @@ public class RedisConfig {
         redisTemplate.setHashValueSerializer(jsonRedisSerializer);
         return redisTemplate;
     }
+
     public class MyRedisSerializerCustomized extends GenericJackson2JsonRedisSerializer {
         @Override
         public byte[] serialize(Object source) throws SerializationException {
@@ -46,6 +43,7 @@ public class RedisConfig {
             }
             return super.serialize(source);
         }
+
         @Override
         public <T> T deserialize(byte[] source, Class<T> type) throws SerializationException {
             Assert.notNull(type,
@@ -53,7 +51,7 @@ public class RedisConfig {
             if (source == null || source.length == 0) {
                 return null;
             }
-            if (type.isAssignableFrom(String.class)  || type.isAssignableFrom(Character.class)) {
+            if (type.isAssignableFrom(String.class) || type.isAssignableFrom(Character.class)) {
                 return (T) new String(source);
             }
             return super.deserialize(source, type);
@@ -62,7 +60,7 @@ public class RedisConfig {
 
     @SneakyThrows
     public static void main(String[] args) {
-        ObjectMapper objectMapper =new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper();
         System.out.println(objectMapper.writeValueAsString(1));
         System.out.println(objectMapper.writeValueAsString("1"));
         System.out.println(objectMapper.writeValueAsString(Boolean.TRUE));

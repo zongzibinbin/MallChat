@@ -1,6 +1,5 @@
 package com.abin.mallchat.common.common.event;
 
-import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.domain.entity.UserBackpack;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;

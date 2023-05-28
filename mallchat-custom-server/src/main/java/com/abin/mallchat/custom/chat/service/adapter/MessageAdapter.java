@@ -6,7 +6,6 @@ import com.abin.mallchat.common.chat.domain.entity.MessageExtra;
 import com.abin.mallchat.common.chat.domain.entity.MessageMark;
 import com.abin.mallchat.common.chat.domain.enums.MessageMarkTypeEnum;
 import com.abin.mallchat.common.chat.domain.enums.MessageStatusEnum;
-import com.abin.mallchat.common.chat.domain.enums.MessageTypeEnum;
 import com.abin.mallchat.common.common.domain.enums.YesOrNoEnum;
 import com.abin.mallchat.common.common.utils.discover.PrioritizedUrlTitleDiscover;
 import com.abin.mallchat.common.user.domain.entity.IpDetail;
@@ -15,8 +14,6 @@ import com.abin.mallchat.common.user.domain.entity.ItemConfig;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessageReq;
 import com.abin.mallchat.custom.chat.domain.vo.response.ChatMessageResp;
-import com.sun.org.apache.regexp.internal.RE;
-import org.yaml.snakeyaml.error.Mark;
 
 import java.util.*;
 import java.util.stream.Collectors;

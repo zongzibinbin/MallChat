@@ -11,6 +11,7 @@ import lombok.Data;
 public class WSBaseResp<T> {
     /**
      * ws推送给前端的消息
+     *
      * @see com.abin.mallchat.custom.user.domain.enums.WSRespTypeEnum
      */
     private Integer type;

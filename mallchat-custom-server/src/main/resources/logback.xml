@@ -11,7 +11,7 @@
     <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder >
+        <encoder>
             <pattern>${CONSOLE_LOG_PATTERN}</pattern>
         </encoder>
     </appender>
@@ -19,7 +19,7 @@
     <appender name="fileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_PATH}/${LOG_FILE}.log</file>
         <append>true</append>
-        <encoder >
+        <encoder>
             <pattern>${CONSOLE_LOG_PATTERN}</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -43,7 +43,7 @@
         </filter>
         <file>${LOG_PATH}/${LOG_FILE}.error.log</file>
         <append>true</append>
-        <encoder >
+        <encoder>
             <pattern>${CONSOLE_LOG_PATTERN}</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">

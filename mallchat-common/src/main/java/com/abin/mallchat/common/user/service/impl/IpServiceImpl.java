@@ -3,10 +3,8 @@ package com.abin.mallchat.common.user.service.impl;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.thread.NamedThreadFactory;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
-import com.abin.mallchat.common.common.domain.vo.response.ApiResult;
 import com.abin.mallchat.common.user.dao.UserDao;
 import com.abin.mallchat.common.user.domain.dto.IpResult;
 import com.abin.mallchat.common.user.domain.entity.IpDetail;
@@ -16,14 +14,14 @@ import com.abin.mallchat.common.user.service.IpService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.*;
-import java.util.jar.Manifest;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Description: ip

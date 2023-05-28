@@ -1,6 +1,5 @@
 package com.abin.mallchat.common.common.utils;
 
-import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

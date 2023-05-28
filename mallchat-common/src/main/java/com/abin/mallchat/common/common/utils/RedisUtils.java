@@ -1,20 +1,16 @@
 package com.abin.mallchat.common.common.utils;
 
 import cn.hutool.extra.spring.SpringUtil;
-import cn.hutool.json.JSONUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import net.sf.json.util.JSONUtils;
-import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.*;
+import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.security.Key;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -218,6 +214,7 @@ public class RedisUtils {
     private static String get(String key) {
         return key == null ? null : stringRedisTemplate.opsForValue().get(key);
     }
+
     /**
      * 普通缓存放入
      *
@@ -234,6 +231,7 @@ public class RedisUtils {
             return false;
         }
     }
+
     public static String getStr(String key) {
         return get(key, String.class);
     }
@@ -263,7 +261,6 @@ public class RedisUtils {
             expire(key, time);
         });
     }
-
 
 
     /**
@@ -754,8 +751,9 @@ public class RedisUtils {
     public static Boolean zAdd(String key, Object value, double score) {
         return zAdd(key, value.toString(), score);
     }
+
     public static Boolean zIsMember(String key, Object value) {
-        return Objects.nonNull(stringRedisTemplate.opsForZSet().score(key,value.toString()));
+        return Objects.nonNull(stringRedisTemplate.opsForZSet().score(key, value.toString()));
     }
 
     /**

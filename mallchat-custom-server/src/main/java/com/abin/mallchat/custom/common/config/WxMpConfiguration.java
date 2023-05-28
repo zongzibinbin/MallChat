@@ -1,28 +1,24 @@
 package com.abin.mallchat.custom.common.config;
 
-import com.abin.mallchat.custom.user.service.handler.*;
+import com.abin.mallchat.custom.user.service.handler.LogHandler;
+import com.abin.mallchat.custom.user.service.handler.MsgHandler;
+import com.abin.mallchat.custom.user.service.handler.ScanHandler;
+import com.abin.mallchat.custom.user.service.handler.SubscribeHandler;
 import lombok.AllArgsConstructor;
-import me.chanjar.weixin.common.redis.JedisWxRedisOps;
 import me.chanjar.weixin.mp.api.WxMpMessageRouter;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.api.impl.WxMpServiceImpl;
 import me.chanjar.weixin.mp.config.impl.WxMpDefaultConfigImpl;
-import me.chanjar.weixin.mp.config.impl.WxMpRedisConfigImpl;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static me.chanjar.weixin.common.api.WxConsts.EventType;
 import static me.chanjar.weixin.common.api.WxConsts.EventType.SUBSCRIBE;
-import static me.chanjar.weixin.common.api.WxConsts.EventType.UNSUBSCRIBE;
-import static me.chanjar.weixin.common.api.WxConsts.XmlMsgType;
 import static me.chanjar.weixin.common.api.WxConsts.XmlMsgType.EVENT;
-import static me.chanjar.weixin.mp.constant.WxMpEventConstants.CustomerService.*;
-import static me.chanjar.weixin.mp.constant.WxMpEventConstants.POI_CHECK_NOTIFY;
 
 /**
  * wechat mp configuration

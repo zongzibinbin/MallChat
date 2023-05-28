@@ -2,7 +2,6 @@ package com.abin.mallchat.common.user.dao;
 
 import com.abin.mallchat.common.user.domain.entity.Black;
 import com.abin.mallchat.common.user.mapper.BlackMapper;
-import com.abin.mallchat.common.user.service.IBlackService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 

@@ -1,8 +1,5 @@
 package com.abin.mallchat.custom.user.service;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
 /**
  * Description: 登录相关处理类
  * Author: <a href="https://github.com/zongzibinbin">abin</a>
@@ -36,6 +33,7 @@ public interface LoginService {
 
     /**
      * 如果token有效，返回uid
+     *
      * @param token
      * @return
      */

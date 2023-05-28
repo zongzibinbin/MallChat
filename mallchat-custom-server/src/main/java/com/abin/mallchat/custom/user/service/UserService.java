@@ -1,11 +1,9 @@
 package com.abin.mallchat.custom.user.service;
 
-import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.custom.user.domain.vo.request.user.ModifyNameReq;
 import com.abin.mallchat.custom.user.domain.vo.request.user.WearingBadgeReq;
 import com.abin.mallchat.custom.user.domain.vo.response.user.BadgeResp;
 import com.abin.mallchat.custom.user.domain.vo.response.user.UserInfoResp;
-import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
 
@@ -17,10 +15,11 @@ import java.util.List;
  * @author <a href="https://github.com/zongzibinbin">abin</a>
  * @since 2023-03-19
  */
-public interface UserService  {
+public interface UserService {
 
     /**
      * 获取前端展示信息
+     *
      * @param uid
      * @return
      */
@@ -28,6 +27,7 @@ public interface UserService  {
 
     /**
      * 修改用户名
+     *
      * @param uid
      * @param req
      */
@@ -35,12 +35,14 @@ public interface UserService  {
 
     /**
      * 用户徽章列表
+     *
      * @param uid
      */
     List<BadgeResp> badges(Long uid);
 
     /**
      * 佩戴徽章
+     *
      * @param uid
      * @param req
      */
@@ -48,6 +50,7 @@ public interface UserService  {
 
     /**
      * 用户注册
+     *
      * @param openId
      */
     void register(String openId);

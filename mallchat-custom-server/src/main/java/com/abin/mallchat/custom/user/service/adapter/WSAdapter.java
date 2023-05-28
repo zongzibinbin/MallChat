@@ -3,19 +3,20 @@ package com.abin.mallchat.custom.user.service.adapter;
 import cn.hutool.core.bean.BeanUtil;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.domain.enums.ChatActiveStatusEnum;
-import com.abin.mallchat.common.user.service.cache.UserCache;
+import com.abin.mallchat.custom.chat.domain.vo.response.ChatMemberResp;
 import com.abin.mallchat.custom.chat.domain.vo.response.ChatMemberStatisticResp;
 import com.abin.mallchat.custom.chat.domain.vo.response.ChatMessageResp;
 import com.abin.mallchat.custom.chat.service.ChatService;
 import com.abin.mallchat.custom.user.domain.enums.WSRespTypeEnum;
-import com.abin.mallchat.custom.chat.domain.vo.response.ChatMemberResp;
-import com.abin.mallchat.custom.user.domain.vo.response.ws.*;
+import com.abin.mallchat.custom.user.domain.vo.response.ws.WSBaseResp;
+import com.abin.mallchat.custom.user.domain.vo.response.ws.WSLoginSuccess;
+import com.abin.mallchat.custom.user.domain.vo.response.ws.WSLoginUrl;
+import com.abin.mallchat.custom.user.domain.vo.response.ws.WSOnlineOfflineNotify;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
-import java.util.Date;
 
 /**
  * Description: ws消息适配器

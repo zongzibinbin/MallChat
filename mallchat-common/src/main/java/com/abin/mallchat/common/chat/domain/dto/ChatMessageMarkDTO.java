@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotNull;
-
 /**
  * Description: 消息标记请求
  * Author: <a href="https://github.com/zongzibinbin">abin</a>

@@ -1,32 +1,25 @@
 package com.abin.mallchat.custom.user.service;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.core.util.StrUtil;
-import com.abin.mallchat.common.common.config.ThreadPoolConfig;
 import com.abin.mallchat.common.user.dao.UserDao;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.custom.user.service.adapter.TextBuilder;
 import com.abin.mallchat.custom.user.service.adapter.UserAdapter;
-import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.net.URLEncoder;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Description: 处理与微信api的交互逻辑
@@ -91,7 +84,7 @@ public class WxMsgService {
     public void authorize(WxOAuth2UserInfo userInfo) {
         User user = userDao.getByOpenId(userInfo.getOpenid());
         //更新用户信息
-        if(Objects.isNull(user.getName())){
+        if (Objects.isNull(user.getName())) {
             fillUserInfo(user.getId(), userInfo);
         }
         //触发用户登录成功操作

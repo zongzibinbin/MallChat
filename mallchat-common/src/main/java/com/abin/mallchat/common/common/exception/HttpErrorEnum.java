@@ -1,23 +1,14 @@
 package com.abin.mallchat.common.common.exception;
 
 import cn.hutool.http.ContentType;
-import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
 import com.abin.mallchat.common.common.domain.vo.response.ApiResult;
 import com.google.common.base.Charsets;
-import io.netty.handler.codec.http.HttpContent;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.apache.commons.lang3.CharSet;
-import org.apache.commons.lang3.CharSetUtils;
-import org.springframework.http.HttpStatus;
-import sun.awt.CharsetString;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.charset.Charset;
 
 /**
  * Description: 业务校验异常码

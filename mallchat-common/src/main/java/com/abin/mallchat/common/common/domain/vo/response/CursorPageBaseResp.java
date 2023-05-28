@@ -1,8 +1,6 @@
 package com.abin.mallchat.common.common.domain.vo.response;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.abin.mallchat.common.chat.domain.entity.Message;
-import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
