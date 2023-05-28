@@ -16,6 +16,7 @@ import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
 import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
 import com.abin.mallchat.common.common.exception.BusinessException;
 import com.abin.mallchat.common.common.utils.AssertUtil;
+import com.abin.mallchat.common.common.utils.discover.PrioritizedUrlTitleDiscover;
 import com.abin.mallchat.common.user.dao.UserDao;
 import com.abin.mallchat.common.user.domain.entity.ItemConfig;
 import com.abin.mallchat.common.user.domain.entity.User;
@@ -76,8 +77,6 @@ public class ChatServiceImpl implements ChatService {
 
     /**
      * 发送消息
-     *
-     * @param request
      */
     @Override
     @Transactional
@@ -90,6 +89,7 @@ public class ChatServiceImpl implements ChatService {
             AssertUtil.equal(replyMsg.getRoomId(), request.getRoomId(), "只能回复相同会话内的消息");
 
         }
+        //同步获取消息的跳转链接标题
         Message insert = MessageAdapter.buildMsgSave(request, uid);
         messageDao.save(insert);
         //如果有回复消息
@@ -224,10 +224,10 @@ public class ChatServiceImpl implements ChatService {
         Set<Long> uidSet = Stream.concat(replyMap.values().stream().map(Message::getFromUid), messages.stream().map(Message::getFromUid)).collect(Collectors.toSet());
         userMap = userCache.getUserInfoBatch(uidSet);
         //批量查询item信息
-        itemMap = userMap.values().stream().map(User::getItemId).distinct().filter(Objects::nonNull).map(itemCache::getById).collect(Collectors.toMap(ItemConfig::getId,Function.identity()));
+        itemMap = userMap.values().stream().map(User::getItemId).distinct().filter(Objects::nonNull).map(itemCache::getById).collect(Collectors.toMap(ItemConfig::getId, Function.identity()));
         //查询消息标志
         List<MessageMark> msgMark = messageMarkDao.getValidMarkByMsgIdBatch(messages.stream().map(Message::getId).collect(Collectors.toList()));
-        return MessageAdapter.buildMsgResp(messages, replyMap, userMap, msgMark, receiveUid,itemMap);
+        return MessageAdapter.buildMsgResp(messages, replyMap, userMap, msgMark, receiveUid, itemMap);
     }
 
 }

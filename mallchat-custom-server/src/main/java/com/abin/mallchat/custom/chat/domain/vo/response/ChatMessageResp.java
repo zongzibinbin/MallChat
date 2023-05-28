@@ -1,18 +1,12 @@
 package com.abin.mallchat.custom.chat.domain.vo.response;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
-
-import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.List;
+import java.util.Map;
 
 /**
  * Description: 消息
@@ -38,6 +32,8 @@ public class ChatMessageResp {
         private Long uid;
         @ApiModelProperty("头像")
         private String avatar;
+        @ApiModelProperty("归属地")
+        private String locPlace;
         @ApiModelProperty("徽章标识，如果没有展示null")
         private Badge badge;
     }
@@ -50,6 +46,8 @@ public class ChatMessageResp {
         private Date sendTime;
         @ApiModelProperty("消息内容")
         private String content;
+        @ApiModelProperty("消息链接映射")
+        private Map<String,String> urlTitleMap;
         @ApiModelProperty("消息类型 1正常文本 2.爆赞 （点赞超过10）3.危险发言（举报超5）")
         private Integer type;
         @ApiModelProperty("消息标记")

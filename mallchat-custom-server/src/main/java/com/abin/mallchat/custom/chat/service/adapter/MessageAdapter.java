@@ -2,11 +2,15 @@ package com.abin.mallchat.custom.chat.service.adapter;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.abin.mallchat.common.chat.domain.entity.Message;
+import com.abin.mallchat.common.chat.domain.entity.MessageExtra;
 import com.abin.mallchat.common.chat.domain.entity.MessageMark;
 import com.abin.mallchat.common.chat.domain.enums.MessageMarkTypeEnum;
 import com.abin.mallchat.common.chat.domain.enums.MessageStatusEnum;
 import com.abin.mallchat.common.chat.domain.enums.MessageTypeEnum;
 import com.abin.mallchat.common.common.domain.enums.YesOrNoEnum;
+import com.abin.mallchat.common.common.utils.discover.PrioritizedUrlTitleDiscover;
+import com.abin.mallchat.common.user.domain.entity.IpDetail;
+import com.abin.mallchat.common.user.domain.entity.IpInfo;
 import com.abin.mallchat.common.user.domain.entity.ItemConfig;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessageReq;
@@ -23,24 +27,32 @@ import java.util.stream.Collectors;
  * Date: 2023-03-26
  */
 public class MessageAdapter {
-    public static final int CAN_CALLBACK_GAP_COUNT = 100;
+    public static final int CAN_CALLBACK_GAP_COUNT = 50;
+    private static final PrioritizedUrlTitleDiscover URL_TITLE_DISCOVER = new PrioritizedUrlTitleDiscover();
 
     public static Message buildMsgSave(ChatMessageReq request, Long uid) {
+
         return Message.builder()
                 .replyMsgId(request.getReplyMsgId())
                 .content(request.getContent())
                 .fromUid(uid)
                 .roomId(request.getRoomId())
                 .status(MessageStatusEnum.NORMAL.getStatus())
+                .extra(buildExtra(request))
                 .build();
 
+    }
+
+    private static MessageExtra buildExtra(ChatMessageReq request) {
+        Map<String, String> contentTitleMap = URL_TITLE_DISCOVER.getContentTitleMap(request.getContent());
+        return MessageExtra.builder().urlTitleMap(contentTitleMap).build();
     }
 
     public static List<ChatMessageResp> buildMsgResp(List<Message> messages, Map<Long, Message> replyMap, Map<Long, User> userMap, List<MessageMark> msgMark, Long receiveUid, Map<Long, ItemConfig> itemMap) {
         Map<Long, List<MessageMark>> markMap = msgMark.stream().collect(Collectors.groupingBy(MessageMark::getMsgId));
         return messages.stream().map(a -> {
             ChatMessageResp resp = new ChatMessageResp();
-            resp.setFromUser(buildFromUser(userMap.get(a.getFromUid()),itemMap));
+            resp.setFromUser(buildFromUser(userMap.get(a.getFromUid()), itemMap));
             resp.setMessage(buildMessage(a, replyMap, userMap, markMap.getOrDefault(a.getId(), new ArrayList<>()), receiveUid));
             return resp;
         })
@@ -52,6 +64,7 @@ public class MessageAdapter {
         ChatMessageResp.Message messageVO = new ChatMessageResp.Message();
         BeanUtil.copyProperties(message, messageVO);
         messageVO.setSendTime(message.getCreateTime());
+        messageVO.setUrlTitleMap(Optional.ofNullable(message.getExtra()).map(MessageExtra::getUrlTitleMap).orElse(null));
         Message replyMessage = replyMap.get(message.getReplyMsgId());
         //回复消息
         if (Objects.nonNull(replyMessage)) {
@@ -85,9 +98,10 @@ public class MessageAdapter {
         ChatMessageResp.UserInfo userInfo = new ChatMessageResp.UserInfo();
         userInfo.setUsername(fromUser.getName());
         userInfo.setAvatar(fromUser.getAvatar());
+        userInfo.setLocPlace(Optional.ofNullable(fromUser.getIpInfo()).map(IpInfo::getUpdateIpDetail).map(IpDetail::getCity).orElse(null));
         userInfo.setUid(fromUser.getId());
-        if(Objects.nonNull(fromUser.getItemId())){
-            ChatMessageResp.Badge badge =new ChatMessageResp.Badge();
+        if (Objects.nonNull(fromUser.getItemId())) {
+            ChatMessageResp.Badge badge = new ChatMessageResp.Badge();
             ItemConfig itemConfig = itemMap.get(fromUser.getItemId());
             badge.setImg(itemConfig.getImg());
             badge.setDescribe(itemConfig.getDescribe());

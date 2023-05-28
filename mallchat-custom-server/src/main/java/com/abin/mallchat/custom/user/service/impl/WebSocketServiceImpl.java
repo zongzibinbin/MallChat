@@ -157,7 +157,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         boolean online = userCache.isOnline(user.getId());
         if (!online) {
             user.setLastOptTime(new Date());
-            user.getIpInfo().refreshIp(NettyUtil.getAttr(channel, NettyUtil.IP));
+            user.refreshIp(NettyUtil.getAttr(channel, NettyUtil.IP));
             applicationEventPublisher.publishEvent(new UserOnlineEvent(this, user));
         }
     }

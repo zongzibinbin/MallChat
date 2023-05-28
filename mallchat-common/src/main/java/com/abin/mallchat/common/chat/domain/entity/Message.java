@@ -1,5 +1,6 @@
 package com.abin.mallchat.common.chat.domain.entity;
 
+import com.abin.mallchat.common.user.domain.entity.IpInfo;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -8,6 +9,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -21,7 +23,7 @@ import lombok.experimental.Accessors;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("message")
+@TableName(value = "message",autoResultMap = true)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -79,6 +81,11 @@ public class Message implements Serializable {
     @TableField("type")
     private Integer type;
 
+    /**
+     * 最后上下线时间
+     */
+    @TableField(value = "extra", typeHandler = JacksonTypeHandler.class)
+    private MessageExtra extra;
 
     /**
      * 创建时间

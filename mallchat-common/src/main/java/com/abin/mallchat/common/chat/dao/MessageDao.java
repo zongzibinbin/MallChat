@@ -55,6 +55,7 @@ public class MessageDao extends ServiceImpl<MessageMapper, Message> {
     public void updateGapCount(Long id, Integer gapCount) {
         lambdaUpdate()
                 .eq(Message::getId, id)
-                .set(Message::getGapCount, gapCount);
+                .set(Message::getGapCount, gapCount)
+                .update();
     }
 }

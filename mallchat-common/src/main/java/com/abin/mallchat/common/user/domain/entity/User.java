@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
@@ -99,11 +100,10 @@ public class User implements Serializable {
     @TableField("update_time")
     private Date updateTime;
 
-    public IpInfo getIpInfo() {
+    public void refreshIp(String ip) {
         if (ipInfo == null) {
             ipInfo = new IpInfo();
         }
-        return ipInfo;
+        ipInfo.refreshIp(ip);
     }
-
 }

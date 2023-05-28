@@ -54,6 +54,7 @@ CREATE TABLE `message`  (
   `status` int(11) NOT NULL COMMENT '消息状态 0正常 1删除',
   `gap_count` int(11) NULL DEFAULT NULL COMMENT '与回复的消息间隔多少条',
   `type` int(11) NULL DEFAULT 1 COMMENT '消息类型 1正常文本 2.爆赞 （点赞超过10）3.危险发言（举报超5）',
+  `extra` json DEFAULT NULL COMMENT '扩展信息',
   `create_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
   `update_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE,
@@ -163,10 +164,10 @@ DROP TABLE IF EXISTS `black`;
 CREATE TABLE `black`  (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'id',
   `type` int(11) NOT NULL COMMENT '拉黑目标类型 1.ip 2uid',
-  `target` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '拉黑目标',
+  `target` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '拉黑目标',
   `create_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
   `update_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `idx_type_target`(`type`, `target`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '黑名单' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '黑名单' ROW_FORMAT = Dynamic;
 SET FOREIGN_KEY_CHECKS = 1;

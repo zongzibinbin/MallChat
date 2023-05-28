@@ -45,6 +45,9 @@ public class IpServiceImpl implements IpService, DisposableBean {
         executor.execute(() -> {
             User user = userDao.getById(uid);
             IpInfo ipInfo = user.getIpInfo();
+            if (Objects.isNull(ipInfo)) {
+                return;
+            }
             String ip = ipInfo.needRefreshIp();
             if (StrUtil.isBlank(ip)) {
                 return;

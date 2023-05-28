@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * <p>
@@ -66,7 +68,7 @@ public class ChatController {
         return userCache.getBlackMap().get(BlackTypeEnum.UID.getType());
     }
 
-    @GetMapping("/public/member/statistic")
+    @GetMapping("public/member/statistic/")
     @ApiOperation("群成员人数统计")
     public ApiResult<ChatMemberStatisticResp> getMemberStatistic() {
         return ApiResult.success(chatService.getMemberStatistic());

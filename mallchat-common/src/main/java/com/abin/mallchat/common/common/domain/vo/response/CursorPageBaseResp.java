@@ -32,22 +32,23 @@ public class CursorPageBaseResp<T> {
     @ApiModelProperty("数据列表")
     private List<T> list;
 
-    public static CursorPageBaseResp init(CursorPageBaseResp cursorPage, List list) {
-        CursorPageBaseResp cursorPageBaseResp = new CursorPageBaseResp();
+    public static <T> CursorPageBaseResp<T> init(CursorPageBaseResp cursorPage, List<T> list) {
+        CursorPageBaseResp<T> cursorPageBaseResp = new CursorPageBaseResp<T>();
         cursorPageBaseResp.setIsLast(cursorPage.getIsLast());
         cursorPageBaseResp.setList(list);
         cursorPageBaseResp.setCursor(cursorPage.getCursor());
         return cursorPageBaseResp;
     }
+
     @JsonIgnore
     public Boolean isEmpty() {
         return CollectionUtil.isEmpty(list);
     }
 
-    public static CursorPageBaseResp empty() {
-        CursorPageBaseResp cursorPageBaseResp = new CursorPageBaseResp();
+    public static <T> CursorPageBaseResp<T> empty() {
+        CursorPageBaseResp<T> cursorPageBaseResp = new CursorPageBaseResp<T>();
         cursorPageBaseResp.setIsLast(true);
-        cursorPageBaseResp.setList(new ArrayList());
+        cursorPageBaseResp.setList(new ArrayList<T>());
         return cursorPageBaseResp;
     }
 
