@@ -152,12 +152,13 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public CursorPageBaseResp<ChatRoomResp> getRoomPage(CursorPageBaseReq request, Long uid) {
         CursorPageBaseResp<Room> cursorPage = roomDao.getCursorPage(request);
+        ArrayList<Room> rooms = new ArrayList<>(cursorPage.getList());
         if (request.isFirstPage()) {
             //第一页插入置顶的大群聊
             Room group = roomDao.getById(ROOM_GROUP_ID);
-            cursorPage.getList().add(0, group);
+            rooms.add(0, group);
         }
-        return CursorPageBaseResp.init(cursorPage, RoomAdapter.buildResp(cursorPage.getList()));
+        return CursorPageBaseResp.init(cursorPage, RoomAdapter.buildResp(rooms));
     }
 
     @Override
