@@ -12,6 +12,7 @@ import com.abin.mallchat.custom.user.domain.vo.response.user.UserInfoResp;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -53,6 +54,11 @@ public class UserAdapter {
     }
 
     public static List<BadgeResp> buildBadgeResp(List<ItemConfig> itemConfigs, List<UserBackpack> backpacks, User user) {
+        if (ObjectUtil.isNull(user)) {
+            // 这里 user 入参可能为空，防止 NPE 问题
+            return Collections.emptyList();
+        }
+
         Set<Long> obtainItemSet = backpacks.stream().map(UserBackpack::getItemId).collect(Collectors.toSet());
         return itemConfigs.stream().map(a -> {
             BadgeResp resp = new BadgeResp();
