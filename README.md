@@ -73,6 +73,11 @@ MallChat的后端项目，是一个既能购物又能即时聊天的电商系统
 
 ![Stargazers over time](https://starchart.cc/zongzibinbin/MallChat.svg)
 
+## 贡献者
+<a href="https://github.com/zongzibinbin/MallChat/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=zongzibinbin/MallChat" />
+</a>
+
 ## 公众号
 
 微信搜索 **阿斌Java之路** 关注我的原创公众号，后台回复「**抹茶**」即可加入抹茶交流群，一些做过公司万人群聊，高并发的小伙伴都在里面讨论方案。公众号也会经常更新项目相关的文档，等你来撩~~
