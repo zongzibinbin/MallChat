@@ -11,7 +11,7 @@ public class GlobalUncaughtExceptionHandler  implements Thread.UncaughtException
     }
     @Override
     public void uncaughtException(Thread t, Throwable e) {
-        log.error("current thread ",t.getName()," is error[{}]",e);
+        log.error("current thread name is",t.getName()," is error[{}]",e);
     }
 
 }
