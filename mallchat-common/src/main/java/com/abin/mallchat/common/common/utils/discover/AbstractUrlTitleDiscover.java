@@ -4,6 +4,7 @@ import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import com.abin.mallchat.common.common.utils.FutureUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -38,7 +39,7 @@ public abstract class AbstractUrlTitleDiscover implements UrlTitleDiscover {
         //并行请求
         List<CompletableFuture<Pair<String, String>>> futures = matchList.stream().map(match -> CompletableFuture.supplyAsync(() -> {
             String title = getUrlTitle(match);
-            return Objects.nonNull(title) ? Pair.of(match, title) : null;
+            return StringUtils.isNotEmpty(title) ? Pair.of(match, title) : null;
         })).collect(Collectors.toList());
         CompletableFuture<List<Pair<String, String>>> future = FutureUtils.sequenceNonNull(futures);
         //结果组装
