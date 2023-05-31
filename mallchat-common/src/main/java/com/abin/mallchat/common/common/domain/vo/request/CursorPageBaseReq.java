@@ -34,6 +34,6 @@ public class CursorPageBaseReq {
 
     @JsonIgnore
     public Boolean isFirstPage() {
-        return StringUtils.isNotEmpty(cursor);
+        return StringUtils.isEmpty(cursor);
     }
 }

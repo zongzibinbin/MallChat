@@ -17,7 +17,7 @@ public class HttpHeadersHandler extends ChannelInboundHandlerAdapter {
         if (msg instanceof FullHttpRequest) {
             HttpHeaders headers = ((FullHttpRequest) msg).headers();
             String ip = headers.get("X-Real-IP");
-            if (StringUtils.isNotEmpty(ip)) {//如果没经过nginx，就直接获取远端地址
+            if (StringUtils.isEmpty(ip)) {//如果没经过nginx，就直接获取远端地址
                 InetSocketAddress address = (InetSocketAddress) ctx.channel().remoteAddress();
                 ip = address.getAddress().getHostAddress();
             }
