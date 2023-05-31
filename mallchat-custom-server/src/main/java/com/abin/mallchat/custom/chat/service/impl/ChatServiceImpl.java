@@ -36,6 +36,7 @@ import com.abin.mallchat.custom.chat.service.adapter.MemberAdapter;
 import com.abin.mallchat.custom.chat.service.adapter.MessageAdapter;
 import com.abin.mallchat.custom.chat.service.adapter.RoomAdapter;
 import com.abin.mallchat.custom.chat.service.helper.ChatMemberHelper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,24 +56,18 @@ import java.util.stream.Stream;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ChatServiceImpl implements ChatService {
     public static final long ROOM_GROUP_ID = 1L;
-    @Autowired
-    private MessageDao messageDao;
-    @Autowired
-    private UserDao userDao;
-    @Autowired
-    private ApplicationEventPublisher applicationEventPublisher;
-    @Autowired
-    private UserCache userCache;
-    @Autowired
-    private MemberAdapter memberAdapter;
-    @Autowired
-    private RoomDao roomDao;
-    @Autowired
-    private MessageMarkDao messageMarkDao;
-    @Autowired
-    private ItemCache itemCache;
+
+    private final MessageDao messageDao;
+    private final UserDao userDao;
+    private final ApplicationEventPublisher applicationEventPublisher;
+    private final UserCache userCache;
+    private final MemberAdapter memberAdapter;
+    private final RoomDao roomDao;
+    private final MessageMarkDao messageMarkDao;
+    private final ItemCache itemCache;
 
     /**
      * 发送消息

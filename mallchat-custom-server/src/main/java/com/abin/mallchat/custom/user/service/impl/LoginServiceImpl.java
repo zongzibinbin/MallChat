@@ -5,6 +5,7 @@ import com.abin.mallchat.common.common.constant.RedisKey;
 import com.abin.mallchat.common.common.utils.JwtUtils;
 import com.abin.mallchat.common.common.utils.RedisUtils;
 import com.abin.mallchat.custom.user.service.LoginService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -20,12 +21,11 @@ import java.util.concurrent.TimeUnit;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class LoginServiceImpl implements LoginService {
+    private final JwtUtils jwtUtils;
+    private final RedisUtils redisUtils;
 
-    @Autowired
-    private JwtUtils jwtUtils;
-    @Autowired
-    private RedisUtils redisUtils;
     //token过期时间
     private static final Integer TOKEN_EXPIRE_DAYS = 5;
     //token续期时间

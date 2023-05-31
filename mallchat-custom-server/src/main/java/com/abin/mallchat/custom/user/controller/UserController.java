@@ -10,6 +10,7 @@ import com.abin.mallchat.custom.user.domain.vo.response.user.UserInfoResp;
 import com.abin.mallchat.custom.user.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,9 +28,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/capi/user")
 @Api(tags = "用户管理相关接口")
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserController {
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     @GetMapping("/userInfo")
     @ApiOperation("用户详情")

@@ -11,6 +11,7 @@ import com.abin.mallchat.common.user.domain.entity.UserBackpack;
 import com.abin.mallchat.common.user.domain.enums.ItemTypeEnum;
 import com.abin.mallchat.common.user.service.IUserBackpackService;
 import com.abin.mallchat.common.user.service.cache.ItemCache;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -26,15 +27,12 @@ import java.util.Objects;
  * @since 2023-03-19
  */
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserBackpackServiceImpl implements IUserBackpackService {
-    @Autowired
-    private UserBackpackDao userBackpackDao;
-    @Autowired
-    private ItemConfigDao itemConfigDao;
-    @Autowired
-    private ItemCache itemCache;
-    @Autowired
-    private ApplicationEventPublisher applicationEventPublisher;
+    private final UserBackpackDao userBackpackDao;
+    private final ItemConfigDao itemConfigDao;
+    private final ItemCache itemCache;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     @RedissonLock(key = "#uid", waitTime = 5000)//相同用户会同时发奖，需要排队不能直接拒绝

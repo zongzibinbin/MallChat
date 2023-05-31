@@ -2,6 +2,7 @@ package com.abin.mallchat.custom.user.service.handler;
 
 import com.abin.mallchat.custom.user.service.WxMsgService;
 import com.abin.mallchat.custom.user.service.adapter.TextBuilder;
+import lombok.RequiredArgsConstructor;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.common.session.WxSessionManager;
 import me.chanjar.weixin.mp.api.WxMpService;
@@ -16,9 +17,9 @@ import java.util.Map;
  * @author <a href="https://github.com/binarywang">Binary Wang</a>
  */
 @Component
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class SubscribeHandler extends AbstractHandler {
-    @Autowired
-    private WxMsgService wxMsgService;
+    private final WxMsgService wxMsgService;
 
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage,

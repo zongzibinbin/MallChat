@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.abin.mallchat.common.common.annotation.RedissonLock;
 import com.abin.mallchat.common.common.service.LockService;
 import com.abin.mallchat.common.common.utils.SpElUtils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -24,9 +25,9 @@ import java.lang.reflect.Method;
 @Aspect
 @Component
 @Order(0)//确保比事务注解先执行，分布式锁在事务外
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class RedissonLockAspect {
-    @Autowired
-    private LockService lockService;
+    private final LockService lockService;
 
     @Around("@annotation(com.abin.mallchat.common.common.annotation.RedissonLock)")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {

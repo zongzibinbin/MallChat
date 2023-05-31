@@ -19,6 +19,7 @@ import com.abin.mallchat.custom.user.domain.vo.response.user.BadgeResp;
 import com.abin.mallchat.custom.user.domain.vo.response.user.UserInfoResp;
 import com.abin.mallchat.custom.user.service.UserService;
 import com.abin.mallchat.custom.user.service.adapter.UserAdapter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -35,22 +36,15 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserServiceImpl implements UserService {
-
-    @Autowired
-    private UserCache userCache;
-    @Autowired
-    private UserBackpackDao userBackpackDao;
-    @Autowired
-    private UserDao userDao;
-    @Autowired
-    private ItemConfigDao itemConfigDao;
-    @Autowired
-    private IUserBackpackService iUserBackpackService;
-    @Autowired
-    private ApplicationEventPublisher applicationEventPublisher;
-    @Autowired
-    private ItemCache itemCache;
+    private final UserCache userCache;
+    private final UserBackpackDao userBackpackDao;
+    private final UserDao userDao;
+    private final ItemConfigDao itemConfigDao;
+    private final IUserBackpackService iUserBackpackService;
+    private final ApplicationEventPublisher applicationEventPublisher;
+    private final ItemCache itemCache;
 
     @Override
     public UserInfoResp getUserInfo(Long uid) {

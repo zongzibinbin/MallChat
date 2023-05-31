@@ -11,6 +11,7 @@ import com.abin.mallchat.common.user.domain.entity.IpDetail;
 import com.abin.mallchat.common.user.domain.entity.IpInfo;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.service.IpService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,13 +31,13 @@ import java.util.concurrent.TimeUnit;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class IpServiceImpl implements IpService, DisposableBean {
     private static ExecutorService executor = new ThreadPoolExecutor(1, 1,
             0L, TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<Runnable>(500), new NamedThreadFactory("refresh-ipDetail", false));
 
-    @Autowired
-    private UserDao userDao;
+    private final UserDao userDao;
 
     @Override
     public void refreshIpDetailAsync(Long uid) {

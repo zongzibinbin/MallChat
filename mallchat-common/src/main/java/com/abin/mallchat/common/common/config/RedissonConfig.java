@@ -1,5 +1,6 @@
 package com.abin.mallchat.common.common.config;
 
+import lombok.RequiredArgsConstructor;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -14,9 +15,9 @@ import org.springframework.context.annotation.Configuration;
  * Date: 2023-04-22
  */
 @Configuration
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class RedissonConfig {
-    @Autowired
-    private RedisProperties redisProperties;
+    private final RedisProperties redisProperties;
 
     @Bean
     public RedissonClient redissonClient() {

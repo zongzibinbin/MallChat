@@ -64,19 +64,27 @@ public class WebSocketServiceImpl implements WebSocketService {
     }
 
     public static final int EXPIRE_SECONDS = 60 * 60;
-    @Autowired
-    private WxMpService wxMpService;
-    @Autowired
-    private LoginService loginService;
-    @Autowired
-    private UserDao userDao;
-    @Autowired
-    private ApplicationEventPublisher applicationEventPublisher;
-    @Autowired
-    @Qualifier(ThreadPoolConfig.WS_EXECUTOR)
-    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
-    @Autowired
-    private UserCache userCache;
+
+    private final WxMpService wxMpService;
+    private final LoginService loginService;
+    private final UserDao userDao;
+    private final ApplicationEventPublisher applicationEventPublisher;
+    private final ThreadPoolTaskExecutor threadPoolTaskExecutor;
+    private final UserCache userCache;
+
+    public WebSocketServiceImpl(@Autowired WxMpService wxMpService,
+                                @Autowired LoginService loginService,
+                                @Autowired UserDao userDao,
+                                @Autowired ApplicationEventPublisher applicationEventPublisher,
+                                @Autowired @Qualifier(ThreadPoolConfig.WS_EXECUTOR) ThreadPoolTaskExecutor threadPoolTaskExecutor,
+                                @Autowired UserCache userCache) {
+        this.wxMpService = wxMpService;
+        this.loginService = loginService;
+        this.userDao = userDao;
+        this.applicationEventPublisher = applicationEventPublisher;
+        this.threadPoolTaskExecutor = threadPoolTaskExecutor;
+        this.userCache = userCache;
+    }
 
     /**
      * 处理用户登录请求，需要返回一张带code的二维码

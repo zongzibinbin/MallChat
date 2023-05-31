@@ -5,6 +5,7 @@ import com.abin.mallchat.common.common.exception.HttpErrorEnum;
 import com.abin.mallchat.common.common.utils.RequestHolder;
 import com.abin.mallchat.common.user.domain.enums.BlackTypeEnum;
 import com.abin.mallchat.common.user.service.cache.UserCache;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
@@ -23,10 +24,9 @@ import java.util.Set;
 @Order(2)
 @Slf4j
 @Component
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class BlackInterceptor implements HandlerInterceptor {
-
-    @Autowired
-    private UserCache userCache;
+    private final UserCache userCache;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
