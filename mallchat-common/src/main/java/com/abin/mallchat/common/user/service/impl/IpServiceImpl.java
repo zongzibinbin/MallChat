@@ -1,16 +1,19 @@
 package com.abin.mallchat.common.user.service.impl;
 
 import cn.hutool.core.lang.TypeReference;
+
 import cn.hutool.core.thread.NamedThreadFactory;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
+import com.abin.mallchat.common.common.handler.GlobalUncaughtExceptionHandler;
 import com.abin.mallchat.common.user.dao.UserDao;
 import com.abin.mallchat.common.user.domain.dto.IpResult;
 import com.abin.mallchat.common.user.domain.entity.IpDetail;
 import com.abin.mallchat.common.user.domain.entity.IpInfo;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.service.IpService;
+import jodd.util.concurrent.ThreadFactoryBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * Description: ip
@@ -33,10 +33,15 @@ import java.util.concurrent.TimeUnit;
 public class IpServiceImpl implements IpService, DisposableBean {
     private static ExecutorService executor = new ThreadPoolExecutor(1, 1,
             0L, TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<Runnable>(500), new NamedThreadFactory("refresh-ipDetail", false));
+            new LinkedBlockingQueue<Runnable>(500),
+            new NamedThreadFactory("refresh-ipDetail", (ThreadGroup)null,false,
+                    new GlobalUncaughtExceptionHandler("refresh-ipDetail")));
 
     @Autowired
     private UserDao userDao;
+
+
+
 
     @Override
     public void refreshIpDetailAsync(Long uid) {
@@ -116,5 +121,7 @@ public class IpServiceImpl implements IpService, DisposableBean {
                 log.error("Timed out while waiting for executor [{}] to terminate", executor);
             }
         }
+
+
     }
 }
