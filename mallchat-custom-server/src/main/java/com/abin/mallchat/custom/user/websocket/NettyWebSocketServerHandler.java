@@ -13,11 +13,23 @@ import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
 
-
+/**
+ * <p>
+ * netty ws 服务处理
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-04-18
+ */
 @Slf4j
 public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
 
-    // 当web客户端连接后，触发该方法
+    /**
+     * 当web客户端连接后，触发该方法
+     *
+     * @param ctx
+     * @throws Exception
+     */
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
         getService().connect(ctx.channel());
@@ -67,7 +79,13 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
         super.userEventTriggered(ctx, evt);
     }
 
-    // 处理异常
+    /**
+     * 处理异常
+     *
+     * @param ctx
+     * @param cause
+     * @throws Exception
+     */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         log.warn("异常发生，异常消息 ={}", cause.getMessage());
@@ -78,7 +96,13 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
         return SpringUtil.getBean(WebSocketService.class);
     }
 
-    // 读取客户端发送的请求报文
+    /**
+     * 读取客户端发送的请求报文
+     *
+     * @param ctx
+     * @param msg
+     * @throws Exception
+     */
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) throws Exception {
         WSBaseReq wsBaseReq = JSONUtil.toBean(msg.text(), WSBaseReq.class);
@@ -93,8 +117,11 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
             case AUTHORIZE:
                 getService().authorize(ctx.channel(), JSONUtil.toBean(wsBaseReq.getData(), WSAuthorize.class));
                 log.info("主动认证 = " + msg.text());
+                break;
             default:
                 log.info("未知类型");
+                break;
         }
     }
+
 }

@@ -12,4 +12,5 @@ public class MessageMarkEvent extends ApplicationEvent {
         super(source);
         this.dto = dto;
     }
+
 }

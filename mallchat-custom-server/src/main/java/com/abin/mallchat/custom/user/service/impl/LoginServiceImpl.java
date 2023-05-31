@@ -14,9 +14,12 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Description: 登录相关处理类
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-19
+ * <p>
+ * 登录相关处理类
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-19
  */
 @Service
 @Slf4j
@@ -44,7 +47,8 @@ public class LoginServiceImpl implements LoginService {
         }
         String key = RedisKey.getKey(RedisKey.USER_TOKEN_STRING, uid);
         String realToken = RedisUtils.getStr(key);
-        return token.equals(realToken);//有可能token失效了，需要校验是不是和最新token一致
+        //有可能token失效了，需要校验是不是和最新token一致
+        return token.equals(realToken);
     }
 
     @Async
@@ -54,11 +58,13 @@ public class LoginServiceImpl implements LoginService {
             return;
         }
         String key = RedisKey.getKey(RedisKey.USER_TOKEN_STRING, uid);
-        long expireDays = redisUtils.getExpire(key, TimeUnit.DAYS);
-        if (expireDays == -2) {//不存在的key
+        long expireDays = RedisUtils.getExpire(key, TimeUnit.DAYS);
+        //不存在的key
+        if (expireDays == -2) {
             return;
         }
-        if (expireDays < TOKEN_RENEWAL_DAYS) {//小于一天的token帮忙续期
+        //小于一天的token帮忙续期
+        if (expireDays < TOKEN_RENEWAL_DAYS) {
             redisUtils.expire(key, TOKEN_EXPIRE_DAYS, TimeUnit.DAYS);
         }
     }
@@ -66,13 +72,14 @@ public class LoginServiceImpl implements LoginService {
     @Override
     public String login(Long uid) {
         String key = RedisKey.getKey(RedisKey.USER_TOKEN_STRING, uid);
-        String token = redisUtils.getStr(key);
+        String token = RedisUtils.getStr(key);
         if (StrUtil.isNotBlank(token)) {
             return token;
         }
         //获取用户token
         token = jwtUtils.createToken(uid);
-        RedisUtils.set(key, token, TOKEN_EXPIRE_DAYS, TimeUnit.DAYS);//token过期用redis中心化控制，初期采用5天过期，剩1天自动续期的方案。后续可以用双token实现
+        //token过期用redis中心化控制，初期采用5天过期，剩1天自动续期的方案。后续可以用双token实现
+        RedisUtils.set(key, token, TOKEN_EXPIRE_DAYS, TimeUnit.DAYS);
         return token;
     }
 
@@ -85,4 +92,5 @@ public class LoginServiceImpl implements LoginService {
     public static void main(String[] args) {
         System.out.println();
     }
+
 }

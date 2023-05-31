@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Getter
 public enum MessageStatusEnum {
+
     NORMAL(0, "正常"),
     DELETE(1, "删除"),
     ;
@@ -32,4 +33,6 @@ public enum MessageStatusEnum {
     public static MessageStatusEnum of(Integer type) {
         return cache.get(type);
     }
+
+
 }

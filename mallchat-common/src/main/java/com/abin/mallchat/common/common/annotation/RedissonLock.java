@@ -7,11 +7,17 @@ import java.lang.annotation.Target;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * <p>
  * 分布式锁注解
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-29
  */
 @Retention(RetentionPolicy.RUNTIME)//运行时生效
 @Target(ElementType.METHOD)//作用在方法上
 public @interface RedissonLock {
+
     /**
      * key的前缀,默认取方法全限定名，除非我们在不同方法上对同一个资源做分布式锁，就自己指定
      *

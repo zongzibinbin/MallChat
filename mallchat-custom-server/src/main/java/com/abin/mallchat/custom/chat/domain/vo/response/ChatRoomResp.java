@@ -9,15 +9,19 @@ import lombok.NoArgsConstructor;
 import java.util.Date;
 
 /**
- * Description: 群成员列表的成员信息
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-23
+ * <p>
+ * 群成员列表的成员信息
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-23
  */
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatRoomResp {
+
     @ApiModelProperty("会话id")
     private Long id;
     @ApiModelProperty("会话名称")
@@ -26,4 +30,5 @@ public class ChatRoomResp {
     private Integer type;
     @ApiModelProperty("房间最后活跃时间")
     private Date lastActiveTime;
+
 }

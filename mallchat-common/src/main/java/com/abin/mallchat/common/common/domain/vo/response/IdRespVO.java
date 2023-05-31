@@ -6,12 +6,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * @author zhongzb create on 2021/05/31
+ * <p>
+ * id数据返回
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2021-05-31
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class IdRespVO {
+
     @ApiModelProperty("id")
     private long id;
 
@@ -20,4 +26,5 @@ public class IdRespVO {
         idRespVO.setId(id);
         return idRespVO;
     }
+
 }

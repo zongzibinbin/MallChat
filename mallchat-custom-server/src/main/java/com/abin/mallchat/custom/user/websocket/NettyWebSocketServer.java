@@ -21,11 +21,23 @@ import org.springframework.context.annotation.Configuration;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+/**
+ * <p>
+ * netty ws 服务
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-04-18
+ */
 @Slf4j
 @Configuration
 public class NettyWebSocketServer {
+
     public static final int WEB_SOCKET_PORT = 8090;
-    // 创建线程池执行器
+
+    /**
+     * 创建线程池执行器
+     */
     private EventLoopGroup bossGroup = new NioEventLoopGroup(1);
     private EventLoopGroup workerGroup = new NioEventLoopGroup(8);
 
@@ -59,7 +71,8 @@ public class NettyWebSocketServer {
                 .channel(NioServerSocketChannel.class)
                 .option(ChannelOption.SO_BACKLOG, 128)
                 .option(ChannelOption.SO_KEEPALIVE, true)
-                .handler(new LoggingHandler(LogLevel.INFO)) // 为 bossGroup 添加 日志处理器
+                // 为 bossGroup 添加 日志处理器
+                .handler(new LoggingHandler(LogLevel.INFO))
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel socketChannel) throws Exception {
@@ -70,7 +83,7 @@ public class NettyWebSocketServer {
                         pipeline.addLast(new HttpServerCodec());
                         // 以块方式写，添加 chunkedWriter 处理器
                         pipeline.addLast(new ChunkedWriteHandler());
-                        /**
+                        /*
                          * 说明：
                          *  1. http数据在传输过程中是分段的，HttpObjectAggregator可以把多个段聚合起来；
                          *  2. 这就是为什么当浏览器发送大量数据时，就会发出多次 http请求的原因
@@ -78,7 +91,7 @@ public class NettyWebSocketServer {
                         pipeline.addLast(new HttpObjectAggregator(8192));
                         //保存用户ip
                         pipeline.addLast(new HttpHeadersHandler());
-                        /**
+                        /*
                          * 说明：
                          *  1. 对于 WebSocket，它的数据是以帧frame 的形式传递的；
                          *  2. 可以看到 WebSocketFrame 下面有6个子类

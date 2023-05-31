@@ -10,13 +10,17 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Description: ws前端请求类型枚举
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-19
+ * <p>
+ * ws前端请求类型枚举
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-19
  */
 @AllArgsConstructor
 @Getter
 public enum WSRespTypeEnum {
+
     LOGIN_URL(1, "登录二维码返回", WSLoginUrl.class),
     LOGIN_SCAN_SUCCESS(2, "用户扫描成功等待授权", null),
     LOGIN_SUCCESS(3, "用户登录成功返回用户信息", WSLoginSuccess.class),
@@ -39,4 +43,5 @@ public enum WSRespTypeEnum {
     public static WSRespTypeEnum of(Integer type) {
         return cache.get(type);
     }
+
 }

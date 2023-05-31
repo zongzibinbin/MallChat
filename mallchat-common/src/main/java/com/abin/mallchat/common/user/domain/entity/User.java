@@ -100,4 +100,5 @@ public class User implements Serializable {
         }
         ipInfo.refreshIp(ip);
     }
+
 }

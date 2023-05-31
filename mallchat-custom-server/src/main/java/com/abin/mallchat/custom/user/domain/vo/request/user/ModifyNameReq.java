@@ -11,9 +11,12 @@ import javax.validation.constraints.NotNull;
 
 
 /**
- * Description: 修改用户名
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-23
+ * <p>
+ * 修改用户名前端请求体
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-23
  */
 @Data
 @Builder

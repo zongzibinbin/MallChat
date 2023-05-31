@@ -10,7 +10,6 @@ import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.domain.entity.UserBackpack;
 import com.abin.mallchat.common.user.domain.enums.ItemEnum;
 import com.abin.mallchat.common.user.domain.enums.ItemTypeEnum;
-import com.abin.mallchat.common.user.service.IUserBackpackService;
 import com.abin.mallchat.common.user.service.cache.ItemCache;
 import com.abin.mallchat.common.user.service.cache.UserCache;
 import com.abin.mallchat.custom.user.domain.vo.request.user.ModifyNameReq;
@@ -29,9 +28,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Description: 用户基础操作类
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-19
+ * <p>
+ * 用户基础操作类
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-19
  */
 @Service
 @Slf4j
@@ -45,8 +47,6 @@ public class UserServiceImpl implements UserService {
     private UserDao userDao;
     @Autowired
     private ItemConfigDao itemConfigDao;
-    @Autowired
-    private IUserBackpackService iUserBackpackService;
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
     @Autowired
@@ -70,7 +70,8 @@ public class UserServiceImpl implements UserService {
         AssertUtil.isNotEmpty(firstValidItem, "改名次数不够了，等后续活动送改名卡哦");
         //使用改名卡
         boolean useSuccess = userBackpackDao.invalidItem(firstValidItem.getId());
-        if (useSuccess) {//用乐观锁，就不用分布式锁了
+        //用乐观锁，就不用分布式锁了
+        if (useSuccess) {
             //改名
             userDao.modifyName(uid, req.getName());
             //删除缓存
@@ -109,4 +110,5 @@ public class UserServiceImpl implements UserService {
         userDao.save(insert);
         applicationEventPublisher.publishEvent(new UserRegisterEvent(this, insert));
     }
+
 }

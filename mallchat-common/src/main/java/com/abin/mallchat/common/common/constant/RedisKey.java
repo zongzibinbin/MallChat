@@ -1,9 +1,15 @@
 package com.abin.mallchat.common.common.constant;
 
 /**
- * @author zhongzb create on 2021/06/10
+ * <p>
+ * Redis key
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2021-06-10
  */
 public class RedisKey {
+
     private static final String BASE_KEY = "mallchat:";
 
     /**

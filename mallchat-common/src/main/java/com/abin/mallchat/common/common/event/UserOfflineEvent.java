@@ -12,4 +12,5 @@ public class UserOfflineEvent extends ApplicationEvent {
         super(source);
         this.user = user;
     }
+
 }

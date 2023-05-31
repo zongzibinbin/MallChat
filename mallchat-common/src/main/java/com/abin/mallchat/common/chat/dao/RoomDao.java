@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class RoomDao extends ServiceImpl<RoomMapper, Room> {
+
     @Autowired
     private CursorUtils cursorUtils;
 
@@ -28,4 +29,5 @@ public class RoomDao extends ServiceImpl<RoomMapper, Room> {
             wrapper.ne(Room::getType, RoomTypeEnum.GROUP.getStatus());
         }, Room::getActiveTime);
     }
+
 }

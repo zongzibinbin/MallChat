@@ -9,13 +9,17 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Description: ws前端请求类型枚举
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-19
+ * <p>
+ * ws前端请求类型枚举
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-19
  */
 @AllArgsConstructor
 @Getter
 public enum ChatActiveStatusEnum {
+
     ONLINE(1, "在线"),
     OFFLINE(2, "离线"),
     ;
@@ -32,4 +36,5 @@ public enum ChatActiveStatusEnum {
     public static ChatActiveStatusEnum of(Integer type) {
         return cache.get(type);
     }
+
 }

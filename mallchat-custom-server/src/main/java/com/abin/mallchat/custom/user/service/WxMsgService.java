@@ -22,13 +22,17 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Description: 处理与微信api的交互逻辑
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-19
+ * <p>
+ * 处理与微信api的交互逻辑
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-19
  */
 @Service
 @Slf4j
 public class WxMsgService {
+
     /**
      * 用户的openId和前端登录场景code的映射关系
      */
@@ -47,7 +51,6 @@ public class WxMsgService {
     private UserService userService;
     @Autowired
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
-
 
     public WxMpXmlOutMessage scan(WxMpService wxMpService, WxMpXmlMessage wxMpXmlMessage) {
         String fromUser = wxMpXmlMessage.getFromUser();
@@ -114,4 +117,5 @@ public class WxMsgService {
         //推送前端登录成功
         webSocketService.scanLoginSuccess(eventKey, user, token);
     }
+
 }

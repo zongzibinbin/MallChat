@@ -19,11 +19,15 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Description: 消息适配器
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-26
+ * <p>
+ * 消息适配器
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-26
  */
 public class MessageAdapter {
+
     public static final int CAN_CALLBACK_GAP_COUNT = 50;
     private static final PrioritizedUrlTitleDiscover URL_TITLE_DISCOVER = new PrioritizedUrlTitleDiscover();
 
@@ -48,12 +52,13 @@ public class MessageAdapter {
     public static List<ChatMessageResp> buildMsgResp(List<Message> messages, Map<Long, Message> replyMap, Map<Long, User> userMap, List<MessageMark> msgMark, Long receiveUid, Map<Long, ItemConfig> itemMap) {
         Map<Long, List<MessageMark>> markMap = msgMark.stream().collect(Collectors.groupingBy(MessageMark::getMsgId));
         return messages.stream().map(a -> {
-            ChatMessageResp resp = new ChatMessageResp();
-            resp.setFromUser(buildFromUser(userMap.get(a.getFromUid()), itemMap));
-            resp.setMessage(buildMessage(a, replyMap, userMap, markMap.getOrDefault(a.getId(), new ArrayList<>()), receiveUid));
-            return resp;
-        })
-                .sorted(Comparator.comparing(a -> a.getMessage().getSendTime()))//帮前端排好序，更方便它展示
+                    ChatMessageResp resp = new ChatMessageResp();
+                    resp.setFromUser(buildFromUser(userMap.get(a.getFromUid()), itemMap));
+                    resp.setMessage(buildMessage(a, replyMap, userMap, markMap.getOrDefault(a.getId(), new ArrayList<>()), receiveUid));
+                    return resp;
+                })
+                //帮前端排好序，更方便它展示
+                .sorted(Comparator.comparing(a -> a.getMessage().getSendTime()))
                 .collect(Collectors.toList());
     }
 
@@ -106,6 +111,5 @@ public class MessageAdapter {
         }
         return userInfo;
     }
-
 
 }

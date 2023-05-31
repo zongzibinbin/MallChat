@@ -19,13 +19,19 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * Description: urlTitle查询抽象类
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-05-27
+ * <p>
+ * urlTitle查询抽象类
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-05-27
  */
 @Slf4j
 public abstract class AbstractUrlTitleDiscover implements UrlTitleDiscover {
-    //链接识别的正则
+
+    /**
+     * 链接识别的正则
+     */
     private static final Pattern PATTERN = Pattern.compile("((http|https)://)?(www.)?([\\w_-]+(?:(?:\\.[\\w_-]+)+))([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])?");
 
     @Nullable
@@ -72,4 +78,5 @@ public abstract class AbstractUrlTitleDiscover implements UrlTitleDiscover {
         }
         return null;
     }
+
 }

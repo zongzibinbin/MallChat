@@ -15,9 +15,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
 /**
- * Description: 微信api交互接口
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-19
+ * <p>
+ * 微信api交互接口
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-19
  */
 @Slf4j
 @AllArgsConstructor
@@ -115,4 +118,5 @@ public class WxPortalController {
 
         return null;
     }
+
 }

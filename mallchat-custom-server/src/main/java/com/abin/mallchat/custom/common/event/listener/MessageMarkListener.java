@@ -19,13 +19,17 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 
 /**
+ * <p>
  * 消息标记监听器
+ * </p>
  *
- * @author zhongzb create on 2022/08/26
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2022-08-26
  */
 @Slf4j
 @Component
 public class MessageMarkListener {
+
     @Autowired
     private MessageMarkDao messageMarkDao;
     @Autowired

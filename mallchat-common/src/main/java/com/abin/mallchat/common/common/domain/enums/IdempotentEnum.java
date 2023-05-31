@@ -9,13 +9,17 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Description: 幂等类型
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-19
+ * <p>
+ * 幂等类型
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-19
  */
 @AllArgsConstructor
 @Getter
 public enum IdempotentEnum {
+
     UID(1, "uid"),
     MSG_ID(2, "消息id"),
     ;
@@ -32,4 +36,5 @@ public enum IdempotentEnum {
     public static IdempotentEnum of(Integer type) {
         return cache.get(type);
     }
+
 }

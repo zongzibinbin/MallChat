@@ -18,7 +18,12 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
+ * <p>
  * 黑名单拦截
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-26
  */
 @Order(2)
 @Slf4j

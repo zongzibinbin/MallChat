@@ -2,7 +2,6 @@ package com.abin.mallchat.custom.user.service.handler;
 
 import com.abin.mallchat.custom.user.service.WxMsgService;
 import com.abin.mallchat.custom.user.service.adapter.TextBuilder;
-import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.common.session.WxSessionManager;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
@@ -17,13 +16,14 @@ import java.util.Map;
  */
 @Component
 public class SubscribeHandler extends AbstractHandler {
+
     @Autowired
     private WxMsgService wxMsgService;
 
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage,
                                     Map<String, Object> context, WxMpService weixinService,
-                                    WxSessionManager sessionManager) throws WxErrorException {
+                                    WxSessionManager sessionManager) {
 
         this.logger.info("新关注用户 OPENID: " + wxMessage.getFromUser());
 
@@ -50,8 +50,7 @@ public class SubscribeHandler extends AbstractHandler {
     /**
      * 处理特殊请求，比如如果是扫码进来的，可以做相应处理
      */
-    private WxMpXmlOutMessage handleSpecial(WxMpService weixinService, WxMpXmlMessage wxMessage)
-            throws Exception {
+    private WxMpXmlOutMessage handleSpecial(WxMpService weixinService, WxMpXmlMessage wxMessage) {
         return wxMsgService.scan(weixinService, wxMessage);
     }
 

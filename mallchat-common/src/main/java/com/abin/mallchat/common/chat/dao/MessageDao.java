@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class MessageDao extends ServiceImpl<MessageMapper, Message> {
+
     @Autowired
     private CursorUtils cursorUtils;
 
@@ -55,4 +56,5 @@ public class MessageDao extends ServiceImpl<MessageMapper, Message> {
                 .set(Message::getGapCount, gapCount)
                 .update();
     }
+
 }

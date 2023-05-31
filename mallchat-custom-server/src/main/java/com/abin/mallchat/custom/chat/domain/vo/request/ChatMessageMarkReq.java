@@ -9,15 +9,19 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotNull;
 
 /**
- * Description: 消息标记请求
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-29
+ * <p>
+ * 消息标记请求
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-29
  */
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatMessageMarkReq {
+
     @NotNull
     @ApiModelProperty("消息id")
     private Long msgId;
@@ -29,4 +33,5 @@ public class ChatMessageMarkReq {
     @NotNull
     @ApiModelProperty("动作类型 1确认 2取消")
     private Integer actType;
+
 }

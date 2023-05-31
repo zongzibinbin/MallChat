@@ -11,6 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * <p>
+ * 基础翻页返回
+ * </p>
+ *
  * @author <a href="https://github.com/zongzibinbin">abin</a>
  * @since 2023-03-19
  */
@@ -74,6 +78,7 @@ public class PageBaseResp<T> {
             return false;
         }
         long pageTotal = totalRecords / pageSize + (totalRecords % pageSize == 0 ? 0 : 1);
-        return pageNo >= pageTotal ? true : false;
+        return pageNo >= pageTotal;
     }
+
 }

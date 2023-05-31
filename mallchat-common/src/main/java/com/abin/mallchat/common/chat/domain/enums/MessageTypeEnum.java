@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Getter
 public enum MessageTypeEnum {
+
     NORMAL(1, "正常"),
     LIKE(2, "爆赞"),
     DISLIKE(3, "危险发言"),
@@ -33,4 +34,5 @@ public enum MessageTypeEnum {
     public static MessageTypeEnum of(Integer type) {
         return cache.get(type);
     }
+
 }

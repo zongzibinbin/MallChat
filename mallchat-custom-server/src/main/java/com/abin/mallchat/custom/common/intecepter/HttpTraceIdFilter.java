@@ -10,9 +10,12 @@ import java.io.IOException;
 import java.util.UUID;
 
 /**
- * Description: 设置链路追踪的值，初期单体项目先简单用
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-04-05
+ * <p>
+ * 设置链路追踪的值，初期单体项目先简单用
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-04-05
  */
 @Slf4j
 @WebFilter(urlPatterns = "/*")

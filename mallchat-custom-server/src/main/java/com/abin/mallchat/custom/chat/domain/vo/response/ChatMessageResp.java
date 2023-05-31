@@ -10,9 +10,12 @@ import java.util.Date;
 import java.util.Map;
 
 /**
- * Description: 消息
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-23
+ * <p>
+ * 消息
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-23
  */
 @Data
 @Builder
@@ -91,4 +94,5 @@ public class ChatMessageResp {
         @ApiModelProperty("徽章说明")
         private String describe;
     }
+
 }

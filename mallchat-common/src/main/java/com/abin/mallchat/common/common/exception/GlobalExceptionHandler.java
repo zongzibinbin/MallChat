@@ -6,7 +6,14 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-
+/**
+ * <p>
+ * 统一异常处理
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-26
+ */
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
@@ -49,4 +56,5 @@ public class GlobalExceptionHandler {
         log.info("business exception！The reason is：{}", e.getMessage(), e);
         return ApiResult.fail(e.getErrorCode(), e.getMessage());
     }
+
 }

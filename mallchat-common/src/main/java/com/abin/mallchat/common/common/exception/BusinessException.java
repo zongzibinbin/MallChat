@@ -2,8 +2,17 @@ package com.abin.mallchat.common.common.exception;
 
 import lombok.Data;
 
+/**
+ * <p>
+ * 业务异常
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-26
+ */
 @Data
 public class BusinessException extends RuntimeException {
+
     private static final long serialVersionUID = 1L;
 
     /**
@@ -52,4 +61,5 @@ public class BusinessException extends RuntimeException {
     public synchronized Throwable fillInStackTrace() {
         return this;
     }
+
 }

@@ -13,7 +13,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 
 /**
+ * <p>
  * 信息收集的拦截器
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-26
  */
 @Order(1)
 @Slf4j

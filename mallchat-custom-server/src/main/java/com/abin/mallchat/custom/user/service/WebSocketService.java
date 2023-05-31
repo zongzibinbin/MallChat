@@ -5,7 +5,16 @@ import com.abin.mallchat.custom.user.domain.vo.request.ws.WSAuthorize;
 import com.abin.mallchat.custom.user.domain.vo.response.ws.WSBaseResp;
 import io.netty.channel.Channel;
 
+/**
+ * <p>
+ * WebSocket 服务类
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-19
+ */
 public interface WebSocketService {
+
     /**
      * 处理用户登录请求，需要返回一张带code的二维码
      *
@@ -58,6 +67,5 @@ public interface WebSocketService {
      * @param skipUid    需要跳过的人
      */
     void sendToAllOnline(WSBaseResp wsBaseResp, Long skipUid);
-
 
 }

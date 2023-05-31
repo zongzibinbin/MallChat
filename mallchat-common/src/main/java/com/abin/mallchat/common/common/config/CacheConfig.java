@@ -11,6 +11,14 @@ import org.springframework.context.annotation.Primary;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * <p>
+ * 缓存配置
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-04-20
+ */
 @EnableCaching
 @Configuration
 public class CacheConfig extends CachingConfigurerSupport {

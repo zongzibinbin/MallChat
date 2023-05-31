@@ -13,8 +13,17 @@ import org.springframework.util.Assert;
 
 import java.util.Objects;
 
+/**
+ * <p>
+ * Redis 配置
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-04-20
+ */
 @Configuration
 public class RedisConfig {
+
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         // 创建模板
@@ -33,7 +42,7 @@ public class RedisConfig {
         return redisTemplate;
     }
 
-    public class MyRedisSerializerCustomized extends GenericJackson2JsonRedisSerializer {
+    public static class MyRedisSerializerCustomized extends GenericJackson2JsonRedisSerializer {
         @Override
         public byte[] serialize(Object source) throws SerializationException {
             if (Objects.nonNull(source)) {
@@ -65,4 +74,5 @@ public class RedisConfig {
         System.out.println(objectMapper.writeValueAsString("1"));
         System.out.println(objectMapper.writeValueAsString(Boolean.TRUE));
     }
+
 }

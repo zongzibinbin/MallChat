@@ -19,12 +19,16 @@ import org.springframework.stereotype.Component;
 import java.util.Collections;
 
 /**
- * Description: ws消息适配器
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-19
+ * <p>
+ * ws消息适配器
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-19
  */
 @Component
 public class WSAdapter {
+
     @Autowired
     private ChatService chatService;
 
@@ -110,4 +114,5 @@ public class WSAdapter {
         wsBaseResp.setData(msgResp);
         return wsBaseResp;
     }
+
 }

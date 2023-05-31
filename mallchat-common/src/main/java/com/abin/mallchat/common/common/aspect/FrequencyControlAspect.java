@@ -34,7 +34,8 @@ public class FrequencyControlAspect {
         Map<String, FrequencyControl> keyMap = new HashMap<>();
         for (int i = 0; i < annotationsByType.length; i++) {
             FrequencyControl frequencyControl = annotationsByType[i];
-            String prefix = StrUtil.isBlank(frequencyControl.prefixKey()) ? SpElUtils.getMethodKey(method) + ":index:" + i : frequencyControl.prefixKey();//默认方法限定名+注解排名（可能多个）
+            //默认方法限定名+注解排名（可能多个）
+            String prefix = StrUtil.isBlank(frequencyControl.prefixKey()) ? SpElUtils.getMethodKey(method) + ":index:" + i : frequencyControl.prefixKey();
             String key = "";
             switch (frequencyControl.target()) {
                 case EL:
@@ -45,6 +46,8 @@ public class FrequencyControlAspect {
                     break;
                 case UID:
                     key = RequestHolder.get().getUid().toString();
+                default:
+                    break;
             }
             keyMap.put(prefix + ":" + key, frequencyControl);
         }
@@ -55,7 +58,8 @@ public class FrequencyControlAspect {
             String key = keyList.get(i);
             Integer count = countList.get(i);
             FrequencyControl frequencyControl = keyMap.get(key);
-            if (Objects.nonNull(count) && count >= frequencyControl.count()) {//频率超过了
+            //频率超过了
+            if (Objects.nonNull(count) && count >= frequencyControl.count()) {
                 log.warn("frequencyControl limit key:{},count:{}", key, count);
                 throw new BusinessException(CommonErrorEnum.FREQUENCY_LIMIT);
             }
@@ -64,9 +68,8 @@ public class FrequencyControlAspect {
             return joinPoint.proceed();
         } finally {
             //不管成功还是失败，都增加次数
-            keyMap.forEach((k, v) -> {
-                RedisUtils.inc(k, v.time(), v.unit());
-            });
+            keyMap.forEach((k, v) -> RedisUtils.inc(k, v.time(), v.unit()));
         }
     }
+
 }

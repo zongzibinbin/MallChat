@@ -6,8 +6,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 
 /**
- * @author zhongzb
- * @date 2021/05/27
+ * <p>
+ * Mallchat C端 主启动程序
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">zhongzb</a>
+ * @since 2021-05-27
  */
 @SpringBootApplication(scanBasePackages = {"com.abin.mallchat"})
 @MapperScan({"com.abin.mallchat.common.**.mapper"})

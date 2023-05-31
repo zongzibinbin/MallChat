@@ -56,5 +56,6 @@ public class UserController {
         userService.wearingBadge(RequestHolder.get().getUid(), req);
         return ApiResult.success();
     }
+
 }
 

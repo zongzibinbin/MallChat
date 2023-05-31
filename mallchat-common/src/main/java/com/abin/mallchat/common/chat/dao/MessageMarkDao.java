@@ -39,4 +39,5 @@ public class MessageMarkDao extends ServiceImpl<MessageMarkMapper, MessageMark> 
                 .eq(MessageMark::getStatus, YesOrNoEnum.NO.getStatus())
                 .list();
     }
+
 }

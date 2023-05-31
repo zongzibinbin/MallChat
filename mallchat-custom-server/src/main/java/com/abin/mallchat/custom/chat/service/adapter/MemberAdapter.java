@@ -14,13 +14,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Description: 成员适配器
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-26
+ * <p>
+ * 成员适配器
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-26
  */
 @Component
 @Slf4j
 public class MemberAdapter {
+
     @Autowired
     private UserCache userCache;
 
@@ -36,4 +40,5 @@ public class MemberAdapter {
             return resp;
         }).collect(Collectors.toList());
     }
+
 }

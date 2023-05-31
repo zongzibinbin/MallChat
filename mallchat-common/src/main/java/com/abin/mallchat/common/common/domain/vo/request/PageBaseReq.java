@@ -8,6 +8,10 @@ import lombok.Data;
 import javax.validation.constraints.Max;
 
 /**
+ * <p>
+ * 基础翻页请求
+ * </p>
+ *
  * @author <a href="https://github.com/zongzibinbin">abin</a>
  * @since 2023-03-19
  */
@@ -30,4 +34,5 @@ public class PageBaseReq {
     public Page plusPage() {
         return new Page(pageNo, pageSize);
     }
+
 }

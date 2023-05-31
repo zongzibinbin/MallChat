@@ -16,12 +16,23 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatMessageMarkDTO {
+
+    /**
+     * 消息id
+     */
     @ApiModelProperty("消息id")
     private Long msgId;
 
+    /**
+     * 标记类型 1点赞 2举报
+     */
     @ApiModelProperty("标记类型 1点赞 2举报")
     private Integer markType;
 
+    /**
+     * 动作类型 1确认 2取消
+     */
     @ApiModelProperty("动作类型 1确认 2取消")
     private Integer actType;
+
 }

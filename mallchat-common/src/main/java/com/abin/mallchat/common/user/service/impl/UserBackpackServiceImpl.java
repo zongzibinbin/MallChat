@@ -4,7 +4,6 @@ import com.abin.mallchat.common.common.annotation.RedissonLock;
 import com.abin.mallchat.common.common.domain.enums.IdempotentEnum;
 import com.abin.mallchat.common.common.domain.enums.YesOrNoEnum;
 import com.abin.mallchat.common.common.event.ItemReceiveEvent;
-import com.abin.mallchat.common.user.dao.ItemConfigDao;
 import com.abin.mallchat.common.user.dao.UserBackpackDao;
 import com.abin.mallchat.common.user.domain.entity.ItemConfig;
 import com.abin.mallchat.common.user.domain.entity.UserBackpack;
@@ -27,12 +26,13 @@ import java.util.Objects;
  */
 @Service
 public class UserBackpackServiceImpl implements IUserBackpackService {
+
     @Autowired
     private UserBackpackDao userBackpackDao;
-    @Autowired
-    private ItemConfigDao itemConfigDao;
+
     @Autowired
     private ItemCache itemCache;
+
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 
@@ -47,9 +47,11 @@ public class UserBackpackServiceImpl implements IUserBackpackService {
         }
         //业务检查
         ItemConfig itemConfig = itemCache.getById(itemId);
-        if (ItemTypeEnum.BADGE.getType().equals(itemConfig.getType())) {//徽章类型做唯一性检查
+        //徽章类型做唯一性检查
+        if (ItemTypeEnum.BADGE.getType().equals(itemConfig.getType())) {
             Integer countByValidItemId = userBackpackDao.getCountByValidItemId(uid, itemId);
-            if (countByValidItemId > 0) {//已经有徽章了不发
+            //已经有徽章了不发
+            if (countByValidItemId > 0) {
                 return;
             }
         }
@@ -68,4 +70,5 @@ public class UserBackpackServiceImpl implements IUserBackpackService {
     private String getIdempotent(Long itemId, IdempotentEnum idempotentEnum, String businessId) {
         return String.format("%d_%d_%s", itemId, idempotentEnum.getType(), businessId);
     }
+
 }

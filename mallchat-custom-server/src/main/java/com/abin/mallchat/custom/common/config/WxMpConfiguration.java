@@ -21,14 +21,18 @@ import static me.chanjar.weixin.common.api.WxConsts.EventType.SUBSCRIBE;
 import static me.chanjar.weixin.common.api.WxConsts.XmlMsgType.EVENT;
 
 /**
+ * <p>
  * wechat mp configuration
+ * </p>
  *
- * @author <a href="https://github.com/binarywang">Binary Wang</a>
+ * @author @author <a href="https://github.com/binarywang">Binary Wang</a>
+ * @since 2023-03-23
  */
 @AllArgsConstructor
 @Configuration
 @EnableConfigurationProperties(WxMpProperties.class)
 public class WxMpConfiguration {
+
     private final LogHandler logHandler;
     private final MsgHandler msgHandler;
     private final SubscribeHandler subscribeHandler;

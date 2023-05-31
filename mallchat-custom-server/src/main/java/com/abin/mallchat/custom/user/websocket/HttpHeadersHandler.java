@@ -9,6 +9,14 @@ import io.netty.util.AttributeKey;
 import java.net.InetSocketAddress;
 import java.util.Objects;
 
+/**
+ * <p>
+ * Http 请求头处理
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-22
+ */
 public class HttpHeadersHandler extends ChannelInboundHandlerAdapter {
     private AttributeKey<String> key = AttributeKey.valueOf("Id");
 
@@ -17,7 +25,8 @@ public class HttpHeadersHandler extends ChannelInboundHandlerAdapter {
         if (msg instanceof FullHttpRequest) {
             HttpHeaders headers = ((FullHttpRequest) msg).headers();
             String ip = headers.get("X-Real-IP");
-            if (Objects.isNull(ip)) {//如果没经过nginx，就直接获取远端地址
+            //如果没经过nginx，就直接获取远端地址
+            if (Objects.isNull(ip)) {
                 InetSocketAddress address = (InetSocketAddress) ctx.channel().remoteAddress();
                 ip = address.getAddress().getHostAddress();
             }
@@ -25,4 +34,5 @@ public class HttpHeadersHandler extends ChannelInboundHandlerAdapter {
         }
         ctx.fireChannelRead(msg);
     }
+
 }

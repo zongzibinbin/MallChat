@@ -7,12 +7,16 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * Description:
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-04-18
+ * <p>
+ * IP 请求
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-04-18
  */
 @Data
 public class IpResult<T> implements Serializable {
+
     @ApiModelProperty("错误码")
     private Integer code;
     @ApiModelProperty("错误消息")
@@ -23,4 +27,5 @@ public class IpResult<T> implements Serializable {
     public boolean isSuccess() {
         return Objects.nonNull(this.code) && this.code == 0;
     }
+
 }

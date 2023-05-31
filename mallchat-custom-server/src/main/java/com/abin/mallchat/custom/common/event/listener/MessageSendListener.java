@@ -14,13 +14,17 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 /**
+ * <p>
  * 消息发送监听器
+ * </p>
  *
- * @author zhongzb create on 2022/08/26
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2022-08-26
  */
 @Slf4j
 @Component
 public class MessageSendListener {
+
     @Autowired
     private WebSocketService webSocketService;
     @Autowired

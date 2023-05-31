@@ -7,9 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Description: 具有优先级的title查询器
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-05-27
+ * <p>
+ * 具有优先级的title查询器
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-05-27
  */
 public class PrioritizedUrlTitleDiscover extends AbstractUrlTitleDiscover {
 
@@ -30,4 +33,5 @@ public class PrioritizedUrlTitleDiscover extends AbstractUrlTitleDiscover {
         }
         return null;
     }
+
 }

@@ -7,13 +7,17 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.util.List;
 
 /**
- * wechat mp properties
+ * <p>
+ * wechat mp configuration
+ * </p>
  *
- * @author <a href="https://github.com/binarywang">Binary Wang</a>
+ * @author @author <a href="https://github.com/binarywang">Binary Wang</a>
+ * @since 2023-03-23
  */
 @Data
 @ConfigurationProperties(prefix = "wx.mp")
 public class WxMpProperties {
+
     /**
      * 是否使用redis存储access token
      */
@@ -26,6 +30,7 @@ public class WxMpProperties {
 
     @Data
     public static class RedisConfig {
+
         /**
          * redis服务器 主机地址
          */
@@ -45,6 +50,7 @@ public class WxMpProperties {
          * redis 服务连接超时时间
          */
         private Integer timeout;
+
     }
 
     /**
@@ -54,6 +60,7 @@ public class WxMpProperties {
 
     @Data
     public static class MpConfig {
+
         /**
          * 设置微信公众号的appid
          */
@@ -73,10 +80,12 @@ public class WxMpProperties {
          * 设置微信公众号的EncodingAESKey
          */
         private String aesKey;
+
     }
 
     @Override
     public String toString() {
         return JSONUtil.toJsonStr(this);
     }
+
 }

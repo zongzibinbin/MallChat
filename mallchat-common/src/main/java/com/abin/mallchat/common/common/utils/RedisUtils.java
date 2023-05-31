@@ -15,17 +15,25 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-
+/**
+ * <p>
+ * Redis 工具类
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-05-27
+ */
 @Slf4j
 @Component
 public class RedisUtils {
+
     public RedisTemplate redisTemplate;
 
     private static StringRedisTemplate stringRedisTemplate;
 
     @PostConstruct
     public void init() {
-        this.stringRedisTemplate = SpringUtil.getBean(StringRedisTemplate.class);
+        stringRedisTemplate = SpringUtil.getBean(StringRedisTemplate.class);
     }
 
     private static final String LUA_INCR_EXPIRE =

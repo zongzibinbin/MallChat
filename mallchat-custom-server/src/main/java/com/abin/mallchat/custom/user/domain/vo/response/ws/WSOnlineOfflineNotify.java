@@ -10,17 +10,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Description:用户上下线变动的推送类
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-19
+ * <p>
+ * 用户上下线变动的推送类
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-19
  */
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class WSOnlineOfflineNotify {
-    private List<ChatMemberResp> changeList = new ArrayList<>();//新的上下线用户
-    private Long onlineNum;//在线人数
-    private Long totalNum;//总人数
+
+    /**
+     * 新的上下线用户
+     */
+    private List<ChatMemberResp> changeList = new ArrayList<>();
+
+    /**
+     * 在线人数
+     */
+    private Long onlineNum;
+
+    /**
+     * 总人数
+     */
+    private Long totalNum;
 
 }

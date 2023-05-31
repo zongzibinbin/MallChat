@@ -9,13 +9,17 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Description: ws前端请求类型枚举
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-19
+ * <p>
+ * ws前端请求类型枚举
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-19
  */
 @AllArgsConstructor
 @Getter
 public enum WSReqTypeEnum {
+
     LOGIN(1, "请求登录二维码"),
     HEARTBEAT(2, "心跳包"),
     AUTHORIZE(3, "登录认证"),
@@ -33,4 +37,5 @@ public enum WSReqTypeEnum {
     public static WSReqTypeEnum of(Integer type) {
         return cache.get(type);
     }
+
 }

@@ -4,16 +4,20 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * Description:
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-04-25
+ * <p>
+ * Json 工具类
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-04-25
  */
 public class JsonUtils {
-    private static final ObjectMapper jsonMapper = new ObjectMapper();
+
+    private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
 
     public static <T> T toObj(String str, Class<T> clz) {
         try {
-            return jsonMapper.readValue(str, clz);
+            return JSON_MAPPER.readValue(str, clz);
         } catch (JsonProcessingException e) {
             throw new UnsupportedOperationException(e);
         }
@@ -21,9 +25,10 @@ public class JsonUtils {
 
     public static String toStr(Object t) {
         try {
-            return jsonMapper.writeValueAsString(t);
+            return JSON_MAPPER.writeValueAsString(t);
         } catch (Exception e) {
             throw new UnsupportedOperationException(e);
         }
     }
+
 }

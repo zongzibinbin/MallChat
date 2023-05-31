@@ -1,12 +1,14 @@
 package com.abin.mallchat.custom.user.service;
 
 /**
- * Description: 登录相关处理类
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-19
+ * <p>
+ * 登录相关处理类
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-19
  */
 public interface LoginService {
-
 
     /**
      * 校验token是不是有效
@@ -38,4 +40,5 @@ public interface LoginService {
      * @return
      */
     Long getValidUid(String token);
+
 }

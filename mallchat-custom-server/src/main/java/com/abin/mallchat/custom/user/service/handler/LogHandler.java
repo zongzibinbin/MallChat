@@ -16,6 +16,7 @@ import java.util.Map;
 @Component
 @Slf4j
 public class LogHandler extends AbstractHandler {
+
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage,
                                     Map<String, Object> context, WxMpService wxMpService,

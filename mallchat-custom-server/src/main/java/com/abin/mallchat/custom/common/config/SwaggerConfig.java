@@ -26,13 +26,17 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Description:
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-23
+ * <p>
+ * 接口文档配置
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-23
  */
 @Configuration
 @EnableSwagger2WebMvc
 public class SwaggerConfig {
+
     @Bean(value = "defaultApi2")
     Docket docket() {
         return new Docket(DocumentationType.SWAGGER_2)
@@ -60,7 +64,7 @@ public class SwaggerConfig {
      **/
     @Bean
     public WebMvcEndpointHandlerMapping webEndpointServletHandlerMapping(WebEndpointsSupplier webEndpointsSupplier, ServletEndpointsSupplier servletEndpointsSupplier, ControllerEndpointsSupplier controllerEndpointsSupplier, EndpointMediaTypes endpointMediaTypes, CorsEndpointProperties corsProperties, WebEndpointProperties webEndpointProperties, Environment environment) {
-        List<ExposableEndpoint<?>> allEndpoints = new ArrayList();
+        List<ExposableEndpoint<?>> allEndpoints = new ArrayList<>();
         Collection<ExposableWebEndpoint> webEndpoints = webEndpointsSupplier.getEndpoints();
         allEndpoints.addAll(webEndpoints);
         allEndpoints.addAll(servletEndpointsSupplier.getEndpoints());

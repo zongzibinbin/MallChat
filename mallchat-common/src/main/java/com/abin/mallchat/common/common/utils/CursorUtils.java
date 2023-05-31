@@ -20,16 +20,20 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Description: 游标分页工具类
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-28
+ * <p>
+ * 游标分页工具类
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-28
  */
 @Component
 public class CursorUtils {
 
     public <T> CursorPageBaseResp<Pair<T, Double>> getCursorPageByRedis(CursorPageBaseReq cursorPageBaseReq, String redisKey, Function<String, T> typeConvert) {
         Set<ZSetOperations.TypedTuple<String>> typedTuples;
-        if (StrUtil.isBlank(cursorPageBaseReq.getCursor())) {//第一次
+        //第一次
+        if (StrUtil.isBlank(cursorPageBaseReq.getCursor())) {
             typedTuples = RedisUtils.zReverseRangeWithScores(redisKey, cursorPageBaseReq.getPageSize());
         } else {
             typedTuples = RedisUtils.zReverseRangeByScoreWithScores(redisKey, Double.parseDouble(cursorPageBaseReq.getCursor()), cursorPageBaseReq.getPageSize());

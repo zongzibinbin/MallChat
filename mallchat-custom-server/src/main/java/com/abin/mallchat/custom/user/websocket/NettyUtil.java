@@ -5,11 +5,13 @@ import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 
 /**
- * Description: netty工具类
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-04-18
+ * <p>
+ * netty工具类
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-04-18
  */
-
 public class NettyUtil {
 
     public static AttributeKey<String> IP = AttributeKey.valueOf("ip");
@@ -22,4 +24,5 @@ public class NettyUtil {
     public static <T> T getAttr(Channel channel, AttributeKey<T> ip) {
         return channel.attr(ip).get();
     }
+
 }

@@ -12,6 +12,14 @@ import org.springframework.stereotype.Service;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
+/**
+ * <p>
+ * 锁相关服务类
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-04-08
+ */
 @Service
 @Slf4j
 public class LockService {
@@ -26,7 +34,8 @@ public class LockService {
             throw new BusinessException(CommonErrorEnum.LOCK_LIMIT);
         }
         try {
-            return supplier.get();//执行锁内的代码逻辑
+            //执行锁内的代码逻辑
+            return supplier.get();
         } finally {
             lock.unlock();
         }
@@ -47,4 +56,5 @@ public class LockService {
          */
         T get() throws Throwable;
     }
+
 }

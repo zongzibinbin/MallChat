@@ -4,9 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * Description: 通用异常码
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-26
+ * <p>
+ * 通用异常码
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-26
  */
 @AllArgsConstructor
 @Getter
@@ -17,6 +20,7 @@ public enum CommonErrorEnum implements ErrorEnum {
     FREQUENCY_LIMIT(-3, "请求太频繁了，请稍后再试哦~~"),
     LOCK_LIMIT(-4, "请求太频繁了，请稍后再试哦~~"),
     ;
+
     private Integer code;
     private String msg;
 
@@ -29,4 +33,5 @@ public enum CommonErrorEnum implements ErrorEnum {
     public String getErrorMsg() {
         return this.msg;
     }
+
 }

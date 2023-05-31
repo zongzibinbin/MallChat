@@ -6,13 +6,17 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
- * Description: 通用返回体
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-23
+ * <p>
+ * 通用返回体
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-23
  */
 @Data
 @ApiModel("基础返回体")
 public class ApiResult<T> {
+
     @ApiModelProperty("成功标识true or false")
     private Boolean success;
     @ApiModelProperty("错误码")
@@ -55,4 +59,5 @@ public class ApiResult<T> {
     public boolean isSuccess() {
         return this.success;
     }
+
 }

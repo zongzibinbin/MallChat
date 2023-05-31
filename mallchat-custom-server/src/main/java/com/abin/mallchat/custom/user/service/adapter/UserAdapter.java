@@ -19,9 +19,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Description: 用户适配器
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-19
+ * <p>
+ * 用户适配器
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-19
  */
 @Slf4j
 public class UserAdapter {
@@ -70,4 +73,5 @@ public class UserAdapter {
                 .thenComparing(BadgeResp::getObtain, Comparator.reverseOrder()))
                 .collect(Collectors.toList());
     }
+
 }

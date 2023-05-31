@@ -57,5 +57,4 @@ public class Black implements Serializable {
     @TableField("update_time")
     private LocalDateTime updateTime;
 
-
 }

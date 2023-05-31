@@ -9,11 +9,13 @@ import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotNull;
 
-
 /**
- * Description: 消息发送请求体
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-23
+ * <p>
+ * 消息发送请求体
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-23
  */
 @Data
 @Builder
@@ -32,4 +34,5 @@ public class ChatMessageReq {
 
     @ApiModelProperty("回复的消息id,如果没有别传就好")
     private Long replyMsgId;
+
 }

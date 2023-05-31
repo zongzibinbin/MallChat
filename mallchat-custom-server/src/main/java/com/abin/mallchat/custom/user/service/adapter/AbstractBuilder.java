@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
  * @author <a href="https://github.com/binarywang">Binary Wang</a>
  */
 public abstract class AbstractBuilder {
+
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     public abstract WxMpXmlOutMessage build(String content,

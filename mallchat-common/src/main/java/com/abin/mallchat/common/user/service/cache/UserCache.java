@@ -21,15 +21,19 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Description: 用户相关缓存
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-27
+ * <p>
+ * 用户相关缓存
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-27
  */
 @Component
 public class UserCache {
 
     @Autowired
     private CursorUtils cursorUtils;
+
     @Autowired
     private UserDao userDao;
     @Autowired
@@ -81,7 +85,7 @@ public class UserCache {
     /**
      * 获取用户信息，盘路缓存模式
      *
-     * @param uid
+     * @param uid 用户id
      * @return
      */
     public User getUserInfo(Long uid) {//todo 后期做二级缓存
@@ -91,7 +95,7 @@ public class UserCache {
     /**
      * 获取用户信息，盘路缓存模式
      *
-     * @param uids
+     * @param uids 用户id集合
      * @return
      */
     public Map<Long, User> getUserInfoBatch(Set<Long> uids) {
@@ -128,4 +132,5 @@ public class UserCache {
     public Map<Integer, Set<String>> evictBlackMap() {
         return null;
     }
+
 }

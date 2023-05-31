@@ -71,5 +71,4 @@ public class MessageMark implements Serializable {
     @TableField("update_time")
     private LocalDateTime updateTime;
 
-
 }

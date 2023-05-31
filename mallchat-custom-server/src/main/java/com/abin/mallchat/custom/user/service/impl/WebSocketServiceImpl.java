@@ -36,24 +36,28 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Description: websocket处理类
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-19 16:21
+ * <p>
+ * websocket处理类
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-19
  */
 @Component
 @Slf4j
 public class WebSocketServiceImpl implements WebSocketService {
-
 
     /**
      * 所有请求登录的code与channel关系
      * todo 有可能有人请求了二维码，就是不登录，留个坑，之后处理
      */
     private static final ConcurrentHashMap<Integer, Channel> WAIT_LOGIN_MAP = new ConcurrentHashMap<>();
+
     /**
      * 所有已连接的websocket连接列表和一些额外参数
      */
     private static final ConcurrentHashMap<Channel, WSChannelExtraDTO> ONLINE_WS_MAP = new ConcurrentHashMap<>();
+
     /**
      * 所有在线的用户和对应的socket
      */
@@ -64,6 +68,7 @@ public class WebSocketServiceImpl implements WebSocketService {
     }
 
     public static final int EXPIRE_SECONDS = 60 * 60;
+
     @Autowired
     private WxMpService wxMpService;
     @Autowired
@@ -137,10 +142,12 @@ public class WebSocketServiceImpl implements WebSocketService {
     public void authorize(Channel channel, WSAuthorize wsAuthorize) {
         //校验token
         boolean verifySuccess = loginService.verify(wsAuthorize.getToken());
-        if (verifySuccess) {//用户校验成功给用户登录
+        //用户校验成功给用户登录
+        if (verifySuccess) {
             User user = userDao.getById(loginService.getValidUid(wsAuthorize.getToken()));
             loginSuccess(channel, user, wsAuthorize.getToken());
-        } else { //让前端的token失效
+            //让前端的token失效
+        } else {
             sendMsg(channel, WSAdapter.buildInvalidateTokenResp());
         }
     }
@@ -225,7 +232,12 @@ public class WebSocketServiceImpl implements WebSocketService {
         return ObjectUtil.isNull(old) ? wsChannelExtraDTO : old;
     }
 
-    //entrySet的值不是快照数据,但是它支持遍历，所以无所谓了，不用快照也行。
+    /**
+     * entrySet的值不是快照数据,但是它支持遍历，所以无所谓了，不用快照也行。
+     *
+     * @param wsBaseResp 发送的消息体
+     * @param skipUid    需要跳过的人
+     */
     @Override
     public void sendToAllOnline(WSBaseResp wsBaseResp, Long skipUid) {
         ONLINE_WS_MAP.forEach((channel, ext) -> {
@@ -273,4 +285,5 @@ public class WebSocketServiceImpl implements WebSocketService {
         reentrantLock.unlock();
         Thread.sleep(1000);
     }
+
 }

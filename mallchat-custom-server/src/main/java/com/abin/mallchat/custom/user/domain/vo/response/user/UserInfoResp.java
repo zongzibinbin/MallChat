@@ -5,9 +5,12 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
- * Description: 用户信息返回
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-22
+ * <p>
+ * 用户信息返回
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-22
  */
 @Data
 @ApiModel("用户详情")

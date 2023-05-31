@@ -16,13 +16,17 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 
 /**
+ * <p>
  * 用户收到物品监听器
+ * </p>
  *
- * @author zhongzb create on 2022/08/26
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2022-08-26
  */
 @Slf4j
 @Component
 public class ItemReceiveListener {
+
     @Autowired
     private UserDao userDao;
     @Autowired
@@ -31,7 +35,7 @@ public class ItemReceiveListener {
     /**
      * 徽章类型，帮忙默认佩戴
      *
-     * @param event
+     * @param event 用户收到物品事件
      */
     @Async
     @EventListener(classes = ItemReceiveEvent.class)

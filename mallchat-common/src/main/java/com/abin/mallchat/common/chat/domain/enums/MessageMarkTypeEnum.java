@@ -16,14 +16,23 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Getter
 public enum MessageMarkTypeEnum {
+
     LIKE(1, "点赞", 10, MessageTypeEnum.LIKE),
     DISLIKE(2, "点踩", 5, MessageTypeEnum.DISLIKE),
     ;
 
     private final Integer type;
     private final String desc;
-    private final Integer riseNum;//需要多少个标记升级
-    private final MessageTypeEnum riseEnum;//消息升级成什么类型的消息
+
+    /**
+     * 需要多少个标记升级
+     */
+    private final Integer riseNum;
+
+    /**
+     * 消息升级成什么类型的消息
+     */
+    private final MessageTypeEnum riseEnum;
 
     private static Map<Integer, MessageMarkTypeEnum> cache;
 
@@ -34,4 +43,5 @@ public enum MessageMarkTypeEnum {
     public static MessageMarkTypeEnum of(Integer type) {
         return cache.get(type);
     }
+
 }

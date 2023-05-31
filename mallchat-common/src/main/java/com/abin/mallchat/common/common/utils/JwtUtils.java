@@ -15,9 +15,12 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Description: jwt的token生成与解析
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-04-03
+ * <p>
+ * jwt的token生成与解析
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-04-03
  */
 @Slf4j
 @Component
@@ -39,11 +42,12 @@ public class JwtUtils {
      */
     public String createToken(Long uid) {
         // build token
-        String token = JWT.create()
-                .withClaim(UID_CLAIM, uid) // 只存一个uid信息，其他的自己去redis查
+        return JWT.create()
+                // 只存一个uid信息，其他的自己去redis查
+                .withClaim(UID_CLAIM, uid)
                 .withClaim(CREATE_TIME, new Date())
-                .sign(Algorithm.HMAC256(secret)); // signature
-        return token;
+                // signature
+                .sign(Algorithm.HMAC256(secret));
     }
 
     public static void main(String[] args) {

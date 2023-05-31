@@ -8,11 +8,13 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 
-
 /**
- * Description: 佩戴徽章
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-23
+ * <p>
+ * 佩戴徽章前端请求体
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-23
  */
 @Data
 @Builder

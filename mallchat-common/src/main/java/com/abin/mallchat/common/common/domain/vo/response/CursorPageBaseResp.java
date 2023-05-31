@@ -12,6 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * <p>
+ * 游标翻页返回
+ * </p>
+ *
  * @author <a href="https://github.com/zongzibinbin">abin</a>
  * @since 2023-03-19
  */

@@ -9,13 +9,17 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Description: 物品枚举
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-19
+ * <p>
+ * 物品枚举
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-19
  */
 @AllArgsConstructor
 @Getter
 public enum ItemEnum {
+
     MODIFY_NAME_CARD(1L, ItemTypeEnum.MODIFY_NAME_CARD, "改名卡"),
     LIKE_BADGE(2L, ItemTypeEnum.BADGE, "爆赞徽章"),
     REG_TOP10_BADGE(3L, ItemTypeEnum.BADGE, "前十注册徽章"),
@@ -26,7 +30,7 @@ public enum ItemEnum {
     private final ItemTypeEnum typeEnum;
     private final String desc;
 
-    private static Map<Long, ItemEnum> cache;
+    private static final Map<Long, ItemEnum> cache;
 
     static {
         cache = Arrays.stream(ItemEnum.values()).collect(Collectors.toMap(ItemEnum::getId, Function.identity()));
@@ -35,4 +39,5 @@ public enum ItemEnum {
     public static ItemEnum of(Integer type) {
         return cache.get(type);
     }
+
 }

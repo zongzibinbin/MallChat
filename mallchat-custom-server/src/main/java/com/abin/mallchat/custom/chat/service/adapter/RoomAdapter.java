@@ -8,12 +8,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Description: 消息适配器
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-26
+ * <p>
+ * 消息适配器
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-26
  */
 public class RoomAdapter {
-
 
     public static List<ChatRoomResp> buildResp(List<Room> list) {
         return list.stream()
@@ -24,4 +26,5 @@ public class RoomAdapter {
                     return resp;
                 }).collect(Collectors.toList());
     }
+
 }

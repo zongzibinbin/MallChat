@@ -1,7 +1,6 @@
 package com.abin.mallchat.common.user.service.impl;
 
 import cn.hutool.core.lang.TypeReference;
-
 import cn.hutool.core.thread.NamedThreadFactory;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
@@ -13,7 +12,6 @@ import com.abin.mallchat.common.user.domain.entity.IpDetail;
 import com.abin.mallchat.common.user.domain.entity.IpInfo;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.service.IpService;
-import jodd.util.concurrent.ThreadFactoryBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,31 +19,36 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.Objects;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
- * Description: ip
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-04-18
+ * <p>
+ * ip 服务实现类
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-04-18
  */
 @Service
 @Slf4j
 public class IpServiceImpl implements IpService, DisposableBean {
-    private static ExecutorService executor = new ThreadPoolExecutor(1, 1,
+
+    private static final ExecutorService EXECUTOR = new ThreadPoolExecutor(1, 1,
             0L, TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<Runnable>(500),
-            new NamedThreadFactory("refresh-ipDetail", (ThreadGroup)null,false,
-                    new GlobalUncaughtExceptionHandler("refresh-ipDetail")));
+            new NamedThreadFactory("refresh-ipDetail", null, false,
+                    new GlobalUncaughtExceptionHandler()));
 
     @Autowired
     private UserDao userDao;
 
 
-
-
     @Override
     public void refreshIpDetailAsync(Long uid) {
-        executor.execute(() -> {
+        EXECUTOR.execute(() -> {
             User user = userDao.getById(uid);
             IpInfo ipInfo = user.getIpInfo();
             if (Objects.isNull(ipInfo)) {
@@ -55,7 +58,7 @@ public class IpServiceImpl implements IpService, DisposableBean {
             if (StrUtil.isBlank(ip)) {
                 return;
             }
-            IpDetail ipDetail = TryGetIpDetailOrNullTreeTimes(ip);
+            IpDetail ipDetail = tryGetIpDetailOrNullTreeTimes(ip);
             if (Objects.nonNull(ipDetail)) {
                 ipInfo.refreshIpDetail(ipDetail);
                 User update = new User();
@@ -65,11 +68,10 @@ public class IpServiceImpl implements IpService, DisposableBean {
             } else {
                 log.error("get ip detail fail ip:{},uid:{}", ip, uid);
             }
-
         });
     }
 
-    private static IpDetail TryGetIpDetailOrNullTreeTimes(String ip) {
+    private static IpDetail tryGetIpDetailOrNullTreeTimes(String ip) {
         for (int i = 0; i < 3; i++) {
             IpDetail ipDetail = getIpDetailOrNull(ip);
             if (Objects.nonNull(ipDetail)) {
@@ -103,11 +105,11 @@ public class IpServiceImpl implements IpService, DisposableBean {
         Date begin = new Date();
         for (int i = 0; i < 100; i++) {
             int finalI = i;
-            executor.execute(() -> {
-                IpDetail ipDetail = TryGetIpDetailOrNullTreeTimes("113.90.36.126");
+            EXECUTOR.execute(() -> {
+                IpDetail ipDetail = tryGetIpDetailOrNullTreeTimes("113.90.36.126");
                 if (Objects.nonNull(ipDetail)) {
                     Date date = new Date();
-                    System.out.println(String.format("第%d次成功,目前耗时：%dms", finalI, (date.getTime() - begin.getTime())));
+                    System.out.printf("第%d次成功,目前耗时：%dms%n", finalI, (date.getTime() - begin.getTime()));
                 }
             });
         }
@@ -115,13 +117,13 @@ public class IpServiceImpl implements IpService, DisposableBean {
 
     @Override
     public void destroy() throws InterruptedException {
-        executor.shutdown();
-        if (!executor.awaitTermination(30, TimeUnit.SECONDS)) {//最多等30秒，处理不完就拉倒
+        EXECUTOR.shutdown();
+        //最多等30秒，处理不完就拉倒
+        if (!EXECUTOR.awaitTermination(30, TimeUnit.SECONDS)) {
             if (log.isErrorEnabled()) {
-                log.error("Timed out while waiting for executor [{}] to terminate", executor);
+                log.error("Timed out while waiting for executor [{}] to terminate", EXECUTOR);
             }
         }
-
-
     }
+
 }

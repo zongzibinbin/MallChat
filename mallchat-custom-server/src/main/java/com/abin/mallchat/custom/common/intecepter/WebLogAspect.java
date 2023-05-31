@@ -20,11 +20,13 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-
 /**
- * 日志切面
+ * <p>
+ * token 日志切面
+ * </p>
  *
  * @author wayne
+ * @since 2023-04-05
  */
 @Aspect
 @Slf4j
@@ -69,6 +71,5 @@ public class WebLogAspect {
         }
         return result;
     }
-
 
 }

@@ -14,63 +14,67 @@ import com.abin.mallchat.custom.chat.domain.vo.response.ChatRoomResp;
 import javax.annotation.Nullable;
 
 /**
- * Description: 消息处理类
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-26
+ * <p>
+ * 消息处理类
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-26
  */
 public interface ChatService {
 
     /**
      * 发送消息
      *
-     * @param request
+     * @param request 消息发送请求体
      */
     Long sendMsg(ChatMessageReq request, Long uid);
 
     /**
      * 根据消息获取消息前端展示的物料
      *
-     * @param message
+     * @param message    消息发送请求体
      * @param receiveUid 接受消息的uid，可null
-     * @return
+     * @return 消息
      */
     ChatMessageResp getMsgResp(Message message, Long receiveUid);
 
     /**
      * 根据消息获取消息前端展示的物料
      *
-     * @param msgId
+     * @param msgId      消息id
      * @param receiveUid 接受消息的uid，可null
-     * @return
+     * @return 消息
      */
     ChatMessageResp getMsgResp(Long msgId, Long receiveUid);
 
     /**
      * 获取群成员列表
      *
-     * @param request
-     * @return
+     * @param request 游标翻页请求
+     * @return 游标翻页返回
      */
     CursorPageBaseResp<ChatMemberResp> getMemberPage(CursorPageBaseReq request);
 
     /**
      * 获取消息列表
      *
-     * @param request
-     * @return
+     * @param request 消息列表请求
+     * @return 游标翻页返回
      */
     CursorPageBaseResp<ChatMessageResp> getMsgPage(ChatMessagePageReq request, @Nullable Long receiveUid);
 
     /**
      * 获取会话列表
      *
-     * @param request
-     * @param uid
-     * @return
+     * @param request 游标翻页请求
+     * @param uid     用户id
+     * @return 游标翻页返回
      */
     CursorPageBaseResp<ChatRoomResp> getRoomPage(CursorPageBaseReq request, Long uid);
 
     ChatMemberStatisticResp getMemberStatistic();
 
     void setMsgMark(Long uid, ChatMessageMarkReq request);
+
 }

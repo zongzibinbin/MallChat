@@ -98,5 +98,4 @@ public class Message implements Serializable {
     @TableField("update_time")
     private Date updateTime;
 
-
 }

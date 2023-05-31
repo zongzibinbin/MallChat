@@ -11,9 +11,16 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+/**
+ * <p>
+ * 扫码处理
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-19
+ */
 @Component
 public class ScanHandler extends AbstractHandler {
-
 
     @Autowired
     private WxMsgService wxMsgService;

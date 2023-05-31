@@ -13,13 +13,17 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 /**
- * 用户上线监听器
+ * <p>
+ * 用户注册监听器
+ * </p>
  *
- * @author zhongzb create on 2022/08/26
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2022-08-26
  */
 @Slf4j
 @Component
 public class UserRegisterListener {
+
     @Autowired
     private UserDao userDao;
     @Autowired
@@ -37,7 +41,8 @@ public class UserRegisterListener {
     @EventListener(classes = UserRegisterEvent.class)
     public void sendBadge(UserRegisterEvent event) {
         User user = event.getUser();
-        int count = userDao.count();//todo 性能瓶颈，等注册用户多了直接删掉
+        //todo 性能瓶颈，等注册用户多了直接删掉
+        int count = userDao.count();
         if (count <= 10) {
             iUserBackpackService.acquireItem(user.getId(), ItemEnum.REG_TOP10_BADGE.getId(), IdempotentEnum.UID, user.getId().toString());
         } else if (count <= 100) {

@@ -4,13 +4,17 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * Description: 业务校验异常码
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-26
+ * <p>
+ * 业务校验异常码
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-26
  */
 @AllArgsConstructor
 @Getter
 public enum BusinessErrorEnum implements ErrorEnum {
+
     //==================================common==================================
     BUSINESS_ERROR(1001, "{0}"),
     //==================================user==================================
@@ -29,4 +33,5 @@ public enum BusinessErrorEnum implements ErrorEnum {
     public String getErrorMsg() {
         return msg;
     }
+
 }

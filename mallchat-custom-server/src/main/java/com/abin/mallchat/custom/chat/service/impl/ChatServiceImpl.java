@@ -18,7 +18,6 @@ import com.abin.mallchat.common.common.event.MessageMarkEvent;
 import com.abin.mallchat.common.common.event.MessageSendEvent;
 import com.abin.mallchat.common.common.exception.BusinessException;
 import com.abin.mallchat.common.common.utils.AssertUtil;
-import com.abin.mallchat.common.user.dao.UserDao;
 import com.abin.mallchat.common.user.domain.entity.ItemConfig;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.domain.enums.ChatActiveStatusEnum;
@@ -49,18 +48,21 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Description: 消息处理类
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-26
+ * <p>
+ * 消息处理类实现
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-26
  */
 @Service
 @Slf4j
 public class ChatServiceImpl implements ChatService {
+
     public static final long ROOM_GROUP_ID = 1L;
+
     @Autowired
     private MessageDao messageDao;
-    @Autowired
-    private UserDao userDao;
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
     @Autowired
@@ -86,7 +88,6 @@ public class ChatServiceImpl implements ChatService {
             replyMsg = messageDao.getById(request.getReplyMsgId());
             AssertUtil.isNotEmpty(replyMsg, "回复消息不存在");
             AssertUtil.equal(replyMsg.getRoomId(), request.getRoomId(), "只能回复相同会话内的消息");
-
         }
         //同步获取消息的跳转链接标题
         Message insert = MessageAdapter.buildMsgSave(request, uid);
@@ -117,22 +118,29 @@ public class ChatServiceImpl implements ChatService {
         Pair<ChatActiveStatusEnum, String> pair = ChatMemberHelper.getCursorPair(request.getCursor());
         ChatActiveStatusEnum activeStatusEnum = pair.getKey();
         String timeCursor = pair.getValue();
-        List<ChatMemberResp> resultList = new ArrayList<>();//最终列表
+        //最终列表
+        List<ChatMemberResp> resultList = new ArrayList<>();
         Boolean isLast = Boolean.FALSE;
-        if (activeStatusEnum == ChatActiveStatusEnum.ONLINE) {//在线列表
+        //在线列表
+        if (activeStatusEnum == ChatActiveStatusEnum.ONLINE) {
             CursorPageBaseResp<Pair<Long, Double>> cursorPage = userCache.getOnlineCursorPage(new CursorPageBaseReq(request.getPageSize(), timeCursor));
-            resultList.addAll(memberAdapter.buildMember(cursorPage.getList(), ChatActiveStatusEnum.ONLINE));//添加在线列表
-            if (cursorPage.getIsLast()) {//如果是最后一页,从离线列表再补点数据
+            //添加在线列表
+            resultList.addAll(memberAdapter.buildMember(cursorPage.getList(), ChatActiveStatusEnum.ONLINE));
+            //如果是最后一页,从离线列表再补点数据
+            if (cursorPage.getIsLast()) {
                 Integer leftSize = request.getPageSize() - cursorPage.getList().size();
                 cursorPage = userCache.getOfflineCursorPage(new CursorPageBaseReq(leftSize, null));
-                resultList.addAll(memberAdapter.buildMember(cursorPage.getList(), ChatActiveStatusEnum.OFFLINE));//添加离线线列表
+                //添加离线线列表
+                resultList.addAll(memberAdapter.buildMember(cursorPage.getList(), ChatActiveStatusEnum.OFFLINE));
                 activeStatusEnum = ChatActiveStatusEnum.OFFLINE;
             }
             timeCursor = cursorPage.getCursor();
             isLast = cursorPage.getIsLast();
-        } else if (activeStatusEnum == ChatActiveStatusEnum.OFFLINE) {//离线列表
+            //离线列表
+        } else if (activeStatusEnum == ChatActiveStatusEnum.OFFLINE) {
             CursorPageBaseResp<Pair<Long, Double>> cursorPage = userCache.getOfflineCursorPage(new CursorPageBaseReq(request.getPageSize(), timeCursor));
-            resultList.addAll(memberAdapter.buildMember(cursorPage.getList(), ChatActiveStatusEnum.OFFLINE));//添加离线线列表
+            //添加离线线列表
+            resultList.addAll(memberAdapter.buildMember(cursorPage.getList(), ChatActiveStatusEnum.OFFLINE));
             timeCursor = cursorPage.getCursor();
             isLast = cursorPage.getIsLast();
         }
@@ -177,7 +185,8 @@ public class ChatServiceImpl implements ChatService {
     public void setMsgMark(Long uid, ChatMessageMarkReq request) {
         //用户对该消息的标记
         MessageMark messageMark = messageMarkDao.get(uid, request.getMsgId(), request.getMarkType());
-        if (Objects.nonNull(messageMark)) {//有标记过消息修改一下就好
+        //有标记过消息修改一下就好
+        if (Objects.nonNull(messageMark)) {
             MessageMark update = MessageMark.builder()
                     .id(messageMark.getId())
                     .status(transformAct(request.getActType()))

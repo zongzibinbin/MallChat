@@ -54,4 +54,5 @@ public interface UserService {
      * @param openId
      */
     void register(String openId);
+
 }

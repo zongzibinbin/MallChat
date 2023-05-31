@@ -9,9 +9,12 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * Description: 用户相关缓存
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-27
+ * <p>
+ * 用户相关缓存
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-03-27
  */
 @Component
 public class ItemCache {//todo 多级缓存
@@ -28,4 +31,5 @@ public class ItemCache {//todo 多级缓存
     public ItemConfig getById(Long itemId) {
         return itemConfigDao.getById(itemId);
     }
+
 }

@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Getter
 public enum RoomTypeEnum {
+
     GROUP(1, "大群聊"),
     BOILING(2, "沸点"),
     ;
@@ -32,4 +33,5 @@ public enum RoomTypeEnum {
     public static RoomTypeEnum of(Integer type) {
         return cache.get(type);
     }
+
 }

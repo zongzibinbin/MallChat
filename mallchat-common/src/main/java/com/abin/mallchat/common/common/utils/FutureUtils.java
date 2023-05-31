@@ -12,10 +12,16 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
+ * <p>
  * 美团的CompletableFuture封装工具类，参考文章https://mp.weixin.qq.com/s/GQGidprakfticYnbVYVYGQ
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-05-27
  */
 @Slf4j
 public class FutureUtils {
+
     /**
      * 设置CF状态为失败
      */
@@ -57,8 +63,9 @@ public class FutureUtils {
                 );
     }
 
-    /*
+    /**
      * 将List<CompletableFuture<Map<K, V>>> 转为 CompletableFuture<Map<K, V>>
+     *
      * @Param mergeFunction 自定义key冲突时的merge策略
      */
     public static <K, V> CompletableFuture<Map<K, V>> sequenceMap(
@@ -134,4 +141,5 @@ public class FutureUtils {
                         .flatMap(map -> map.entrySet().stream())
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> b)));
     }
+
 }

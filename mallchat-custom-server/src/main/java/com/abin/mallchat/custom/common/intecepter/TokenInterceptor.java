@@ -15,6 +15,14 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * <p>
+ * token 校验拦截
+ * </p>
+ *
+ * @author <a href="https://github.com/zongzibinbin">abin</a>
+ * @since 2023-04-05
+ */
 @Order(-2)
 @Slf4j
 @Component
@@ -32,11 +40,13 @@ public class TokenInterceptor implements HandlerInterceptor {
         //获取用户登录token
         String token = getToken(request);
         Long validUid = loginService.getValidUid(token);
-        if (Objects.nonNull(validUid)) {//有登录态
+        //有登录态
+        if (Objects.nonNull(validUid)) {
             request.setAttribute(ATTRIBUTE_UID, validUid);
         } else {
             boolean isPublicURI = isPublicURI(request.getRequestURI());
-            if (!isPublicURI) {//又没有登录态，又不是公开路径，直接401
+            //又没有登录态，又不是公开路径，直接401
+            if (!isPublicURI) {
                 HttpErrorEnum.ACCESS_DENIED.sendHttpError(response);
                 return false;
             }
@@ -62,4 +72,5 @@ public class TokenInterceptor implements HandlerInterceptor {
                 .map(h -> h.substring(AUTHORIZATION_SCHEMA.length()))
                 .orElse(null);
     }
+
 }

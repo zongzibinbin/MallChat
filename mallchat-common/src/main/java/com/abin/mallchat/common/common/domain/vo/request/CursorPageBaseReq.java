@@ -12,6 +12,10 @@ import javax.validation.constraints.Max;
 import java.util.Objects;
 
 /**
+ * <p>
+ * 游标翻页请求
+ * </p>
+ *
  * @author <a href="https://github.com/zongzibinbin">abin</a>
  * @since 2023-03-19
  */
@@ -36,4 +40,5 @@ public class CursorPageBaseReq {
     public Boolean isFirstPage() {
         return Objects.isNull(cursor);
     }
+
 }

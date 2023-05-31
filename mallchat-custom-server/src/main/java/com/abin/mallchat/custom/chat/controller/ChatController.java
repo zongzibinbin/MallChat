@@ -37,8 +37,10 @@ import java.util.Set;
 @RequestMapping("/capi/chat")
 @Api(tags = "聊天室相关接口")
 public class ChatController {
+
     @Autowired
     private ChatService chatService;
+
     @Autowired
     private UserCache userCache;
 
@@ -102,5 +104,6 @@ public class ChatController {
         return ApiResult.success();
 
     }
+
 }
 
