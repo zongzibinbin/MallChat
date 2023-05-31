@@ -11,6 +11,7 @@ import com.abin.mallchat.common.user.dao.BlackDao;
 import com.abin.mallchat.common.user.dao.UserDao;
 import com.abin.mallchat.common.user.domain.entity.Black;
 import com.abin.mallchat.common.user.domain.entity.User;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -26,14 +27,11 @@ import java.util.stream.Collectors;
  * Date: 2023-03-27
  */
 @Component
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserCache {
-
-    @Autowired
-    private CursorUtils cursorUtils;
-    @Autowired
-    private UserDao userDao;
-    @Autowired
-    private BlackDao blackDao;
+    private final CursorUtils cursorUtils;
+    private final UserDao userDao;
+    private final BlackDao blackDao;
 
     public Long getOnlineNum() {
         String onlineKey = RedisKey.getKey(RedisKey.ONLINE_UID_ZET);

@@ -7,6 +7,7 @@ import com.abin.mallchat.common.user.service.IpService;
 import com.abin.mallchat.common.user.service.cache.UserCache;
 import com.abin.mallchat.custom.user.service.WebSocketService;
 import com.abin.mallchat.custom.user.service.adapter.WSAdapter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
@@ -20,17 +21,13 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserOnlineListener {
-    @Autowired
-    private WebSocketService webSocketService;
-    @Autowired
-    private UserDao userDao;
-    @Autowired
-    private UserCache userCache;
-    @Autowired
-    private WSAdapter wsAdapter;
-    @Autowired
-    private IpService ipService;
+    private final WebSocketService webSocketService;
+    private final UserDao userDao;
+    private final UserCache userCache;
+    private final WSAdapter wsAdapter;
+    private final IpService ipService;
 
     @Async
     @EventListener(classes = UserOnlineEvent.class)

@@ -18,6 +18,7 @@ import com.abin.mallchat.custom.chat.domain.vo.response.ChatRoomResp;
 import com.abin.mallchat.custom.chat.service.ChatService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,11 +37,10 @@ import java.util.Set;
 @RestController
 @RequestMapping("/capi/chat")
 @Api(tags = "聊天室相关接口")
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ChatController {
-    @Autowired
-    private ChatService chatService;
-    @Autowired
-    private UserCache userCache;
+    private final ChatService chatService;
+    private final UserCache userCache;
 
     @GetMapping("/public/room/page")
     @ApiOperation("会话列表")

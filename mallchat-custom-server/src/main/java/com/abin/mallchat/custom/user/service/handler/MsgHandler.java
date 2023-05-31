@@ -4,6 +4,7 @@ import cn.hutool.json.JSONUtil;
 import com.abin.mallchat.common.chat.dao.WxMsgDao;
 import com.abin.mallchat.common.chat.domain.entity.WxMsg;
 import com.abin.mallchat.custom.user.service.adapter.TextBuilder;
+import lombok.RequiredArgsConstructor;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.common.session.WxSessionManager;
 import me.chanjar.weixin.mp.api.WxMpService;
@@ -21,10 +22,9 @@ import static me.chanjar.weixin.common.api.WxConsts.XmlMsgType;
  * @author <a href="https://github.com/binarywang">Binary Wang</a>
  */
 @Component
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class MsgHandler extends AbstractHandler {
-
-    @Autowired
-    private WxMsgDao wxMsgDao;
+    private final WxMsgDao wxMsgDao;
 
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage,

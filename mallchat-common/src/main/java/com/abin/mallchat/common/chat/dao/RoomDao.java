@@ -7,6 +7,7 @@ import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
 import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
 import com.abin.mallchat.common.common.utils.CursorUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,9 +20,9 @@ import org.springframework.stereotype.Service;
  * @since 2023-03-25
  */
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class RoomDao extends ServiceImpl<RoomMapper, Room> {
-    @Autowired
-    private CursorUtils cursorUtils;
+    private final CursorUtils cursorUtils;
 
     public CursorPageBaseResp<Room> getCursorPage(CursorPageBaseReq request) {
         return cursorUtils.getCursorPageByMysql(this, request, wrapper -> {

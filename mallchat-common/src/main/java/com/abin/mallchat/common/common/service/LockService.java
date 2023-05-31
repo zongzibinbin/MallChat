@@ -2,6 +2,7 @@ package com.abin.mallchat.common.common.service;
 
 import com.abin.mallchat.common.common.exception.BusinessException;
 import com.abin.mallchat.common.common.exception.CommonErrorEnum;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
@@ -14,10 +15,9 @@ import java.util.function.Supplier;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class LockService {
-
-    @Autowired
-    private RedissonClient redissonClient;
+    private final RedissonClient redissonClient;
 
     public <T> T executeWithLockThrows(String key, int waitTime, TimeUnit unit, SupplierThrow<T> supplier) throws Throwable {
         RLock lock = redissonClient.getLock(key);

@@ -5,6 +5,7 @@ import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.domain.enums.ChatActiveStatusEnum;
 import com.abin.mallchat.common.user.service.cache.UserCache;
 import com.abin.mallchat.custom.chat.domain.vo.response.ChatMemberResp;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,9 +21,9 @@ import java.util.stream.Collectors;
  */
 @Component
 @Slf4j
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class MemberAdapter {
-    @Autowired
-    private UserCache userCache;
+    private final UserCache userCache;
 
     public List<ChatMemberResp> buildMember(List<Pair<Long, Double>> list, ChatActiveStatusEnum statusEnum) {
         return list.stream().map(a -> {

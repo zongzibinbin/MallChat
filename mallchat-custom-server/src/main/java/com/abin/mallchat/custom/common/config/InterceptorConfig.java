@@ -3,6 +3,7 @@ package com.abin.mallchat.custom.common.config;
 import com.abin.mallchat.custom.common.intecepter.BlackInterceptor;
 import com.abin.mallchat.custom.common.intecepter.CollectorInterceptor;
 import com.abin.mallchat.custom.common.intecepter.TokenInterceptor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -14,14 +15,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * Date: 2023-04-05
  */
 @Configuration
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class InterceptorConfig implements WebMvcConfigurer {
-
-    @Autowired
-    private TokenInterceptor tokenInterceptor;
-    @Autowired
-    private CollectorInterceptor collectorInterceptor;
-    @Autowired
-    private BlackInterceptor blackInterceptor;
+    private final TokenInterceptor tokenInterceptor;
+    private final CollectorInterceptor collectorInterceptor;
+    private final BlackInterceptor blackInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {

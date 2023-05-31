@@ -6,6 +6,7 @@ import com.abin.mallchat.common.user.dao.UserDao;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.domain.enums.ItemEnum;
 import com.abin.mallchat.common.user.service.IUserBackpackService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
@@ -19,11 +20,10 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserRegisterListener {
-    @Autowired
-    private UserDao userDao;
-    @Autowired
-    private IUserBackpackService iUserBackpackService;
+    private final UserDao userDao;
+    private final IUserBackpackService iUserBackpackService;
 
     @Async
     @EventListener(classes = UserRegisterEvent.class)

@@ -34,20 +34,27 @@ public class WxMsgService {
      */
     private static final ConcurrentHashMap<String, Integer> OPENID_EVENT_CODE_MAP = new ConcurrentHashMap<>();
     private static final String URL = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect";
-    @Value("${wx.mp.callback}")
-    private String callback;
-    @Autowired
-    private UserDao userDao;
-    @Autowired
-    @Lazy
-    private WebSocketService webSocketService;
-    @Autowired
-    private LoginService loginService;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
+    private final String callback;
+    private final UserDao userDao;
+    private final WebSocketService webSocketService;
+    private final LoginService loginService;
+    private final UserService userService;
+    private final ThreadPoolTaskExecutor threadPoolTaskExecutor;
+
+    public WxMsgService(@Value("${wx.mp.callback}") String callback,
+                        @Autowired UserDao userDao,
+                        @Lazy @Autowired WebSocketService webSocketService,
+                        @Autowired LoginService loginService,
+                        @Autowired UserService userService,
+                        @Autowired ThreadPoolTaskExecutor threadPoolTaskExecutor) {
+        this.callback = callback;
+        this.userDao = userDao;
+        this.webSocketService = webSocketService;
+        this.loginService = loginService;
+        this.userService = userService;
+        this.threadPoolTaskExecutor = threadPoolTaskExecutor;
+    }
 
     public WxMpXmlOutMessage scan(WxMpService wxMpService, WxMpXmlMessage wxMpXmlMessage) {
         String fromUser = wxMpXmlMessage.getFromUser();

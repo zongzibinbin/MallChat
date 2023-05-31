@@ -7,6 +7,7 @@ import com.abin.mallchat.custom.chat.domain.vo.response.ChatMessageResp;
 import com.abin.mallchat.custom.chat.service.ChatService;
 import com.abin.mallchat.custom.user.service.WebSocketService;
 import com.abin.mallchat.custom.user.service.adapter.WSAdapter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
@@ -20,13 +21,11 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class MessageSendListener {
-    @Autowired
-    private WebSocketService webSocketService;
-    @Autowired
-    private ChatService chatService;
-    @Autowired
-    private MessageDao messageDao;
+    private final WebSocketService webSocketService;
+    private final ChatService chatService;
+    private final MessageDao messageDao;
 
     @Async
     @EventListener(classes = MessageSendEvent.class)

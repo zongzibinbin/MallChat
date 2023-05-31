@@ -12,6 +12,7 @@ import com.abin.mallchat.custom.user.domain.vo.response.ws.WSBaseResp;
 import com.abin.mallchat.custom.user.domain.vo.response.ws.WSLoginSuccess;
 import com.abin.mallchat.custom.user.domain.vo.response.ws.WSLoginUrl;
 import com.abin.mallchat.custom.user.domain.vo.response.ws.WSOnlineOfflineNotify;
+import lombok.RequiredArgsConstructor;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,9 +25,9 @@ import java.util.Collections;
  * Date: 2023-03-19
  */
 @Component
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class WSAdapter {
-    @Autowired
-    private ChatService chatService;
+    private final ChatService chatService;
 
     public static WSBaseResp<WSLoginUrl> buildLoginResp(WxMpQrCodeTicket wxMpQrCodeTicket) {
         WSBaseResp<WSLoginUrl> wsBaseResp = new WSBaseResp<>();

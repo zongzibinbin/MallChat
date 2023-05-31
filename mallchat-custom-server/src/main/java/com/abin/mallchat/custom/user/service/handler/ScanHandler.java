@@ -1,6 +1,7 @@
 package com.abin.mallchat.custom.user.service.handler;
 
 import com.abin.mallchat.custom.user.service.WxMsgService;
+import lombok.RequiredArgsConstructor;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.common.session.WxSessionManager;
 import me.chanjar.weixin.mp.api.WxMpService;
@@ -12,11 +13,9 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ScanHandler extends AbstractHandler {
-
-
-    @Autowired
-    private WxMsgService wxMsgService;
+    private final WxMsgService wxMsgService;
 
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMpXmlMessage, Map<String, Object> map,

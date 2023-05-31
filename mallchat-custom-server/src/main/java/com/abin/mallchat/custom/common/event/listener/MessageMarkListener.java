@@ -10,6 +10,7 @@ import com.abin.mallchat.common.common.domain.enums.IdempotentEnum;
 import com.abin.mallchat.common.common.event.MessageMarkEvent;
 import com.abin.mallchat.common.user.domain.enums.ItemEnum;
 import com.abin.mallchat.common.user.service.IUserBackpackService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
@@ -25,13 +26,11 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class MessageMarkListener {
-    @Autowired
-    private MessageMarkDao messageMarkDao;
-    @Autowired
-    private MessageDao messageDao;
-    @Autowired
-    private IUserBackpackService iUserBackpackService;
+    private final MessageMarkDao messageMarkDao;
+    private final MessageDao messageDao;
+    private final IUserBackpackService iUserBackpackService;
 
     @Async
     @EventListener(classes = MessageMarkEvent.class)
