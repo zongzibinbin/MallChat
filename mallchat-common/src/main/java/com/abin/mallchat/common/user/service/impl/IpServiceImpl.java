@@ -35,7 +35,7 @@ public class IpServiceImpl implements IpService, DisposableBean {
             0L, TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<Runnable>(500),
             new NamedThreadFactory("refresh-ipDetail", (ThreadGroup)null,false,
-                    new GlobalUncaughtExceptionHandler("refresh-ipDetail")));
+                    new GlobalUncaughtExceptionHandler()));
 
     @Autowired
     private UserDao userDao;
