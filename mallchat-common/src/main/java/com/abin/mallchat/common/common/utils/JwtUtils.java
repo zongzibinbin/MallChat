@@ -6,12 +6,12 @@ import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -59,7 +59,7 @@ public class JwtUtils {
      * @return
      */
     public Map<String, Claim> verifyToken(String token) {
-        if (Objects.isNull(token)) {
+        if (StringUtils.isEmpty(token)) {
             return null;
         }
         try {

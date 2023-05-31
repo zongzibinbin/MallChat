@@ -7,9 +7,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.Max;
-import java.util.Objects;
 
 /**
  * @author <a href="https://github.com/zongzibinbin">abin</a>
@@ -34,6 +34,6 @@ public class CursorPageBaseReq {
 
     @JsonIgnore
     public Boolean isFirstPage() {
-        return Objects.isNull(cursor);
+        return StringUtils.isEmpty(cursor);
     }
 }

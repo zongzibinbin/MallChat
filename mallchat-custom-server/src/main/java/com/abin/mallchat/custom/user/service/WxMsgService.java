@@ -10,6 +10,7 @@ import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -53,7 +54,7 @@ public class WxMsgService {
         String fromUser = wxMpXmlMessage.getFromUser();
         Integer eventKey = Integer.parseInt(getEventKey(wxMpXmlMessage));
         User user = userDao.getByOpenId(fromUser);
-        if (Objects.nonNull(user) && Objects.nonNull(user.getAvatar())) {
+        if (Objects.nonNull(user) && StringUtils.isNotEmpty(user.getAvatar())) {
             //注册且已经授权的用户，直接登录成功
             login(user.getId(), eventKey);
             return null;
@@ -84,7 +85,7 @@ public class WxMsgService {
     public void authorize(WxOAuth2UserInfo userInfo) {
         User user = userDao.getByOpenId(userInfo.getOpenid());
         //更新用户信息
-        if (Objects.isNull(user.getName())) {
+        if (StringUtils.isEmpty(user.getName())) {
             fillUserInfo(user.getId(), userInfo);
         }
         //触发用户登录成功操作
