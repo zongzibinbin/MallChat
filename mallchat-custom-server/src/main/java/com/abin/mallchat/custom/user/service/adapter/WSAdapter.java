@@ -1,6 +1,7 @@
 package com.abin.mallchat.custom.user.service.adapter;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.abin.mallchat.common.chat.domain.dto.ChatMessageMarkDTO;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.domain.enums.ChatActiveStatusEnum;
 import com.abin.mallchat.custom.chat.domain.vo.response.ChatMemberResp;
@@ -8,11 +9,9 @@ import com.abin.mallchat.custom.chat.domain.vo.response.ChatMemberStatisticResp;
 import com.abin.mallchat.custom.chat.domain.vo.response.ChatMessageResp;
 import com.abin.mallchat.custom.chat.service.ChatService;
 import com.abin.mallchat.custom.user.domain.enums.WSRespTypeEnum;
-import com.abin.mallchat.custom.user.domain.vo.response.ws.WSBaseResp;
-import com.abin.mallchat.custom.user.domain.vo.response.ws.WSLoginSuccess;
-import com.abin.mallchat.custom.user.domain.vo.response.ws.WSLoginUrl;
-import com.abin.mallchat.custom.user.domain.vo.response.ws.WSOnlineOfflineNotify;
+import com.abin.mallchat.custom.user.domain.vo.response.ws.*;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -108,6 +107,18 @@ public class WSAdapter {
         WSBaseResp<ChatMessageResp> wsBaseResp = new WSBaseResp<>();
         wsBaseResp.setType(WSRespTypeEnum.MESSAGE.getType());
         wsBaseResp.setData(msgResp);
+        return wsBaseResp;
+    }
+
+    public static WSBaseResp<WSMsgMark> buildMsgMarkSend(ChatMessageMarkDTO dto, Integer markCount) {
+        WSMsgMark.WSMsgMarkItem item = new WSMsgMark.WSMsgMarkItem();
+        BeanUtils.copyProperties(dto, item);
+        item.setMarkCount(markCount);
+        WSBaseResp<WSMsgMark> wsBaseResp = new WSBaseResp<>();
+        wsBaseResp.setType(WSRespTypeEnum.MARK.getType());
+        WSMsgMark mark = new WSMsgMark();
+        mark.setMarkList(Collections.singletonList(item));
+        wsBaseResp.setData(mark);
         return wsBaseResp;
     }
 }

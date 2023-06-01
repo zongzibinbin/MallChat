@@ -64,7 +64,7 @@ public class ChatController {
         return userCache.getBlackMap().getOrDefault(BlackTypeEnum.UID.getType(), new HashSet<>());
     }
 
-    @GetMapping("public/member/statistic/")
+    @GetMapping("public/member/statistic")
     @ApiOperation("群成员人数统计")
     public ApiResult<ChatMemberStatisticResp> getMemberStatistic() {
         return ApiResult.success(chatService.getMemberStatistic());

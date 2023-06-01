@@ -9,9 +9,9 @@ import com.abin.mallchat.custom.user.service.WebSocketService;
 import com.abin.mallchat.custom.user.service.adapter.WSAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 /**
  * 消息发送监听器
@@ -29,7 +29,7 @@ public class MessageSendListener {
     private MessageDao messageDao;
 
     @Async
-    @EventListener(classes = MessageSendEvent.class)
+    @TransactionalEventListener(classes = MessageSendEvent.class, fallbackExecution = true)
     public void notifyAllOnline(MessageSendEvent event) {
         Message message = messageDao.getById(event.getMsgId());
         ChatMessageResp msgResp = chatService.getMsgResp(message, null);

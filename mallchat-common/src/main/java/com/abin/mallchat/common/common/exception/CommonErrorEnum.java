@@ -17,8 +17,8 @@ public enum CommonErrorEnum implements ErrorEnum {
     FREQUENCY_LIMIT(-3, "请求太频繁了，请稍后再试哦~~"),
     LOCK_LIMIT(-4, "请求太频繁了，请稍后再试哦~~"),
     ;
-    private Integer code;
-    private String msg;
+    private final Integer code;
+    private final String msg;
 
     @Override
     public Integer getErrorCode() {

@@ -10,11 +10,13 @@ import com.abin.mallchat.common.common.domain.enums.IdempotentEnum;
 import com.abin.mallchat.common.common.event.MessageMarkEvent;
 import com.abin.mallchat.common.user.domain.enums.ItemEnum;
 import com.abin.mallchat.common.user.service.IUserBackpackService;
+import com.abin.mallchat.custom.user.service.WebSocketService;
+import com.abin.mallchat.custom.user.service.adapter.WSAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.Objects;
 
@@ -32,9 +34,11 @@ public class MessageMarkListener {
     private MessageDao messageDao;
     @Autowired
     private IUserBackpackService iUserBackpackService;
+    @Autowired
+    private WebSocketService webSocketService;
 
     @Async
-    @EventListener(classes = MessageMarkEvent.class)
+    @TransactionalEventListener(classes = MessageMarkEvent.class, fallbackExecution = true)
     public void changeMsgType(MessageMarkEvent event) {
         ChatMessageMarkDTO dto = event.getDto();
         Message msg = messageDao.getById(dto.getMsgId());
@@ -51,6 +55,14 @@ public class MessageMarkListener {
         if (MessageMarkTypeEnum.LIKE.getType().equals(dto.getMarkType()) && updateSuccess) {//尝试给用户发送一张徽章
             iUserBackpackService.acquireItem(msg.getFromUid(), ItemEnum.LIKE_BADGE.getId(), IdempotentEnum.MSG_ID, msg.getId().toString());
         }
+    }
+
+    @Async
+    @TransactionalEventListener(classes = MessageMarkEvent.class, fallbackExecution = true)
+    public void notifyAll(MessageMarkEvent event) {//后续可做合并查询，目前异步影响不大
+        ChatMessageMarkDTO dto = event.getDto();
+        Integer markCount = messageMarkDao.getMarkCount(dto.getMsgId(), dto.getMarkType());
+        webSocketService.sendToAllOnline(WSAdapter.buildMsgMarkSend(dto, markCount), dto.getUid());
     }
 
 }

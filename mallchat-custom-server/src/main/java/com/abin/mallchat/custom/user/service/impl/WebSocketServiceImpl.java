@@ -227,7 +227,7 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     //entrySet的值不是快照数据,但是它支持遍历，所以无所谓了，不用快照也行。
     @Override
-    public void sendToAllOnline(WSBaseResp wsBaseResp, Long skipUid) {
+    public void sendToAllOnline(WSBaseResp<?> wsBaseResp, Long skipUid) {
         ONLINE_WS_MAP.forEach((channel, ext) -> {
             if (ObjectUtil.equal(ext.getUid(), skipUid)) {
                 return;
@@ -236,7 +236,12 @@ public class WebSocketServiceImpl implements WebSocketService {
         });
     }
 
-    private void sendMsg(Channel channel, WSBaseResp wsBaseResp) {
+    @Override
+    public void sendToAllOnline(WSBaseResp<?> wsBaseResp) {
+        sendToAllOnline(wsBaseResp, null);
+    }
+
+    private void sendMsg(Channel channel, WSBaseResp<?> wsBaseResp) {
         channel.writeAndFlush(new TextWebSocketFrame(JSONUtil.toJsonStr(wsBaseResp)));
     }
 

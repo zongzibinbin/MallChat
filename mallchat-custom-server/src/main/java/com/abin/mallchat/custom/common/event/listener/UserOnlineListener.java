@@ -38,7 +38,7 @@ public class UserOnlineListener {
         User user = event.getUser();
         userCache.online(user.getId(), user.getLastOptTime());
         //推送给所有在线用户，该用户登录成功
-        webSocketService.sendToAllOnline(wsAdapter.buildOnlineNotifyResp(event.getUser()), null);
+        webSocketService.sendToAllOnline(wsAdapter.buildOnlineNotifyResp(event.getUser()));
     }
 
     @Async

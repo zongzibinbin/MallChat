@@ -1,19 +1,3 @@
-/*
- Navicat Premium Data Transfer
-
- Source Server         : mallchat
- Source Server Type    : MySQL
- Source Server Version : 50741
- Source Host           : 101.33.251.36:3306
- Source Schema         : mallchat
-
- Target Server Type    : MySQL
- Target Server Version : 50741
- File Encoding         : 65001
-
- Date: 10/05/2023 14:25:59
-*/
-
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 

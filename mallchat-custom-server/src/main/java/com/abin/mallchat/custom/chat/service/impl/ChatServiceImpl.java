@@ -6,15 +6,14 @@ import cn.hutool.core.lang.Pair;
 import com.abin.mallchat.common.chat.dao.MessageDao;
 import com.abin.mallchat.common.chat.dao.MessageMarkDao;
 import com.abin.mallchat.common.chat.dao.RoomDao;
-import com.abin.mallchat.common.chat.domain.dto.ChatMessageMarkDTO;
 import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.chat.domain.entity.MessageMark;
 import com.abin.mallchat.common.chat.domain.entity.Room;
+import com.abin.mallchat.common.chat.domain.enums.MessageMarkActTypeEnum;
 import com.abin.mallchat.common.common.annotation.RedissonLock;
 import com.abin.mallchat.common.common.domain.enums.YesOrNoEnum;
 import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
 import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
-import com.abin.mallchat.common.common.event.MessageMarkEvent;
 import com.abin.mallchat.common.common.event.MessageSendEvent;
 import com.abin.mallchat.common.common.exception.BusinessException;
 import com.abin.mallchat.common.common.utils.AssertUtil;
@@ -36,8 +35,9 @@ import com.abin.mallchat.custom.chat.service.adapter.MemberAdapter;
 import com.abin.mallchat.custom.chat.service.adapter.MessageAdapter;
 import com.abin.mallchat.custom.chat.service.adapter.RoomAdapter;
 import com.abin.mallchat.custom.chat.service.helper.ChatMemberHelper;
+import com.abin.mallchat.custom.chat.service.strategy.mark.AbstractMsgMarkStrategy;
+import com.abin.mallchat.custom.chat.service.strategy.mark.MsgMarkFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -165,38 +165,25 @@ public class ChatServiceImpl implements ChatService {
     public ChatMemberStatisticResp getMemberStatistic() {
         System.out.println(Thread.currentThread().getName());
         Long onlineNum = userCache.getOnlineNum();
-        Long offlineNum = userCache.getOfflineNum();
+//        Long offlineNum = userCache.getOfflineNum();不展示总人数
         ChatMemberStatisticResp resp = new ChatMemberStatisticResp();
         resp.setOnlineNum(onlineNum);
-        resp.setTotalNum(onlineNum + offlineNum);
+//        resp.setTotalNum(onlineNum + offlineNum);
         return resp;
     }
 
     @Override
     @RedissonLock(key = "#uid")
     public void setMsgMark(Long uid, ChatMessageMarkReq request) {
-        //用户对该消息的标记
-        MessageMark messageMark = messageMarkDao.get(uid, request.getMsgId(), request.getMarkType());
-        if (Objects.nonNull(messageMark)) {//有标记过消息修改一下就好
-            MessageMark update = MessageMark.builder()
-                    .id(messageMark.getId())
-                    .status(transformAct(request.getActType()))
-                    .build();
-            messageMarkDao.updateById(update);
-            return;
+        AbstractMsgMarkStrategy strategy = MsgMarkFactory.getStrategyNoNull(request.getMarkType());
+        switch (MessageMarkActTypeEnum.of(request.getActType())) {
+            case MARK:
+                strategy.mark(uid, request.getMsgId());
+                break;
+            case UN_MARK:
+                strategy.unMark(uid, request.getMsgId());
+                break;
         }
-        //没标记过消息，插入一条新消息
-        MessageMark insert = MessageMark.builder()
-                .uid(uid)
-                .msgId(request.getMsgId())
-                .type(request.getMarkType())
-                .status(transformAct(request.getActType()))
-                .build();
-        messageMarkDao.save(insert);
-        //发布消息标记事件
-        ChatMessageMarkDTO dto = new ChatMessageMarkDTO();
-        BeanUtils.copyProperties(request, dto);
-        applicationEventPublisher.publishEvent(new MessageMarkEvent(this, dto));
     }
 
     private Integer transformAct(Integer actType) {
