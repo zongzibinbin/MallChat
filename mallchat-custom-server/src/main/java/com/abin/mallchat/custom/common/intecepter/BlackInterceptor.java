@@ -1,5 +1,6 @@
 package com.abin.mallchat.custom.common.intecepter;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.abin.mallchat.common.common.domain.dto.RequestInfo;
 import com.abin.mallchat.common.common.exception.HttpErrorEnum;
 import com.abin.mallchat.common.common.utils.RequestHolder;
@@ -44,7 +45,7 @@ public class BlackInterceptor implements HandlerInterceptor {
     }
 
     private boolean inBlackList(Object target, Set<String> blackSet) {
-        if (Objects.isNull(target) || Objects.isNull(blackSet)) {
+        if (Objects.isNull(target) || CollectionUtil.isEmpty(blackSet)) {
             return false;
         }
         return blackSet.contains(target.toString());

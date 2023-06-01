@@ -180,7 +180,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         if (uidOptional.isPresent()) {
             CopyOnWriteArrayList<Channel> channels = ONLINE_UID_MAP.get(uidOptional.get());
             if (CollectionUtil.isNotEmpty(channels)) {
-                channels.removeIf(channel1 -> channel1.equals(channel));
+                channels.removeIf(ch -> Objects.equals(ch, channel));
             }
             return CollectionUtil.isEmpty(ONLINE_UID_MAP.get(uidOptional.get()));
         }

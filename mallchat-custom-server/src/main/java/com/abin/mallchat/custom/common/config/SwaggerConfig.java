@@ -24,6 +24,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Description:
@@ -72,7 +73,7 @@ public class SwaggerConfig {
     }
 
     private boolean shouldRegisterLinksMapping(WebEndpointProperties webEndpointProperties, Environment environment, String basePath) {
-        return webEndpointProperties.getDiscovery().isEnabled() && (StringUtils.hasText(basePath) || ManagementPortType.get(environment).equals(ManagementPortType.DIFFERENT));
+        return webEndpointProperties.getDiscovery().isEnabled() && (StringUtils.hasText(basePath) || Objects.equals(ManagementPortType.get(environment), ManagementPortType.DIFFERENT));
     }
 
 }
