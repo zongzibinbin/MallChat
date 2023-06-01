@@ -18,6 +18,7 @@ import com.abin.mallchat.common.common.event.MessageMarkEvent;
 import com.abin.mallchat.common.common.event.MessageSendEvent;
 import com.abin.mallchat.common.common.exception.BusinessException;
 import com.abin.mallchat.common.common.utils.AssertUtil;
+import com.abin.mallchat.common.common.utils.SpringContextHolder;
 import com.abin.mallchat.common.user.dao.UserDao;
 import com.abin.mallchat.common.user.domain.entity.ItemConfig;
 import com.abin.mallchat.common.user.domain.entity.User;
@@ -78,8 +79,21 @@ public class ChatServiceImpl implements ChatService {
      * 发送消息
      */
     @Override
-    @Transactional
     public Long sendMsg(ChatMessageReq request, Long uid) {
+        Long Mid = SpringContextHolder.getBean(this.getClass()).saveMsg(request, uid);
+        //发布消息发送事件
+        applicationEventPublisher.publishEvent(new MessageSendEvent(this, Mid));
+        return Mid;
+    }
+
+    /**
+     * 保存消息
+     * @param request
+     * @param uid
+     * @return
+     */
+    @Transactional
+    public Long saveMsg(ChatMessageReq request, Long uid){
         //校验下回复消息
         Message replyMsg = null;
         if (Objects.nonNull(request.getReplyMsgId())) {
@@ -96,8 +110,6 @@ public class ChatServiceImpl implements ChatService {
             Integer gapCount = messageDao.getGapCount(request.getRoomId(), replyMsg.getId(), insert.getId());
             messageDao.updateGapCount(insert.getId(), gapCount);
         }
-        //发布消息发送事件
-        applicationEventPublisher.publishEvent(new MessageSendEvent(this, insert.getId()));
         return insert.getId();
     }
 
