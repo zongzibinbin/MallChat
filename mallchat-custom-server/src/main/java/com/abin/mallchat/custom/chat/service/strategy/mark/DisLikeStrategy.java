@@ -22,7 +22,7 @@ public class DisLikeStrategy extends AbstractMsgMarkStrategy {
     }
 
     @Override
-    public void mark(Long uid, Long msgId) {
+    public void doMark(Long uid, Long msgId) {
         super.mark(uid, msgId);
         //同时取消点赞的动作
         MsgMarkFactory.getStrategyNoNull(MessageMarkTypeEnum.LIKE.getType()).unMark(uid, msgId);

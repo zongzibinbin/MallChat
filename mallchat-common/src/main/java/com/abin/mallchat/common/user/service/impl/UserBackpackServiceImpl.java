@@ -35,11 +35,18 @@ public class UserBackpackServiceImpl implements IUserBackpackService {
     private ItemCache itemCache;
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
+    @Autowired
+    private UserBackpackServiceImpl userBackpackService;
 
     @Override
-    @RedissonLock(key = "#uid", waitTime = 5000)//相同用户会同时发奖，需要排队不能直接拒绝
     public void acquireItem(Long uid, Long itemId, IdempotentEnum idempotentEnum, String businessId) {
+        //组装幂等号
         String idempotent = getIdempotent(itemId, idempotentEnum, businessId);
+        userBackpackService.doAcquireItem(uid, itemId, idempotent);
+    }
+
+    @RedissonLock(key = "#idempotent", waitTime = 5000)//相同幂等如果同时发奖，需要排队等上一个执行完，取出之前数据返回
+    public void doAcquireItem(Long uid, Long itemId, String idempotent) {
         UserBackpack userBackpack = userBackpackDao.getByIdp(idempotent);
         //幂等检查
         if (Objects.nonNull(userBackpack)) {

@@ -2,6 +2,7 @@ package com.abin.mallchat.common.common.exception;
 
 import com.abin.mallchat.common.common.domain.vo.response.ApiResult;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -16,6 +17,18 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     public ApiResult methodArgumentNotValidExceptionExceptionHandler(MethodArgumentNotValidException e) {
+        StringBuilder errorMsg = new StringBuilder();
+        e.getBindingResult().getFieldErrors().forEach(x -> errorMsg.append(x.getField()).append(x.getDefaultMessage()).append(","));
+        String message = errorMsg.toString();
+        log.info("validation parameters error！The reason is:{}", message);
+        return ApiResult.fail(-1, message.substring(0, message.length() - 1));
+    }
+
+    /**
+     * validation参数校验异常
+     */
+    @ExceptionHandler(value = BindException.class)
+    public ApiResult bindException(BindException e) {
         StringBuilder errorMsg = new StringBuilder();
         e.getBindingResult().getFieldErrors().forEach(x -> errorMsg.append(x.getField()).append(x.getDefaultMessage()).append(","));
         String message = errorMsg.toString();

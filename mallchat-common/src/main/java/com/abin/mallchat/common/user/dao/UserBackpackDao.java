@@ -22,11 +22,10 @@ import java.util.List;
 public class UserBackpackDao extends ServiceImpl<UserBackpackMapper, UserBackpack> {
 
     public Integer getCountByValidItemId(Long uid, Long itemId) {
-        LambdaQueryWrapper<UserBackpack> wrapper = new QueryWrapper<UserBackpack>().lambda()
-                .eq(UserBackpack::getUid, uid)
+        return lambdaQuery().eq(UserBackpack::getUid, uid)
                 .eq(UserBackpack::getItemId, itemId)
-                .eq(UserBackpack::getStatus, YesOrNoEnum.NO.getStatus());
-        return count(wrapper);
+                .eq(UserBackpack::getStatus, YesOrNoEnum.NO.getStatus())
+                .count();
     }
 
     public UserBackpack getFirstValidItem(Long uid, Long itemId) {

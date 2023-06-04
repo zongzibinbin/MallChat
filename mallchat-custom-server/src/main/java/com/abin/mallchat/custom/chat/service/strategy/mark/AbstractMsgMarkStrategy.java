@@ -31,17 +31,25 @@ public abstract class AbstractMsgMarkStrategy {
 
     @Transactional
     public void mark(Long uid, Long msgId) {
-        exec(uid, msgId, MessageMarkActTypeEnum.MARK);
+        doMark(uid, msgId);
     }
 
     @Transactional
     public void unMark(Long uid, Long msgId) {
-        exec(uid, msgId, MessageMarkActTypeEnum.UN_MARK);
+        doUnMark(uid, msgId);
     }
 
     @PostConstruct
     private void init() {
         MsgMarkFactory.register(getTypeEnum().getType(), this);
+    }
+
+    protected void doMark(Long uid, Long msgId) {
+        exec(uid, msgId, MessageMarkActTypeEnum.MARK);
+    }
+
+    protected void doUnMark(Long uid, Long msgId) {
+        exec(uid, msgId, MessageMarkActTypeEnum.UN_MARK);
     }
 
     protected void exec(Long uid, Long msgId, MessageMarkActTypeEnum actTypeEnum) {

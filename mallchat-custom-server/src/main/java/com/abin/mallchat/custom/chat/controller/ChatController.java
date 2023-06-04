@@ -44,13 +44,13 @@ public class ChatController {
 
     @GetMapping("/public/room/page")
     @ApiOperation("会话列表")
-    public ApiResult<CursorPageBaseResp<ChatRoomResp>> getRoomPage(CursorPageBaseReq request) {
+    public ApiResult<CursorPageBaseResp<ChatRoomResp>> getRoomPage(@Valid CursorPageBaseReq request) {
         return ApiResult.success(chatService.getRoomPage(request, RequestHolder.get().getUid()));
     }
 
     @GetMapping("/public/member/page")
     @ApiOperation("群成员列表")
-    public ApiResult<CursorPageBaseResp<ChatMemberResp>> getMemberPage(CursorPageBaseReq request) {
+    public ApiResult<CursorPageBaseResp<ChatMemberResp>> getMemberPage(@Valid CursorPageBaseReq request) {
         CursorPageBaseResp<ChatMemberResp> memberPage = chatService.getMemberPage(request);
         filterBlackMember(memberPage);
         return ApiResult.success(memberPage);
@@ -72,7 +72,7 @@ public class ChatController {
 
     @GetMapping("/public/msg/page")
     @ApiOperation("消息列表")
-    public ApiResult<CursorPageBaseResp<ChatMessageResp>> getMsgPage(ChatMessagePageReq request) {
+    public ApiResult<CursorPageBaseResp<ChatMessageResp>> getMsgPage(@Valid ChatMessagePageReq request) {
         CursorPageBaseResp<ChatMessageResp> msgPage = chatService.getMsgPage(request, RequestHolder.get().getUid());
         filterBlackMsg(msgPage);
         return ApiResult.success(msgPage);
