@@ -1,6 +1,7 @@
 package com.abin.mallchat.common.user.domain.entity;
 
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -28,7 +29,7 @@ public class IpInfo implements Serializable {
     private IpDetail updateIpDetail;
 
     public void refreshIp(String ip) {
-        if (Objects.isNull(ip)) {
+        if (StringUtils.isEmpty(ip)) {
             return;
         }
         updateIp = ip;
@@ -45,7 +46,7 @@ public class IpInfo implements Serializable {
     public String needRefreshIp() {
         boolean notNeedRefresh = Optional.ofNullable(updateIpDetail)
                 .map(IpDetail::getIp)
-                .filter(ip -> ip.equals(updateIp))
+                .filter(ip -> Objects.equals(ip, updateIp))
                 .isPresent();
         return notNeedRefresh ? null : updateIp;
     }

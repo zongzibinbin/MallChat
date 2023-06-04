@@ -44,7 +44,7 @@ public class LoginServiceImpl implements LoginService {
         }
         String key = RedisKey.getKey(RedisKey.USER_TOKEN_STRING, uid);
         String realToken = RedisUtils.getStr(key);
-        return token.equals(realToken);//有可能token失效了，需要校验是不是和最新token一致
+        return Objects.equals(token, realToken);//有可能token失效了，需要校验是不是和最新token一致
     }
 
     @Async
