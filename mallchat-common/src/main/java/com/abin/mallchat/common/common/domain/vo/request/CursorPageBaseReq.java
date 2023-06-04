@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 /**
  * @author <a href="https://github.com/zongzibinbin">abin</a>
@@ -22,6 +23,7 @@ import javax.validation.constraints.Max;
 public class CursorPageBaseReq {
 
     @ApiModelProperty("页面大小")
+    @Min(0)
     @Max(50)
     private Integer pageSize = 10;
 
