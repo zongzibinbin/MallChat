@@ -44,7 +44,7 @@ public class CursorUtils {
                 .map(String::valueOf)
                 .orElse(null);
         Boolean isLast = result.size() != cursorPageBaseReq.getPageSize();
-        return new CursorPageBaseResp(cursor, isLast, result);
+        return new CursorPageBaseResp<>(cursor, isLast, result);
     }
 
     public <T> CursorPageBaseResp<T> getCursorPageByMysql(IService<T> mapper, CursorPageBaseReq request, Consumer<LambdaQueryWrapper<T>> initWrapper, SFunction<T, ?> cursorColumn) {
@@ -60,7 +60,7 @@ public class CursorUtils {
                 .map(String::valueOf)
                 .orElse(null);
         Boolean isLast = page.getRecords().size() != request.getPageSize();
-        return new CursorPageBaseResp(cursor, isLast, page.getRecords());
+        return new CursorPageBaseResp<>(cursor, isLast, page.getRecords());
     }
 
 }
