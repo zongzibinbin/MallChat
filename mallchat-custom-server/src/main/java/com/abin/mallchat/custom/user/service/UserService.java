@@ -1,5 +1,6 @@
 package com.abin.mallchat.custom.user.service;
 
+import com.abin.mallchat.custom.user.domain.vo.request.user.BlackReq;
 import com.abin.mallchat.custom.user.domain.vo.request.user.ModifyNameReq;
 import com.abin.mallchat.custom.user.domain.vo.request.user.WearingBadgeReq;
 import com.abin.mallchat.custom.user.domain.vo.response.user.BadgeResp;
@@ -54,4 +55,6 @@ public interface UserService {
      * @param openId
      */
     void register(String openId);
+
+    void black(BlackReq req);
 }

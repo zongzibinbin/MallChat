@@ -2,6 +2,7 @@ package com.abin.mallchat.custom.user.service.adapter;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.abin.mallchat.common.chat.domain.dto.ChatMessageMarkDTO;
+import com.abin.mallchat.common.chat.domain.dto.ChatMsgRecallDTO;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.domain.enums.ChatActiveStatusEnum;
 import com.abin.mallchat.custom.chat.domain.vo.response.ChatMemberResp;
@@ -34,7 +35,7 @@ public class WSAdapter {
         return wsBaseResp;
     }
 
-    public static WSBaseResp<WSLoginSuccess> buildLoginSuccessResp(User user, String token) {
+    public static WSBaseResp<WSLoginSuccess> buildLoginSuccessResp(User user, String token, boolean hasPower) {
         WSBaseResp<WSLoginSuccess> wsBaseResp = new WSBaseResp<>();
         wsBaseResp.setType(WSRespTypeEnum.LOGIN_SUCCESS.getType());
         WSLoginSuccess wsLoginSuccess = WSLoginSuccess.builder()
@@ -42,6 +43,7 @@ public class WSAdapter {
                 .name(user.getName())
                 .token(token)
                 .uid(user.getId())
+                .power(hasPower ? 1 : 0)
                 .build();
         wsBaseResp.setData(wsLoginSuccess);
         return wsBaseResp;
@@ -50,6 +52,15 @@ public class WSAdapter {
     public static WSBaseResp buildScanSuccessResp() {
         WSBaseResp wsBaseResp = new WSBaseResp();
         wsBaseResp.setType(WSRespTypeEnum.LOGIN_SCAN_SUCCESS.getType());
+        return wsBaseResp;
+    }
+
+    public static WSBaseResp<?> buildMsgRecall(ChatMsgRecallDTO recallDTO) {
+        WSBaseResp<WSMsgRecall> wsBaseResp = new WSBaseResp<>();
+        wsBaseResp.setType(WSRespTypeEnum.RECALL.getType());
+        WSMsgRecall recall = new WSMsgRecall();
+        BeanUtils.copyProperties(recallDTO, recall);
+        wsBaseResp.setData(recall);
         return wsBaseResp;
     }
 

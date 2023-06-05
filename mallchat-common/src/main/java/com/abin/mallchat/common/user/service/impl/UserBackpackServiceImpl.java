@@ -4,7 +4,6 @@ import com.abin.mallchat.common.common.annotation.RedissonLock;
 import com.abin.mallchat.common.common.domain.enums.IdempotentEnum;
 import com.abin.mallchat.common.common.domain.enums.YesOrNoEnum;
 import com.abin.mallchat.common.common.event.ItemReceiveEvent;
-import com.abin.mallchat.common.user.dao.ItemConfigDao;
 import com.abin.mallchat.common.user.dao.UserBackpackDao;
 import com.abin.mallchat.common.user.domain.entity.ItemConfig;
 import com.abin.mallchat.common.user.domain.entity.UserBackpack;
@@ -13,6 +12,7 @@ import com.abin.mallchat.common.user.service.IUserBackpackService;
 import com.abin.mallchat.common.user.service.cache.ItemCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -30,12 +30,11 @@ public class UserBackpackServiceImpl implements IUserBackpackService {
     @Autowired
     private UserBackpackDao userBackpackDao;
     @Autowired
-    private ItemConfigDao itemConfigDao;
-    @Autowired
     private ItemCache itemCache;
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
     @Autowired
+    @Lazy
     private UserBackpackServiceImpl userBackpackService;
 
     @Override

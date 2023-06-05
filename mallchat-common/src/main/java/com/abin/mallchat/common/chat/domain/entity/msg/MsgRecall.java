@@ -1,4 +1,4 @@
-package com.abin.mallchat.common.chat.domain.entity;
+package com.abin.mallchat.common.chat.domain.entity.msg;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,19 +6,21 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.Map;
+import java.util.Date;
 
 /**
- * Description: 消息扩展属性
+ * Description: 消息撤回
  * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-05-28
+ * Date: 2023-06-04
  */
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class MessageExtra implements Serializable {
+public class MsgRecall implements Serializable {
     private static final long serialVersionUID = 1L;
-    //注册时的ip
-    private Map<String, String> urlTitleMap;
+    //撤回消息的uid
+    private Long recallUid;
+    //撤回的时间点
+    private Date recallTime;
 }

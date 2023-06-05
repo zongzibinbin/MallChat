@@ -2,7 +2,11 @@ package com.abin.mallchat.custom.user.controller;
 
 
 import com.abin.mallchat.common.common.domain.vo.response.ApiResult;
+import com.abin.mallchat.common.common.utils.AssertUtil;
 import com.abin.mallchat.common.common.utils.RequestHolder;
+import com.abin.mallchat.common.user.domain.enums.RoleEnum;
+import com.abin.mallchat.common.user.service.IRoleService;
+import com.abin.mallchat.custom.user.domain.vo.request.user.BlackReq;
 import com.abin.mallchat.custom.user.domain.vo.request.user.ModifyNameReq;
 import com.abin.mallchat.custom.user.domain.vo.request.user.WearingBadgeReq;
 import com.abin.mallchat.custom.user.domain.vo.response.user.BadgeResp;
@@ -30,6 +34,8 @@ import java.util.List;
 public class UserController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private IRoleService iRoleService;
 
     @GetMapping("/userInfo")
     @ApiOperation("用户详情")
@@ -54,6 +60,16 @@ public class UserController {
     @ApiOperation("佩戴徽章")
     public ApiResult<Void> wearingBadge(@Valid @RequestBody WearingBadgeReq req) {
         userService.wearingBadge(RequestHolder.get().getUid(), req);
+        return ApiResult.success();
+    }
+
+    @PutMapping("/black")
+    @ApiOperation("拉黑用户")
+    public ApiResult<Void> black(@Valid @RequestBody BlackReq req) {
+        Long uid = RequestHolder.get().getUid();
+        boolean hasPower = iRoleService.hasPower(uid, RoleEnum.ADMIN);
+        AssertUtil.isTrue(hasPower, "没有权限");
+        userService.black(req);
         return ApiResult.success();
     }
 }

@@ -8,9 +8,11 @@ import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
 import com.abin.mallchat.common.common.utils.RequestHolder;
 import com.abin.mallchat.common.user.domain.enums.BlackTypeEnum;
 import com.abin.mallchat.common.user.service.cache.UserCache;
+import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessageBaseReq;
 import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessageMarkReq;
 import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessagePageReq;
 import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessageReq;
+import com.abin.mallchat.custom.chat.domain.vo.request.msg.TextMsgReq;
 import com.abin.mallchat.custom.chat.domain.vo.response.ChatMemberResp;
 import com.abin.mallchat.custom.chat.domain.vo.response.ChatMemberStatisticResp;
 import com.abin.mallchat.custom.chat.domain.vo.response.ChatMessageResp;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -91,6 +94,10 @@ public class ChatController {
     @FrequencyControl(time = 30, count = 5, target = FrequencyControl.Target.UID)
     @FrequencyControl(time = 60, count = 10, target = FrequencyControl.Target.UID)
     public ApiResult<ChatMessageResp> sendMsg(@Valid @RequestBody ChatMessageReq request) {
+        if (Objects.isNull(request.getBody())) {
+            TextMsgReq req = new TextMsgReq(request.getContent(), request.getReplyMsgId());//todo 消息兼容之后删了
+            request.setBody(req);
+        }
         Long msgId = chatService.sendMsg(request, RequestHolder.get().getUid());
         //返回完整消息格式，方便前端展示
         return ApiResult.success(chatService.getMsgResp(msgId, RequestHolder.get().getUid()));
@@ -102,7 +109,14 @@ public class ChatController {
     public ApiResult<Void> setMsgMark(@Valid @RequestBody ChatMessageMarkReq request) {
         chatService.setMsgMark(RequestHolder.get().getUid(), request);
         return ApiResult.success();
+    }
 
+    @PutMapping("/msg/recall")
+    @ApiOperation("撤回消息")
+    @FrequencyControl(time = 20, count = 3, target = FrequencyControl.Target.UID)
+    public ApiResult<Void> recallMsg(@Valid @RequestBody ChatMessageBaseReq request) {
+        chatService.recallMsg(RequestHolder.get().getUid(), request);
+        return ApiResult.success();
     }
 }
 

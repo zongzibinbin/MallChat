@@ -3,6 +3,7 @@ package com.abin.mallchat.custom.chat.service;
 import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
 import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
+import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessageBaseReq;
 import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessageMarkReq;
 import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessagePageReq;
 import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessageReq;
@@ -73,4 +74,6 @@ public interface ChatService {
     ChatMemberStatisticResp getMemberStatistic();
 
     void setMsgMark(Long uid, ChatMessageMarkReq request);
+
+    void recallMsg(Long uid, ChatMessageBaseReq request);
 }
