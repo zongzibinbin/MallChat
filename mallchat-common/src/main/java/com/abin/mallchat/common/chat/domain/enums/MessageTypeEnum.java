@@ -16,9 +16,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Getter
 public enum MessageTypeEnum {
-    NORMAL(1, "正常"),
-    LIKE(2, "爆赞"),
-    DISLIKE(3, "危险发言"),
+    TEXT(1, "正常"),
+    RECALL(2, "撤回消息"),
     ;
 
     private final Integer type;

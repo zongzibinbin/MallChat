@@ -1,11 +1,11 @@
 package com.abin.mallchat.custom.chat.domain.vo.request;
 
+import com.abin.mallchat.common.chat.domain.enums.MessageTypeEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotNull;
 
@@ -20,16 +20,21 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatMessageReq {
-
-    @NotNull
-    @Length(max = 10000, message = "消息内容过长，服务器扛不住啊，兄dei")
-    @ApiModelProperty("消息内容")
-    private String content;
-
     @NotNull
     @ApiModelProperty("会话id")
     private Long roomId;
 
+    @ApiModelProperty("消息类型")
+    private Integer msgType = MessageTypeEnum.TEXT.getType();
+
+    @ApiModelProperty("消息内容，类型不同传值不同，见https://www.yuque.com/snab/mallcaht/rkb2uz5k1qqdmcmd")
+    private Object body;
+
+    @ApiModelProperty("消息内容")
+    @Deprecated
+    private String content;
+
     @ApiModelProperty("回复的消息id,如果没有别传就好")
+    @Deprecated
     private Long replyMsgId;
 }

@@ -1,5 +1,6 @@
 package com.abin.mallchat.common.chat.domain.entity;
 
+import com.abin.mallchat.common.chat.domain.entity.msg.MessageExtra;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -73,7 +74,7 @@ public class Message implements Serializable {
     private Integer gapCount;
 
     /**
-     * 消息类型 1正常文本 2.爆赞 （点赞超过10）3.危险发言（举报超5）
+     * 消息类型 1正常文本 2.撤回消息
      *
      * @see com.abin.mallchat.common.chat.domain.enums.MessageTypeEnum
      */
@@ -81,7 +82,7 @@ public class Message implements Serializable {
     private Integer type;
 
     /**
-     * 最后上下线时间
+     * 消息扩展字段
      */
     @TableField(value = "extra", typeHandler = JacksonTypeHandler.class)
     private MessageExtra extra;

@@ -6,7 +6,7 @@ import org.springframework.context.ApplicationEvent;
 
 @Getter
 public class UserOfflineEvent extends ApplicationEvent {
-    private User user;
+    private final User user;
 
     public UserOfflineEvent(Object source, User user) {
         super(source);

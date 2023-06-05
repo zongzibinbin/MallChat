@@ -18,7 +18,7 @@ public class LikeStrategy extends AbstractMsgMarkStrategy {
 
     @Override
     public void doMark(Long uid, Long msgId) {
-        super.mark(uid, msgId);
+        super.doMark(uid, msgId);
         //同时取消点踩的动作
         MsgMarkFactory.getStrategyNoNull(MessageMarkTypeEnum.DISLIKE.getType()).unMark(uid, msgId);
     }
