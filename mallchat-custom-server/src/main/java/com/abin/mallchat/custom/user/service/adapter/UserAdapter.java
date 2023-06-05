@@ -38,10 +38,11 @@ public class UserAdapter {
         user.setAvatar(userInfo.getHeadImgUrl());
         user.setName(userInfo.getNickname());
         user.setSex(userInfo.getSex());
-        if (userInfo.getNickname().length() > 6) {
+        String nickname = userInfo.getNickname().replaceAll("\\s+|\\p{C}", "");
+        if (nickname.length() > 6) {
             user.setName("名字过长" + RandomUtil.randomInt(100000));
         } else {
-            user.setName(userInfo.getNickname());
+            user.setName(nickname);
         }
         return user;
     }
