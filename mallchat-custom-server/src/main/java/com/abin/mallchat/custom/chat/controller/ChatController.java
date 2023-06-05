@@ -57,7 +57,8 @@ public class ChatController {
     }
 
     private void filterBlackMember(CursorPageBaseResp<ChatMemberResp> memberPage) {
-        memberPage.getList().removeIf(a -> getBlackUidSet().contains(a.getUid().toString()));
+        Set<String> blackMembers = getBlackUidSet();
+        memberPage.getList().removeIf(a -> blackMembers.contains(a.getUid().toString()));
     }
 
     private Set<String> getBlackUidSet() {
@@ -79,7 +80,8 @@ public class ChatController {
     }
 
     private void filterBlackMsg(CursorPageBaseResp<ChatMessageResp> memberPage) {
-        memberPage.getList().removeIf(a -> getBlackUidSet().contains(a.getFromUser().getUid().toString()));
+        Set<String> blackMembers = getBlackUidSet();
+        memberPage.getList().removeIf(a -> blackMembers.contains(a.getFromUser().getUid().toString()));
         System.out.println(1);
     }
 
