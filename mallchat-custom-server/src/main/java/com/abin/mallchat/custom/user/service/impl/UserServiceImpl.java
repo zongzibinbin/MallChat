@@ -1,18 +1,23 @@
 package com.abin.mallchat.custom.user.service.impl;
 
+import cn.hutool.core.util.StrUtil;
+import com.abin.mallchat.common.common.event.UserBlackEvent;
 import com.abin.mallchat.common.common.event.UserRegisterEvent;
 import com.abin.mallchat.common.common.utils.AssertUtil;
+import com.abin.mallchat.common.user.dao.BlackDao;
 import com.abin.mallchat.common.user.dao.ItemConfigDao;
 import com.abin.mallchat.common.user.dao.UserBackpackDao;
 import com.abin.mallchat.common.user.dao.UserDao;
+import com.abin.mallchat.common.user.domain.entity.Black;
 import com.abin.mallchat.common.user.domain.entity.ItemConfig;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.domain.entity.UserBackpack;
+import com.abin.mallchat.common.user.domain.enums.BlackTypeEnum;
 import com.abin.mallchat.common.user.domain.enums.ItemEnum;
 import com.abin.mallchat.common.user.domain.enums.ItemTypeEnum;
-import com.abin.mallchat.common.user.service.IUserBackpackService;
 import com.abin.mallchat.common.user.service.cache.ItemCache;
 import com.abin.mallchat.common.user.service.cache.UserCache;
+import com.abin.mallchat.custom.user.domain.vo.request.user.BlackReq;
 import com.abin.mallchat.custom.user.domain.vo.request.user.ModifyNameReq;
 import com.abin.mallchat.custom.user.domain.vo.request.user.WearingBadgeReq;
 import com.abin.mallchat.custom.user.domain.vo.response.user.BadgeResp;
@@ -46,11 +51,11 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private ItemConfigDao itemConfigDao;
     @Autowired
-    private IUserBackpackService iUserBackpackService;
-    @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
     @Autowired
     private ItemCache itemCache;
+    @Autowired
+    private BlackDao blackDao;
 
     @Override
     public UserInfoResp getUserInfo(Long uid) {
@@ -108,5 +113,32 @@ public class UserServiceImpl implements UserService {
         User insert = User.builder().openId(openId).build();
         userDao.save(insert);
         applicationEventPublisher.publishEvent(new UserRegisterEvent(this, insert));
+    }
+
+    @Override
+    public void black(BlackReq req) {
+        Long uid = req.getUid();
+        Black user = new Black();
+        user.setTarget(uid.toString());
+        user.setType(BlackTypeEnum.UID.getType());
+        blackDao.save(user);
+        User byId = userDao.getById(uid);
+        blackIp(byId.getIpInfo().getCreateIp());
+        blackIp(byId.getIpInfo().getUpdateIp());
+        applicationEventPublisher.publishEvent(new UserBlackEvent(this, byId));
+    }
+
+    private void blackIp(String ip) {
+        if (StrUtil.isBlank(ip)) {
+            return;
+        }
+        try {
+            Black user = new Black();
+            user.setTarget(ip);
+            user.setType(BlackTypeEnum.IP.getType());
+            blackDao.save(user);
+        } catch (Exception e) {
+            log.error("duplicate black ip:{}", ip);
+        }
     }
 }

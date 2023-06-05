@@ -42,7 +42,7 @@ public class MessageMarkListener {
     public void changeMsgType(MessageMarkEvent event) {
         ChatMessageMarkDTO dto = event.getDto();
         Message msg = messageDao.getById(dto.getMsgId());
-        if (!Objects.equals(msg.getType(), MessageTypeEnum.NORMAL.getType())) {//普通消息才需要升级
+        if (!Objects.equals(msg.getType(), MessageTypeEnum.TEXT.getType())) {//普通消息才需要升级
             return;
         }
         //消息被标记次数
@@ -51,8 +51,7 @@ public class MessageMarkListener {
         if (markCount < markTypeEnum.getRiseNum()) {
             return;
         }
-        boolean updateSuccess = messageDao.riseOptimistic(msg.getId(), msg.getType(), markTypeEnum.getRiseEnum().getType());
-        if (MessageMarkTypeEnum.LIKE.getType().equals(dto.getMarkType()) && updateSuccess) {//尝试给用户发送一张徽章
+        if (MessageMarkTypeEnum.LIKE.getType().equals(dto.getMarkType())) {//尝试给用户发送一张徽章
             iUserBackpackService.acquireItem(msg.getFromUid(), ItemEnum.LIKE_BADGE.getId(), IdempotentEnum.MSG_ID, msg.getId().toString());
         }
     }

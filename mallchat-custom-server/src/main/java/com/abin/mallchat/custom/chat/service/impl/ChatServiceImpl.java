@@ -2,6 +2,8 @@ package com.abin.mallchat.custom.chat.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Pair;
 import com.abin.mallchat.common.chat.dao.MessageDao;
 import com.abin.mallchat.common.chat.dao.MessageMarkDao;
@@ -10,19 +12,21 @@ import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.chat.domain.entity.MessageMark;
 import com.abin.mallchat.common.chat.domain.entity.Room;
 import com.abin.mallchat.common.chat.domain.enums.MessageMarkActTypeEnum;
+import com.abin.mallchat.common.chat.domain.enums.MessageTypeEnum;
 import com.abin.mallchat.common.common.annotation.RedissonLock;
-import com.abin.mallchat.common.common.domain.enums.YesOrNoEnum;
 import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
 import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
 import com.abin.mallchat.common.common.event.MessageSendEvent;
-import com.abin.mallchat.common.common.exception.BusinessException;
 import com.abin.mallchat.common.common.utils.AssertUtil;
 import com.abin.mallchat.common.user.dao.UserDao;
 import com.abin.mallchat.common.user.domain.entity.ItemConfig;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.domain.enums.ChatActiveStatusEnum;
+import com.abin.mallchat.common.user.domain.enums.RoleEnum;
+import com.abin.mallchat.common.user.service.IRoleService;
 import com.abin.mallchat.common.user.service.cache.ItemCache;
 import com.abin.mallchat.common.user.service.cache.UserCache;
+import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessageBaseReq;
 import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessageMarkReq;
 import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessagePageReq;
 import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessageReq;
@@ -37,6 +41,9 @@ import com.abin.mallchat.custom.chat.service.adapter.RoomAdapter;
 import com.abin.mallchat.custom.chat.service.helper.ChatMemberHelper;
 import com.abin.mallchat.custom.chat.service.strategy.mark.AbstractMsgMarkStrategy;
 import com.abin.mallchat.custom.chat.service.strategy.mark.MsgMarkFactory;
+import com.abin.mallchat.custom.chat.service.strategy.msg.AbstractMsgHandler;
+import com.abin.mallchat.custom.chat.service.strategy.msg.MsgHandlerFactory;
+import com.abin.mallchat.custom.chat.service.strategy.msg.RecallMsgHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -73,6 +80,10 @@ public class ChatServiceImpl implements ChatService {
     private MessageMarkDao messageMarkDao;
     @Autowired
     private ItemCache itemCache;
+    @Autowired
+    private IRoleService iRoleService;
+    @Autowired
+    private RecallMsgHandler recallMsgHandler;
 
     /**
      * 发送消息
@@ -80,22 +91,12 @@ public class ChatServiceImpl implements ChatService {
     @Override
     @Transactional
     public Long sendMsg(ChatMessageReq request, Long uid) {
-        //校验下回复消息
-        Message replyMsg = null;
-        if (Objects.nonNull(request.getReplyMsgId())) {
-            replyMsg = messageDao.getById(request.getReplyMsgId());
-            AssertUtil.isNotEmpty(replyMsg, "回复消息不存在");
-            AssertUtil.equal(replyMsg.getRoomId(), request.getRoomId(), "只能回复相同会话内的消息");
-
-        }
+        AbstractMsgHandler msgHandler = MsgHandlerFactory.getStrategyNoNull(request.getMsgType());//todo 这里先不扩展，后续再改
+        msgHandler.checkMsg(request);
         //同步获取消息的跳转链接标题
         Message insert = MessageAdapter.buildMsgSave(request, uid);
         messageDao.save(insert);
-        //如果有回复消息
-        if (Objects.nonNull(replyMsg)) {
-            Integer gapCount = messageDao.getGapCount(request.getRoomId(), replyMsg.getId(), insert.getId());
-            messageDao.updateGapCount(insert.getId(), gapCount);
-        }
+        msgHandler.saveMsg(insert, request);
         //发布消息发送事件
         applicationEventPublisher.publishEvent(new MessageSendEvent(this, insert.getId()));
         return insert.getId();
@@ -186,13 +187,26 @@ public class ChatServiceImpl implements ChatService {
         }
     }
 
-    private Integer transformAct(Integer actType) {
-        if (actType == 1) {
-            return YesOrNoEnum.NO.getStatus();
-        } else if (actType == 2) {
-            return YesOrNoEnum.YES.getStatus();
+    @Override
+    public void recallMsg(Long uid, ChatMessageBaseReq request) {
+        Message message = messageDao.getById(request.getMsgId());
+        //校验能不能执行撤回
+        checkRecall(uid, message);
+        //执行消息撤回
+        recallMsgHandler.recall(uid, message);
+    }
+
+    private void checkRecall(Long uid, Message message) {
+        AssertUtil.isNotEmpty(message, "消息有误");
+        AssertUtil.notEqual(message.getType(), MessageTypeEnum.RECALL, "消息无法撤回");
+        boolean hasPower = iRoleService.hasPower(uid, RoleEnum.CHAT_MANAGER);
+        if (hasPower) {
+            return;
         }
-        throw new BusinessException("动作类型 1确认 2取消");
+        boolean self = Objects.equals(uid, message.getFromUid());
+        AssertUtil.isTrue(self, "抱歉,您没有权限");
+        long between = DateUtil.between(message.getCreateTime(), new Date(), DateUnit.MINUTE);
+        AssertUtil.isTrue(between < 2, "覆水难收，超过2分钟的消息不能撤回哦~~");
     }
 
     public List<ChatMessageResp> getMsgRespBatch(List<Message> messages, Long receiveUid) {

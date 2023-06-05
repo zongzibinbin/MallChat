@@ -22,7 +22,7 @@ import javax.validation.constraints.Max;
 public class CursorPageBaseReq {
 
     @ApiModelProperty("页面大小")
-    @Max(50)
+    @Max(100)
     private Integer pageSize = 10;
 
     @ApiModelProperty("游标（初始为null，后续请求附带上次翻页的游标）")

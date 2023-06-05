@@ -45,12 +45,16 @@ public class ChatMessageResp {
         private Long id;
         @ApiModelProperty("消息发送时间")
         private Date sendTime;
-        @ApiModelProperty("消息内容")
+        @ApiModelProperty("消息内容-废弃")
+        @Deprecated
         private String content;
-        @ApiModelProperty("消息链接映射")
+        @ApiModelProperty("消息链接映射-废弃")
+        @Deprecated
         private Map<String, String> urlTitleMap;
-        @ApiModelProperty("消息类型 1正常文本 2.爆赞 （点赞超过10）3.危险发言（举报超5）")
+        @ApiModelProperty("消息类型 1正常文本 2.撤回消息")
         private Integer type;
+        @ApiModelProperty("消息内容不同的消息类型，内容体不同，见https://www.yuque.com/snab/mallcaht/rkb2uz5k1qqdmcmd")
+        private Object body;
         @ApiModelProperty("消息标记")
         private MessageMark messageMark;
         @ApiModelProperty("父消息，如果没有父消息，返回的是null")
@@ -59,6 +63,7 @@ public class ChatMessageResp {
     }
 
     @Data
+    @Deprecated
     public static class ReplyMsg {
         @ApiModelProperty("消息id")
         private Long id;

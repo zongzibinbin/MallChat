@@ -49,10 +49,10 @@ public class MessageDao extends ServiceImpl<MessageMapper, Message> {
                 .count();
     }
 
-    public void updateGapCount(Long id, Integer gapCount) {
+    public void invalidByUid(Long uid) {
         lambdaUpdate()
-                .eq(Message::getId, id)
-                .set(Message::getGapCount, gapCount)
+                .eq(Message::getFromUid, uid)
+                .set(Message::getStatus, MessageStatusEnum.DELETE.getStatus())
                 .update();
     }
 }

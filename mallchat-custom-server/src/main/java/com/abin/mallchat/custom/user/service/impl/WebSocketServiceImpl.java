@@ -9,6 +9,8 @@ import com.abin.mallchat.common.common.event.UserOfflineEvent;
 import com.abin.mallchat.common.common.event.UserOnlineEvent;
 import com.abin.mallchat.common.user.dao.UserDao;
 import com.abin.mallchat.common.user.domain.entity.User;
+import com.abin.mallchat.common.user.domain.enums.RoleEnum;
+import com.abin.mallchat.common.user.service.IRoleService;
 import com.abin.mallchat.common.user.service.cache.UserCache;
 import com.abin.mallchat.custom.user.domain.dto.ws.WSChannelExtraDTO;
 import com.abin.mallchat.custom.user.domain.vo.request.ws.WSAuthorize;
@@ -77,6 +79,8 @@ public class WebSocketServiceImpl implements WebSocketService {
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
     @Autowired
     private UserCache userCache;
+    @Autowired
+    private IRoleService iRoleService;
 
     /**
      * 处理用户登录请求，需要返回一张带code的二维码
@@ -152,7 +156,8 @@ public class WebSocketServiceImpl implements WebSocketService {
         //更新上线列表
         online(channel, user.getId());
         //返回给用户登录成功
-        sendMsg(channel, WSAdapter.buildLoginSuccessResp(user, token));
+        boolean hasPower = iRoleService.hasPower(user.getId(), RoleEnum.CHAT_MANAGER);
+        sendMsg(channel, WSAdapter.buildLoginSuccessResp(user, token, hasPower));
         //发送用户上线事件
         boolean online = userCache.isOnline(user.getId());
         if (!online) {

@@ -2,8 +2,8 @@ package com.abin.mallchat.custom.chat.service.adapter;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.abin.mallchat.common.chat.domain.entity.Message;
-import com.abin.mallchat.common.chat.domain.entity.MessageExtra;
 import com.abin.mallchat.common.chat.domain.entity.MessageMark;
+import com.abin.mallchat.common.chat.domain.entity.msg.MessageExtra;
 import com.abin.mallchat.common.chat.domain.enums.MessageMarkTypeEnum;
 import com.abin.mallchat.common.chat.domain.enums.MessageStatusEnum;
 import com.abin.mallchat.common.common.domain.enums.YesOrNoEnum;
@@ -14,6 +14,8 @@ import com.abin.mallchat.common.user.domain.entity.ItemConfig;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessageReq;
 import com.abin.mallchat.custom.chat.domain.vo.response.ChatMessageResp;
+import com.abin.mallchat.custom.chat.service.strategy.msg.AbstractMsgHandler;
+import com.abin.mallchat.custom.chat.service.strategy.msg.MsgHandlerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,14 +26,12 @@ import java.util.stream.Collectors;
  * Date: 2023-03-26
  */
 public class MessageAdapter {
-    public static final int CAN_CALLBACK_GAP_COUNT = 50;
+    public static final int CAN_CALLBACK_GAP_COUNT = 100;
     private static final PrioritizedUrlTitleDiscover URL_TITLE_DISCOVER = new PrioritizedUrlTitleDiscover();
 
     public static Message buildMsgSave(ChatMessageReq request, Long uid) {
 
         return Message.builder()
-                .replyMsgId(request.getReplyMsgId())
-                .content(request.getContent())
                 .fromUid(uid)
                 .roomId(request.getRoomId())
                 .status(MessageStatusEnum.NORMAL.getStatus())
@@ -61,8 +61,11 @@ public class MessageAdapter {
         ChatMessageResp.Message messageVO = new ChatMessageResp.Message();
         BeanUtil.copyProperties(message, messageVO);
         messageVO.setSendTime(message.getCreateTime());
+        AbstractMsgHandler msgHandler = MsgHandlerFactory.getStrategyNoNull(message.getType());
+        messageVO.setBody(msgHandler.showMsg(message));
         messageVO.setUrlTitleMap(Optional.ofNullable(message.getExtra()).map(MessageExtra::getUrlTitleMap).orElse(null));
         Message replyMessage = replyMap.get(message.getReplyMsgId());
+
         //回复消息
         if (Objects.nonNull(replyMessage)) {
             ChatMessageResp.ReplyMsg replyMsgVO = new ChatMessageResp.ReplyMsg();

@@ -34,11 +34,11 @@ CREATE TABLE `message`  (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'id',
   `room_id` bigint(20) NOT NULL COMMENT '会话表id',
   `from_uid` bigint(20) NOT NULL COMMENT '消息发送者uid',
-  `content` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '消息内容',
+  `content` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '消息内容',
   `reply_msg_id` bigint(20) NULL DEFAULT NULL COMMENT '回复的消息内容',
   `status` int(11) NOT NULL COMMENT '消息状态 0正常 1删除',
   `gap_count` int(11) NULL DEFAULT NULL COMMENT '与回复的消息间隔多少条',
-  `type` int(11) NULL DEFAULT 1 COMMENT '消息类型 1正常文本 2.爆赞 （点赞超过10）3.危险发言（举报超5）',
+  `type` int(11) NULL DEFAULT 1 COMMENT '消息类型 1正常文本 2.撤回消息',
   `extra` json DEFAULT NULL COMMENT '扩展信息',
   `create_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
   `update_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '修改时间',
@@ -155,4 +155,30 @@ CREATE TABLE `black`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `idx_type_target`(`type`, `target`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '黑名单' ROW_FORMAT = Dynamic;
-SET FOREIGN_KEY_CHECKS = 1;
+
+DROP TABLE IF EXISTS `role`;
+CREATE TABLE `role` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `name` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '角色名称',
+  `create_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
+  `update_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '修改时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `idx_create_time` (`create_time`) USING BTREE,
+  KEY `idx_update_time` (`update_time`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='角色表';
+insert into role(id,`name`) values(1,'超级管理员');
+insert into role(id,`name`) values(2,'抹茶群聊管理员');
+
+DROP TABLE IF EXISTS `user_role`;
+CREATE TABLE `user_role` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `uid` bigint(20) NOT NULL COMMENT 'uid',
+  `role_id` bigint(20) NOT NULL COMMENT '角色id',
+  `create_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
+  `update_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '修改时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `idx_uid` (`uid`) USING BTREE,
+  KEY `idx_role_id` (`role_id`) USING BTREE,
+  KEY `idx_create_time` (`create_time`) USING BTREE,
+  KEY `idx_update_time` (`update_time`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户角色关系表';
