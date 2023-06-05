@@ -7,6 +7,7 @@ import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.domain.entity.UserBackpack;
 import com.abin.mallchat.common.user.domain.enums.ItemTypeEnum;
 import com.abin.mallchat.common.user.service.cache.ItemCache;
+import com.abin.mallchat.common.user.service.cache.UserCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
@@ -27,6 +28,8 @@ public class ItemReceiveListener {
     private UserDao userDao;
     @Autowired
     private ItemCache itemCache;
+    @Autowired
+    private UserCache userCache;
 
     /**
      * 徽章类型，帮忙默认佩戴
@@ -42,6 +45,7 @@ public class ItemReceiveListener {
             User user = userDao.getById(userBackpack.getUid());
             if (Objects.isNull(user.getItemId())) {
                 userDao.wearingBadge(userBackpack.getUid(), userBackpack.getItemId());
+                userCache.delUserInfo(userBackpack.getUid());
             }
         }
     }
