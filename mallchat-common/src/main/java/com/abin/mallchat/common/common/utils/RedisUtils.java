@@ -25,7 +25,7 @@ public class RedisUtils {
 
     @PostConstruct
     public void init() {
-        this.stringRedisTemplate = SpringUtil.getBean(StringRedisTemplate.class);
+        RedisUtils.stringRedisTemplate = SpringUtil.getBean(StringRedisTemplate.class);
     }
 
     private static final String LUA_INCR_EXPIRE =
