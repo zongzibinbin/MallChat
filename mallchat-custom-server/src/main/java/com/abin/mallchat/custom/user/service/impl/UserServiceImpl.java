@@ -128,7 +128,7 @@ public class UserServiceImpl implements UserService {
         applicationEventPublisher.publishEvent(new UserBlackEvent(this, byId));
     }
 
-    private void blackIp(String ip) {
+    public void blackIp(String ip) {
         if (StrUtil.isBlank(ip)) {
             return;
         }
