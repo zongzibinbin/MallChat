@@ -9,6 +9,7 @@ import com.abin.mallchat.custom.user.service.WebSocketService;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +21,7 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
     // 当web客户端连接后，触发该方法
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-        getService().connect(ctx.channel());
+//        getService().connect(ctx.channel());
     }
 
     // 客户端离线
@@ -63,6 +64,8 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
                 // 关闭用户的连接
                 userOffLine(ctx);
             }
+        } else if (evt == WebSocketServerProtocolHandler.ServerHandshakeStateEvent.HANDSHAKE_COMPLETE) {
+            getService().connect(ctx.channel());
         }
         super.userEventTriggered(ctx, evt);
     }
@@ -70,7 +73,7 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
     // 处理异常
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        log.warn("异常发生，异常消息 ={}", cause.getMessage());
+        log.warn("异常发生，异常消息 ={}", cause);
         ctx.channel().close();
     }
 

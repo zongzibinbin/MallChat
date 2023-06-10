@@ -13,6 +13,7 @@ import io.netty.util.AttributeKey;
 public class NettyUtil {
 
     public static AttributeKey<String> IP = AttributeKey.valueOf("ip");
+    public static AttributeKey<Long> UID = AttributeKey.valueOf("uid");
 
     public static <T> void setAttr(Channel channel, AttributeKey<T> attributeKey, T data) {
         Attribute<T> attr = channel.attr(attributeKey);

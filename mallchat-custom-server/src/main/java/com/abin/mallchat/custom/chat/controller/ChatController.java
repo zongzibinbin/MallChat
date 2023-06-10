@@ -18,8 +18,10 @@ import com.abin.mallchat.custom.chat.domain.vo.response.ChatMemberStatisticResp;
 import com.abin.mallchat.custom.chat.domain.vo.response.ChatMessageResp;
 import com.abin.mallchat.custom.chat.domain.vo.response.ChatRoomResp;
 import com.abin.mallchat.custom.chat.service.ChatService;
+import com.abin.mallchat.custom.user.service.impl.UserServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,6 +41,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/capi/chat")
 @Api(tags = "聊天室相关接口")
+@Slf4j
 public class ChatController {
     @Autowired
     private ChatService chatService;
@@ -53,7 +56,9 @@ public class ChatController {
 
     @GetMapping("/public/member/page")
     @ApiOperation("群成员列表")
+    @FrequencyControl(time = 120, count = 10, target = FrequencyControl.Target.IP)
     public ApiResult<CursorPageBaseResp<ChatMemberResp>> getMemberPage(@Valid CursorPageBaseReq request) {
+        black(request);
         CursorPageBaseResp<ChatMemberResp> memberPage = chatService.getMemberPage(request);
         filterBlackMember(memberPage);
         return ApiResult.success(memberPage);
@@ -74,12 +79,26 @@ public class ChatController {
         return ApiResult.success(chatService.getMemberStatistic());
     }
 
+    @Autowired
+    private UserServiceImpl userService;
+
     @GetMapping("/public/msg/page")
     @ApiOperation("消息列表")
+    @FrequencyControl(time = 120, count = 10, target = FrequencyControl.Target.IP)
     public ApiResult<CursorPageBaseResp<ChatMessageResp>> getMsgPage(@Valid ChatMessagePageReq request) {
+        black(request);
         CursorPageBaseResp<ChatMessageResp> msgPage = chatService.getMsgPage(request, RequestHolder.get().getUid());
         filterBlackMsg(msgPage);
         return ApiResult.success(msgPage);
+    }
+
+    private void black(CursorPageBaseReq baseReq) {
+        if (baseReq.getPageSize() > 50) {
+            log.info("limit request:{}", baseReq);
+            baseReq.setPageSize(10);
+            userService.blackIp(RequestHolder.get().getIp());
+        }
+
     }
 
     private void filterBlackMsg(CursorPageBaseResp<ChatMessageResp> memberPage) {
