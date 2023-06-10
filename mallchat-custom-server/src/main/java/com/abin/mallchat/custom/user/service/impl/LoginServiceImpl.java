@@ -24,8 +24,6 @@ public class LoginServiceImpl implements LoginService {
 
     @Autowired
     private JwtUtils jwtUtils;
-    @Autowired
-    private RedisUtils redisUtils;
     //token过期时间
     private static final Integer TOKEN_EXPIRE_DAYS = 5;
     //token续期时间
@@ -37,6 +35,7 @@ public class LoginServiceImpl implements LoginService {
      * @param token
      * @return
      */
+    @Override
     public boolean verify(String token) {
         Long uid = jwtUtils.getUidOrNull(token);
         if (Objects.isNull(uid)) {
@@ -48,25 +47,26 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Async
+    @Override
     public void renewalTokenIfNecessary(String token) {
         Long uid = jwtUtils.getUidOrNull(token);
         if (Objects.isNull(uid)) {
             return;
         }
         String key = RedisKey.getKey(RedisKey.USER_TOKEN_STRING, uid);
-        long expireDays = redisUtils.getExpire(key, TimeUnit.DAYS);
+        long expireDays = RedisUtils.getExpire(key, TimeUnit.DAYS);
         if (expireDays == -2) {//不存在的key
             return;
         }
         if (expireDays < TOKEN_RENEWAL_DAYS) {//小于一天的token帮忙续期
-            redisUtils.expire(key, TOKEN_EXPIRE_DAYS, TimeUnit.DAYS);
+            RedisUtils.expire(key, TOKEN_EXPIRE_DAYS, TimeUnit.DAYS);
         }
     }
 
     @Override
     public String login(Long uid) {
         String key = RedisKey.getKey(RedisKey.USER_TOKEN_STRING, uid);
-        String token = redisUtils.getStr(key);
+        String token = RedisUtils.getStr(key);
         if (StrUtil.isNotBlank(token)) {
             return token;
         }
