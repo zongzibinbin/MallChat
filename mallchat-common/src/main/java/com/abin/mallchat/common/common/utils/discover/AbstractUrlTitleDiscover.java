@@ -66,7 +66,7 @@ public abstract class AbstractUrlTitleDiscover implements UrlTitleDiscover {
     protected Document getUrlDocument(String matchUrl) {
         try {
             Connection connect = Jsoup.connect(matchUrl);
-            connect.timeout(1000);
+            connect.timeout(2000);
             return connect.get();
         } catch (Exception e) {
             log.error("find title error:url:{}", matchUrl, e);

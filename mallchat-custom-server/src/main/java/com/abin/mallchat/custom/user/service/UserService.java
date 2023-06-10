@@ -1,8 +1,8 @@
 package com.abin.mallchat.custom.user.service;
 
-import com.abin.mallchat.custom.user.domain.vo.request.user.BlackReq;
-import com.abin.mallchat.custom.user.domain.vo.request.user.ModifyNameReq;
-import com.abin.mallchat.custom.user.domain.vo.request.user.WearingBadgeReq;
+import com.abin.mallchat.common.user.domain.dto.ItemInfoDTO;
+import com.abin.mallchat.common.user.domain.dto.SummeryInfoDTO;
+import com.abin.mallchat.custom.user.domain.vo.request.user.*;
 import com.abin.mallchat.custom.user.domain.vo.response.user.BadgeResp;
 import com.abin.mallchat.custom.user.domain.vo.response.user.UserInfoResp;
 
@@ -57,4 +57,14 @@ public interface UserService {
     void register(String openId);
 
     void black(BlackReq req);
+
+    /**
+     * 获取用户汇总信息
+     *
+     * @param req
+     * @return
+     */
+    List<SummeryInfoDTO> getSummeryUserInfo(SummeryInfoReq req);
+
+    List<ItemInfoDTO> getItemInfo(ItemInfoReq req);
 }

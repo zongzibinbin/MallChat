@@ -26,14 +26,8 @@ import com.abin.mallchat.common.user.domain.enums.RoleEnum;
 import com.abin.mallchat.common.user.service.IRoleService;
 import com.abin.mallchat.common.user.service.cache.ItemCache;
 import com.abin.mallchat.common.user.service.cache.UserCache;
-import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessageBaseReq;
-import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessageMarkReq;
-import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessagePageReq;
-import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessageReq;
-import com.abin.mallchat.custom.chat.domain.vo.response.ChatMemberResp;
-import com.abin.mallchat.custom.chat.domain.vo.response.ChatMemberStatisticResp;
-import com.abin.mallchat.custom.chat.domain.vo.response.ChatMessageResp;
-import com.abin.mallchat.custom.chat.domain.vo.response.ChatRoomResp;
+import com.abin.mallchat.custom.chat.domain.vo.request.*;
+import com.abin.mallchat.custom.chat.domain.vo.response.*;
 import com.abin.mallchat.custom.chat.service.ChatService;
 import com.abin.mallchat.custom.chat.service.adapter.MemberAdapter;
 import com.abin.mallchat.custom.chat.service.adapter.MessageAdapter;
@@ -45,7 +39,9 @@ import com.abin.mallchat.custom.chat.service.strategy.msg.AbstractMsgHandler;
 import com.abin.mallchat.custom.chat.service.strategy.msg.MsgHandlerFactory;
 import com.abin.mallchat.custom.chat.service.strategy.msg.RecallMsgHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,7 +88,7 @@ public class ChatServiceImpl implements ChatService {
     @Transactional
     public Long sendMsg(ChatMessageReq request, Long uid) {
         AbstractMsgHandler msgHandler = MsgHandlerFactory.getStrategyNoNull(request.getMsgType());//todo 这里先不扩展，后续再改
-        msgHandler.checkMsg(request);
+        msgHandler.checkMsg(request, uid);
         //同步获取消息的跳转链接标题
         Message insert = MessageAdapter.buildMsgSave(request, uid);
         messageDao.save(insert);
@@ -194,6 +190,22 @@ public class ChatServiceImpl implements ChatService {
         checkRecall(uid, message);
         //执行消息撤回
         recallMsgHandler.recall(uid, message);
+    }
+
+    @Override
+    @Cacheable(cacheNames = "member", key = "'memberList.'+#req.roomId")
+    public List<ChatMemberListResp> getMemberList(ChatMessageMemberReq req) {
+        if (Objects.equals(1L, req.getRoomId())) {//大群聊可看见所有人
+            return userDao.getMemberList()
+                    .stream()
+                    .map(a -> {
+                        ChatMemberListResp resp = new ChatMemberListResp();
+                        BeanUtils.copyProperties(a, resp);
+                        resp.setUid(a.getId());
+                        return resp;
+                    }).collect(Collectors.toList());
+        }
+        return null;
     }
 
     private void checkRecall(Long uid, Message message) {

@@ -95,6 +95,16 @@ public class UserCache {
         return cursorUtils.getCursorPageByRedis(pageBaseReq, RedisKey.getKey(RedisKey.OFFLINE_UID_ZET), Long::parseLong);
     }
 
+    public List<Long> getUserModifyTime(List<Long> uidList) {
+        List<String> keys = uidList.stream().map(uid -> RedisKey.getKey(RedisKey.USER_MODIFY_STRING, uid)).collect(Collectors.toList());
+        return RedisUtils.mget(keys, Long.class);
+    }
+
+    public void refreshUserModifyTime(Long uid) {
+        String key = RedisKey.getKey(RedisKey.USER_MODIFY_STRING, uid);
+        RedisUtils.set(key, new Date().getTime());
+    }
+
     /**
      * 获取用户信息，盘路缓存模式
      */
@@ -118,6 +128,11 @@ public class UserCache {
             map.putAll(needLoadUserList.stream().collect(Collectors.toMap(User::getId, Function.identity())));
         }
         return map;
+    }
+
+    public void userInfoChange(Long uid) {
+        delUserInfo(uid);
+        refreshUserModifyTime(uid);
     }
 
     public void delUserInfo(Long uid) {

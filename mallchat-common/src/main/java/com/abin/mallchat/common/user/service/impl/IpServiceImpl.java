@@ -1,7 +1,6 @@
 package com.abin.mallchat.common.user.service.impl;
 
 import cn.hutool.core.lang.TypeReference;
-
 import cn.hutool.core.thread.NamedThreadFactory;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
@@ -13,7 +12,7 @@ import com.abin.mallchat.common.user.domain.entity.IpDetail;
 import com.abin.mallchat.common.user.domain.entity.IpInfo;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.service.IpService;
-import jodd.util.concurrent.ThreadFactoryBuilder;
+import com.abin.mallchat.common.user.service.cache.UserCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.Objects;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Description: ip
@@ -34,13 +36,13 @@ public class IpServiceImpl implements IpService, DisposableBean {
     private static ExecutorService executor = new ThreadPoolExecutor(1, 1,
             0L, TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<Runnable>(500),
-            new NamedThreadFactory("refresh-ipDetail", (ThreadGroup)null,false,
+            new NamedThreadFactory("refresh-ipDetail", (ThreadGroup) null, false,
                     new GlobalUncaughtExceptionHandler()));
 
     @Autowired
     private UserDao userDao;
-
-
+    @Autowired
+    private UserCache userCache;
 
 
     @Override
@@ -62,6 +64,7 @@ public class IpServiceImpl implements IpService, DisposableBean {
                 update.setId(uid);
                 update.setIpInfo(ipInfo);
                 userDao.updateById(update);
+                userCache.userInfoChange(uid);
             } else {
                 log.error("get ip detail fail ip:{},uid:{}", ip, uid);
             }

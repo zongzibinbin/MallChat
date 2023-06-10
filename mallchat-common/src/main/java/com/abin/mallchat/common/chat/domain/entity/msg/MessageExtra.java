@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,4 +26,6 @@ public class MessageExtra implements Serializable {
     private Map<String, String> urlTitleMap;
     //消息撤回详情
     private MsgRecall recall;
+    //艾特的uid
+    private List<Long> atUidList;
 }

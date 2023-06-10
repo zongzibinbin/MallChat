@@ -40,7 +40,7 @@ public class RecallMsgHandler extends AbstractMsgHandler {
     }
 
     @Override
-    public void checkMsg(ChatMessageReq request) {
+    public void checkMsg(ChatMessageReq request, Long uid) {
         throw new UnsupportedOperationException();
     }
 
