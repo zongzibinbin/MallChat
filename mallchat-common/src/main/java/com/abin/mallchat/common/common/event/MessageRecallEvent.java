@@ -6,10 +6,12 @@ import org.springframework.context.ApplicationEvent;
 
 @Getter
 public class MessageRecallEvent extends ApplicationEvent {
-    private ChatMsgRecallDTO recallDTO;
+
+    private final ChatMsgRecallDTO recallDTO;
 
     public MessageRecallEvent(Object source, ChatMsgRecallDTO recallDTO) {
         super(source);
         this.recallDTO = recallDTO;
     }
+
 }

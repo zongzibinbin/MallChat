@@ -33,10 +33,10 @@ import java.util.concurrent.TimeUnit;
 @Service
 @Slf4j
 public class IpServiceImpl implements IpService, DisposableBean {
-    private static ExecutorService executor = new ThreadPoolExecutor(1, 1,
+    private static final ExecutorService EXECUTOR = new ThreadPoolExecutor(1, 1,
             0L, TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<Runnable>(500),
-            new NamedThreadFactory("refresh-ipDetail", (ThreadGroup) null, false,
+            new LinkedBlockingQueue<>(500),
+            new NamedThreadFactory("refresh-ipDetail", null, false,
                     new GlobalUncaughtExceptionHandler()));
 
     @Autowired
@@ -47,7 +47,7 @@ public class IpServiceImpl implements IpService, DisposableBean {
 
     @Override
     public void refreshIpDetailAsync(Long uid) {
-        executor.execute(() -> {
+        EXECUTOR.execute(() -> {
             User user = userDao.getById(uid);
             IpInfo ipInfo = user.getIpInfo();
             if (Objects.isNull(ipInfo)) {
@@ -106,7 +106,7 @@ public class IpServiceImpl implements IpService, DisposableBean {
         Date begin = new Date();
         for (int i = 0; i < 100; i++) {
             int finalI = i;
-            executor.execute(() -> {
+            EXECUTOR.execute(() -> {
                 IpDetail ipDetail = TryGetIpDetailOrNullTreeTimes("113.90.36.126");
                 if (Objects.nonNull(ipDetail)) {
                     Date date = new Date();
@@ -118,13 +118,12 @@ public class IpServiceImpl implements IpService, DisposableBean {
 
     @Override
     public void destroy() throws InterruptedException {
-        executor.shutdown();
-        if (!executor.awaitTermination(30, TimeUnit.SECONDS)) {//最多等30秒，处理不完就拉倒
+        EXECUTOR.shutdown();
+        if (!EXECUTOR.awaitTermination(30, TimeUnit.SECONDS)) {//最多等30秒，处理不完就拉倒
             if (log.isErrorEnabled()) {
-                log.error("Timed out while waiting for executor [{}] to terminate", executor);
+                log.error("Timed out while waiting for executor [{}] to terminate", EXECUTOR);
             }
         }
-
-
     }
+
 }
