@@ -29,15 +29,14 @@ public class WSAdapter {
     private ChatService chatService;
 
     public static WSBaseResp<WSLoginUrl> buildLoginResp(WxMpQrCodeTicket wxMpQrCodeTicket) {
-        WSBaseResp<WSLoginUrl> wsBaseResp = new WSBaseResp<>();
-        wsBaseResp.setType(WSRespTypeEnum.LOGIN_URL.getType());
-        wsBaseResp.setData(WSLoginUrl.builder().loginUrl(wxMpQrCodeTicket.getUrl()).build());
-        return wsBaseResp;
+       return new WSBaseResp<WSLoginUrl>()
+               .setType(WSRespTypeEnum.LOGIN_URL.getType())
+               .setData(WSLoginUrl.builder().loginUrl(wxMpQrCodeTicket.getUrl()).build());
     }
 
     public static WSBaseResp<WSLoginSuccess> buildLoginSuccessResp(User user, String token, boolean hasPower) {
-        WSBaseResp<WSLoginSuccess> wsBaseResp = new WSBaseResp<>();
-        wsBaseResp.setType(WSRespTypeEnum.LOGIN_SUCCESS.getType());
+        WSBaseResp<WSLoginSuccess> wsBaseResp = new WSBaseResp<WSLoginSuccess>()
+                .setType(WSRespTypeEnum.LOGIN_SUCCESS.getType());
         WSLoginSuccess wsLoginSuccess = WSLoginSuccess.builder()
                 .avatar(user.getAvatar())
                 .name(user.getName())
@@ -49,15 +48,12 @@ public class WSAdapter {
         return wsBaseResp;
     }
 
-    public static WSBaseResp buildScanSuccessResp() {
-        WSBaseResp wsBaseResp = new WSBaseResp();
-        wsBaseResp.setType(WSRespTypeEnum.LOGIN_SCAN_SUCCESS.getType());
-        return wsBaseResp;
+    public static WSBaseResp<Void> buildScanSuccessResp() {
+        return new WSBaseResp<Void>().setType(WSRespTypeEnum.LOGIN_SCAN_SUCCESS.getType());
     }
 
     public static WSBaseResp<?> buildMsgRecall(ChatMsgRecallDTO recallDTO) {
-        WSBaseResp<WSMsgRecall> wsBaseResp = new WSBaseResp<>();
-        wsBaseResp.setType(WSRespTypeEnum.RECALL.getType());
+        WSBaseResp<WSMsgRecall> wsBaseResp = new WSBaseResp<WSMsgRecall>().setType(WSRespTypeEnum.RECALL.getType());
         WSMsgRecall recall = new WSMsgRecall();
         BeanUtils.copyProperties(recallDTO, recall);
         wsBaseResp.setData(recall);
@@ -109,27 +105,21 @@ public class WSAdapter {
     }
 
     public static WSBaseResp<WSLoginSuccess> buildInvalidateTokenResp() {
-        WSBaseResp<WSLoginSuccess> wsBaseResp = new WSBaseResp<>();
-        wsBaseResp.setType(WSRespTypeEnum.INVALIDATE_TOKEN.getType());
-        return wsBaseResp;
+        return new WSBaseResp<WSLoginSuccess>().setType(WSRespTypeEnum.INVALIDATE_TOKEN.getType());
     }
 
     public static WSBaseResp<ChatMessageResp> buildMsgSend(ChatMessageResp msgResp) {
-        WSBaseResp<ChatMessageResp> wsBaseResp = new WSBaseResp<>();
-        wsBaseResp.setType(WSRespTypeEnum.MESSAGE.getType());
-        wsBaseResp.setData(msgResp);
-        return wsBaseResp;
+        return new WSBaseResp<ChatMessageResp>()
+                .setType(WSRespTypeEnum.MESSAGE.getType())
+                .setData(msgResp);
     }
 
     public static WSBaseResp<WSMsgMark> buildMsgMarkSend(ChatMessageMarkDTO dto, Integer markCount) {
         WSMsgMark.WSMsgMarkItem item = new WSMsgMark.WSMsgMarkItem();
         BeanUtils.copyProperties(dto, item);
         item.setMarkCount(markCount);
-        WSBaseResp<WSMsgMark> wsBaseResp = new WSBaseResp<>();
-        wsBaseResp.setType(WSRespTypeEnum.MARK.getType());
         WSMsgMark mark = new WSMsgMark();
         mark.setMarkList(Collections.singletonList(item));
-        wsBaseResp.setData(mark);
-        return wsBaseResp;
+        return new WSBaseResp<WSMsgMark>().setType(WSRespTypeEnum.MARK.getType()).setData(mark);
     }
 }

@@ -38,10 +38,9 @@ public class RedisConfig {
     private static class MyRedisSerializerCustomized extends GenericJackson2JsonRedisSerializer {
         @Override
         public byte[] serialize(Object source) throws SerializationException {
-            if (Objects.nonNull(source)) {
-                if (source instanceof String || source instanceof Character) {
+            if (Objects.nonNull(source) && (source instanceof String || source instanceof Character)) {
                     return source.toString().getBytes();
-                }
+
             }
             return super.serialize(source);
         }

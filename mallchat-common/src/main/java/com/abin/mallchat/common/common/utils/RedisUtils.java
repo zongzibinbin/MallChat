@@ -32,6 +32,8 @@ public class RedisUtils {
                     "  return tonumber(redis.call('INCR',key)) \n" +
                     "end ";
 
+    private static final String LONG_DASH = "--------------------------------------------";
+
     public static Long inc(String key, int time, TimeUnit unit) {
         RedisScript<Long> redisScript = new DefaultRedisScript<>(LUA_INCR_EXPIRE, Long.class);
         return stringRedisTemplate.execute(redisScript, Collections.singletonList(key), String.valueOf(unit.toSeconds(time)));
@@ -180,7 +182,7 @@ public class RedisUtils {
         if (keys != null && keys.length > 0) {
             if (keys.length == 1) {
                 Boolean result = stringRedisTemplate.delete(keys[0]);
-                log.debug("--------------------------------------------");
+                log.debug(LONG_DASH);
                 log.debug("删除缓存：" + keys[0] + "，结果：" + result);
             } else {
                 Set<String> keySet = new HashSet<>();
@@ -191,11 +193,11 @@ public class RedisUtils {
                     }
                 }
                 Long count = stringRedisTemplate.delete(keySet);
-                log.debug("--------------------------------------------");
+                log.debug(LONG_DASH);
                 log.debug("成功删除缓存：" + keySet);
                 log.debug("缓存删除数量：" + count + "个");
             }
-            log.debug("--------------------------------------------");
+            log.debug(LONG_DASH);
         }
     }
 
@@ -746,10 +748,10 @@ public class RedisUtils {
         }
         Long count = stringRedisTemplate.delete(keys);
         // 此处提示可自行删除
-        log.debug("--------------------------------------------");
+        log.debug(LONG_DASH);
         log.debug("成功删除缓存：" + keys.toString());
         log.debug("缓存删除数量：" + count + "个");
-        log.debug("--------------------------------------------");
+        log.debug(LONG_DASH);
     }
     /**------------------zSet相关操作--------------------------------*/
 

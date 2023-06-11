@@ -7,8 +7,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -19,6 +20,7 @@ import java.util.List;
 @ApiModel("游标翻页返回")
 @AllArgsConstructor
 @NoArgsConstructor
+@Accessors(chain = true)
 public class CursorPageBaseResp<T> {
 
     @ApiModelProperty("游标（下次翻页带上这参数）")
@@ -31,11 +33,10 @@ public class CursorPageBaseResp<T> {
     private List<T> list;
 
     public static <T> CursorPageBaseResp<T> init(CursorPageBaseResp cursorPage, List<T> list) {
-        CursorPageBaseResp<T> cursorPageBaseResp = new CursorPageBaseResp<T>();
-        cursorPageBaseResp.setIsLast(cursorPage.getIsLast());
-        cursorPageBaseResp.setList(list);
-        cursorPageBaseResp.setCursor(cursorPage.getCursor());
-        return cursorPageBaseResp;
+        return new CursorPageBaseResp<T>()
+                .setIsLast(cursorPage.getIsLast())
+                .setList(list)
+                .setCursor(cursorPage.getCursor());
     }
 
     @JsonIgnore
@@ -44,10 +45,7 @@ public class CursorPageBaseResp<T> {
     }
 
     public static <T> CursorPageBaseResp<T> empty() {
-        CursorPageBaseResp<T> cursorPageBaseResp = new CursorPageBaseResp<T>();
-        cursorPageBaseResp.setIsLast(true);
-        cursorPageBaseResp.setList(new ArrayList<T>());
-        return cursorPageBaseResp;
+        return new CursorPageBaseResp<T>().setIsLast(true).setList(Collections.emptyList());
     }
 
 }

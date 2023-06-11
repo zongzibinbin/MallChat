@@ -4,6 +4,7 @@ import com.abin.mallchat.common.common.exception.ErrorEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * Description: 通用返回体
@@ -12,6 +13,7 @@ import lombok.Data;
  */
 @Data
 @ApiModel("基础返回体")
+@Accessors(chain = true)
 public class ApiResult<T> {
     @ApiModelProperty("成功标识true or false")
     private Boolean success;
@@ -23,33 +25,22 @@ public class ApiResult<T> {
     private T data;
 
     public static <T> ApiResult<T> success() {
-        ApiResult<T> result = new ApiResult<T>();
-        result.setData(null);
-        result.setSuccess(Boolean.TRUE);
-        return result;
+       return new ApiResult<T>().setData(null).setSuccess(Boolean.TRUE);
     }
 
     public static <T> ApiResult<T> success(T data) {
-        ApiResult<T> result = new ApiResult<T>();
-        result.setData(data);
-        result.setSuccess(Boolean.TRUE);
-        return result;
+        return new ApiResult<T>().setData(data).setSuccess(Boolean.TRUE);
     }
 
     public static <T> ApiResult<T> fail(Integer code, String msg) {
-        ApiResult<T> result = new ApiResult<T>();
-        result.setSuccess(Boolean.FALSE);
-        result.setErrCode(code);
-        result.setErrMsg(msg);
-        return result;
+        return new ApiResult<T>().setSuccess(Boolean.FALSE).setErrCode(code).setErrMsg(msg);
     }
 
     public static <T> ApiResult<T> fail(ErrorEnum errorEnum) {
-        ApiResult<T> result = new ApiResult<T>();
-        result.setSuccess(Boolean.FALSE);
-        result.setErrCode(errorEnum.getErrorCode());
-        result.setErrMsg(errorEnum.getErrorMsg());
-        return result;
+        return new ApiResult<T>()
+                .setSuccess(Boolean.FALSE)
+                .setErrCode(errorEnum.getErrorCode())
+                .setErrMsg(errorEnum.getErrorMsg());
     }
 
     public boolean isSuccess() {

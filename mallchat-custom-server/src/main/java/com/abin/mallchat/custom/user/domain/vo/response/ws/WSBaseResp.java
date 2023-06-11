@@ -1,6 +1,7 @@
 package com.abin.mallchat.custom.user.domain.vo.response.ws;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * Description: ws的基本返回信息体
@@ -8,6 +9,7 @@ import lombok.Data;
  * Date: 2023-03-19
  */
 @Data
+@Accessors(chain = true)
 public class WSBaseResp<T> {
     /**
      * ws推送给前端的消息

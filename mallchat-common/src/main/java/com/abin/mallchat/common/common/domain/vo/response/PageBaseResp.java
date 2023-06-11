@@ -6,8 +6,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -18,6 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @ApiModel("基础翻页返回")
+@Accessors(chain = true)
 public class PageBaseResp<T> {
 
     @ApiModelProperty("当前页数")
@@ -35,15 +37,13 @@ public class PageBaseResp<T> {
     @ApiModelProperty("数据列表")
     private List<T> list;
 
-
-    public static PageBaseResp empty() {
-        PageBaseResp r = new PageBaseResp();
-        r.setPageNo(1);
-        r.setPageSize(0);
-        r.setIsLast(true);
-        r.setTotalRecords(0L);
-        r.setList(new ArrayList());
-        return r;
+    public static PageBaseResp<Void> empty() {
+        return new PageBaseResp<Void>()
+                .setPageNo(1)
+                .setPageSize(0)
+                .setIsLast(Boolean.TRUE)
+                .setTotalRecords(0L)
+                .setList(Collections.emptyList());
     }
 
     public static <T> PageBaseResp<T> init(Integer pageNo, Integer pageSize, Long totalRecords, Boolean isLast, List<T> list) {
@@ -74,6 +74,6 @@ public class PageBaseResp<T> {
             return false;
         }
         long pageTotal = totalRecords / pageSize + (totalRecords % pageSize == 0 ? 0 : 1);
-        return pageNo >= pageTotal ? true : false;
+        return pageNo >= pageTotal;
     }
 }
