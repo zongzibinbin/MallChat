@@ -3,6 +3,7 @@ package com.abin.mallchat.common.common.exception;
 import com.abin.mallchat.common.common.domain.vo.response.ApiResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -62,4 +63,14 @@ public class GlobalExceptionHandler {
         log.info("business exception！The reason is：{}", e.getMessage(), e);
         return ApiResult.fail(e.getErrorCode(), e.getMessage());
     }
+
+    /**
+     * http请求方式不支持
+     */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ApiResult<Void> handleException(HttpRequestMethodNotSupportedException e) {
+        log.error(e.getMessage(), e);
+        return ApiResult.fail(-1, String.format("不支持'%s'请求", e.getMethod()));
+    }
+
 }
