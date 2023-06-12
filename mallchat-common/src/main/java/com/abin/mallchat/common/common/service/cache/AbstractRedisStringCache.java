@@ -17,7 +17,7 @@ public abstract class AbstractRedisStringCache<IN, OUT> implements BatchCache<IN
 
     private Class<OUT> outClass;
 
-    public AbstractRedisStringCache() {
+    protected AbstractRedisStringCache() {
         ParameterizedType genericSuperclass = (ParameterizedType) this.getClass().getGenericSuperclass();
         this.outClass = (Class<OUT>) genericSuperclass.getActualTypeArguments()[1];
     }

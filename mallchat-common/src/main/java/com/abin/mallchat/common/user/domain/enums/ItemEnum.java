@@ -33,7 +33,7 @@ public enum ItemEnum {
         cache = Arrays.stream(ItemEnum.values()).collect(Collectors.toMap(ItemEnum::getId, Function.identity()));
     }
 
-    public static ItemEnum of(Integer type) {
+    public static ItemEnum of(Long type) {
         return cache.get(type);
     }
 }
