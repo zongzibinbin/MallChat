@@ -29,7 +29,7 @@ public enum RoleEnum {
         cache = Arrays.stream(RoleEnum.values()).collect(Collectors.toMap(RoleEnum::getId, Function.identity()));
     }
 
-    public static RoleEnum of(Integer type) {
+    public static RoleEnum of(Long type) {
         return cache.get(type);
     }
 }

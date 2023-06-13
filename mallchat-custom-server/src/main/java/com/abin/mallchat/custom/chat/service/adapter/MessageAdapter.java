@@ -7,7 +7,6 @@ import com.abin.mallchat.common.chat.domain.entity.msg.MessageExtra;
 import com.abin.mallchat.common.chat.domain.enums.MessageMarkTypeEnum;
 import com.abin.mallchat.common.chat.domain.enums.MessageStatusEnum;
 import com.abin.mallchat.common.common.domain.enums.YesOrNoEnum;
-import com.abin.mallchat.common.common.utils.discover.PrioritizedUrlTitleDiscover;
 import com.abin.mallchat.common.user.domain.entity.IpDetail;
 import com.abin.mallchat.common.user.domain.entity.IpInfo;
 import com.abin.mallchat.common.user.domain.entity.ItemConfig;
@@ -27,7 +26,6 @@ import java.util.stream.Collectors;
  */
 public class MessageAdapter {
     public static final int CAN_CALLBACK_GAP_COUNT = 100;
-    private static final PrioritizedUrlTitleDiscover URL_TITLE_DISCOVER = new PrioritizedUrlTitleDiscover();
 
     public static Message buildMsgSave(ChatMessageReq request, Long uid) {
 
@@ -35,14 +33,8 @@ public class MessageAdapter {
                 .fromUid(uid)
                 .roomId(request.getRoomId())
                 .status(MessageStatusEnum.NORMAL.getStatus())
-                .extra(buildExtra(request))
                 .build();
 
-    }
-
-    private static MessageExtra buildExtra(ChatMessageReq request) {
-        Map<String, String> contentTitleMap = URL_TITLE_DISCOVER.getContentTitleMap(request.getContent());
-        return MessageExtra.builder().urlTitleMap(contentTitleMap).build();
     }
 
     public static List<ChatMessageResp> buildMsgResp(List<Message> messages, Map<Long, Message> replyMap, Map<Long, User> userMap, List<MessageMark> msgMark, Long receiveUid, Map<Long, ItemConfig> itemMap) {

@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,6 +23,8 @@ public class TextMsgResp {
     private String content;
     @ApiModelProperty("消息链接映射")
     private Map<String, String> urlTitleMap;
+    @ApiModelProperty("艾特的uid")
+    private List<Long> atUidList;
     @ApiModelProperty("父消息，如果没有父消息，返回的是null")
     private TextMsgResp.ReplyMsg reply;
 

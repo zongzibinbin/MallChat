@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
  * Description: 文本消息入参
  * Author: <a href="https://github.com/zongzibinbin">abin</a>
@@ -22,4 +24,7 @@ public class TextMsgReq {
 
     @ApiModelProperty("回复的消息id,如果没有别传就好")
     private Long replyMsgId;
+
+    @ApiModelProperty("艾特的uid")
+    private List<Long> atUidList;
 }

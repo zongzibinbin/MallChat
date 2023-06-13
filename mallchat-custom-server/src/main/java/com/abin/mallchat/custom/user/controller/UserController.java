@@ -4,11 +4,11 @@ package com.abin.mallchat.custom.user.controller;
 import com.abin.mallchat.common.common.domain.vo.response.ApiResult;
 import com.abin.mallchat.common.common.utils.AssertUtil;
 import com.abin.mallchat.common.common.utils.RequestHolder;
+import com.abin.mallchat.common.user.domain.dto.ItemInfoDTO;
+import com.abin.mallchat.common.user.domain.dto.SummeryInfoDTO;
 import com.abin.mallchat.common.user.domain.enums.RoleEnum;
 import com.abin.mallchat.common.user.service.IRoleService;
-import com.abin.mallchat.custom.user.domain.vo.request.user.BlackReq;
-import com.abin.mallchat.custom.user.domain.vo.request.user.ModifyNameReq;
-import com.abin.mallchat.custom.user.domain.vo.request.user.WearingBadgeReq;
+import com.abin.mallchat.custom.user.domain.vo.request.user.*;
 import com.abin.mallchat.custom.user.domain.vo.response.user.BadgeResp;
 import com.abin.mallchat.custom.user.domain.vo.response.user.UserInfoResp;
 import com.abin.mallchat.custom.user.service.UserService;
@@ -41,6 +41,18 @@ public class UserController {
     @ApiOperation("用户详情")
     public ApiResult<UserInfoResp> getUserInfo() {
         return ApiResult.success(userService.getUserInfo(RequestHolder.get().getUid()));
+    }
+
+    @PostMapping("/public/summary/userInfo/batch")
+    @ApiOperation("用户聚合信息-返回的代表需要刷新的")
+    public ApiResult<List<SummeryInfoDTO>> getSummeryUserInfo(@Valid @RequestBody SummeryInfoReq req) {
+        return ApiResult.success(userService.getSummeryUserInfo(req));
+    }
+
+    @PostMapping("/public/badges/batch")
+    @ApiOperation("徽章聚合信息-返回的代表需要刷新的")
+    public ApiResult<List<ItemInfoDTO>> getItemInfo(@Valid @RequestBody ItemInfoReq req) {
+        return ApiResult.success(userService.getItemInfo(req));
     }
 
     @PutMapping("/name")

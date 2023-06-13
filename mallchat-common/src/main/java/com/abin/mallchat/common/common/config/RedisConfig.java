@@ -15,7 +15,8 @@ import java.util.Objects;
 
 @Configuration
 public class RedisConfig {
-    @Bean
+
+    @Bean("myRedisTemplate")
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         // 创建模板
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
@@ -30,10 +31,11 @@ public class RedisConfig {
         // value和 hashValue采用 JSON序列化
         redisTemplate.setValueSerializer(jsonRedisSerializer);
         redisTemplate.setHashValueSerializer(jsonRedisSerializer);
+        redisTemplate.afterPropertiesSet();
         return redisTemplate;
     }
 
-    public class MyRedisSerializerCustomized extends GenericJackson2JsonRedisSerializer {
+    private static class MyRedisSerializerCustomized extends GenericJackson2JsonRedisSerializer {
         @Override
         public byte[] serialize(Object source) throws SerializationException {
             if (Objects.nonNull(source)) {

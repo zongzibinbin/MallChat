@@ -20,7 +20,7 @@ public abstract class AbstractMsgHandler {
 
     abstract MessageTypeEnum getMsgTypeEnum();
 
-    public abstract void checkMsg(ChatMessageReq req);
+    public abstract void checkMsg(ChatMessageReq req, Long uid);
 
     public abstract void saveMsg(Message msg, ChatMessageReq req);
 

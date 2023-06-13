@@ -45,7 +45,7 @@ public class ItemReceiveListener {
             User user = userDao.getById(userBackpack.getUid());
             if (Objects.isNull(user.getItemId())) {
                 userDao.wearingBadge(userBackpack.getUid(), userBackpack.getItemId());
-                userCache.delUserInfo(userBackpack.getUid());
+                userCache.userInfoChange(userBackpack.getUid());
             }
         }
     }

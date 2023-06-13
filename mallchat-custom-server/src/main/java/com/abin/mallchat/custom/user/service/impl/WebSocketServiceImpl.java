@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
+import com.abin.mallchat.common.common.annotation.FrequencyControl;
 import com.abin.mallchat.common.common.config.ThreadPoolConfig;
 import com.abin.mallchat.common.common.event.UserOfflineEvent;
 import com.abin.mallchat.common.common.event.UserOnlineEvent;
@@ -89,6 +90,8 @@ public class WebSocketServiceImpl implements WebSocketService {
      */
     @SneakyThrows
     @Override
+    @FrequencyControl(time = 10, count = 2, spEl = "T(com.abin.mallchat.common.common.utils.RequestHolder).get().getIp()")
+    @FrequencyControl(time = 100, count = 5, spEl = "T(com.abin.mallchat.common.common.utils.RequestHolder).get().getIp()")
     public void handleLoginReq(Channel channel) {
         //生成随机不重复的登录码
         Integer code = generateLoginCode(channel);
@@ -119,6 +122,7 @@ public class WebSocketServiceImpl implements WebSocketService {
      * @param channel
      */
     @Override
+    @FrequencyControl(time = 10, count = 5, spEl = "T(com.abin.mallchat.common.common.utils.RequestHolder).get().getIp()")
     public void connect(Channel channel) {
         ONLINE_WS_MAP.put(channel, new WSChannelExtraDTO());
     }
@@ -174,6 +178,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         getOrInitChannelExt(channel).setUid(uid);
         ONLINE_UID_MAP.putIfAbsent(uid, new CopyOnWriteArrayList<>());
         ONLINE_UID_MAP.get(uid).add(channel);
+        NettyUtil.setAttr(channel, NettyUtil.UID, uid);
     }
 
     /**
