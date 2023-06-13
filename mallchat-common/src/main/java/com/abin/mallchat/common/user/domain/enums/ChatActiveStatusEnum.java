@@ -26,15 +26,15 @@ public enum ChatActiveStatusEnum {
 
     private static volatile Map<Integer, ChatActiveStatusEnum> cache;
 
-    static {
+    /*static {
         cache = Arrays.stream(ChatActiveStatusEnum.values()).collect(Collectors.toMap(ChatActiveStatusEnum::getStatus, Function.identity()));
-    }
+    }*/
 
     public static ChatActiveStatusEnum of(Integer type) {
         if(cache == null){
             synchronized(ChatActiveStatusEnum.class){
                 if(cache == null ){
-                    cache = new ConcurrentHashMap<Integer, ChatActiveStatusEnum>();
+                    cache = Arrays.stream(ChatActiveStatusEnum.values()).collect(Collectors.toMap(ChatActiveStatusEnum::getStatus, Function.identity()));
                 }
             }
         }
