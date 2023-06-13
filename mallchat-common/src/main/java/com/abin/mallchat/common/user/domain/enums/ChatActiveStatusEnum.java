@@ -5,6 +5,7 @@ import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -23,13 +24,20 @@ public enum ChatActiveStatusEnum {
     private final Integer status;
     private final String desc;
 
-    private static Map<Integer, ChatActiveStatusEnum> cache;
+    private static volatile Map<Integer, ChatActiveStatusEnum> cache;
 
     static {
         cache = Arrays.stream(ChatActiveStatusEnum.values()).collect(Collectors.toMap(ChatActiveStatusEnum::getStatus, Function.identity()));
     }
 
     public static ChatActiveStatusEnum of(Integer type) {
+        if(cache == null){
+            synchronized(ChatActiveStatusEnum.class){
+                if(cache == null ){
+                    cache = new ConcurrentHashMap<Integer, ChatActiveStatusEnum>();
+                }
+            }
+        }
         return cache.get(type);
     }
 }
