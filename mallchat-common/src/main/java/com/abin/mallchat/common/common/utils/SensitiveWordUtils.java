@@ -46,8 +46,11 @@ public final class SensitiveWordUtils {
         if (StringUtils.isBlank(text)) return text;
         List<MatchResult> matchResults = ac_trie.matches(text);
         StringBuffer result = new StringBuffer(text);
+        // matchResults是按照startIndex排序的，因此可以通过不断更新endIndex最大值的方式算出尚未被替代部分
+        int endIndex = 0;
         for (MatchResult matchResult : matchResults) {
-            replaceBetween(result, matchResult.getStartIndex(), matchResult.getEndIndex());
+            endIndex = Math.max(endIndex, matchResult.getEndIndex());
+            replaceBetween(result, matchResult.getStartIndex(), endIndex);
         }
         return result.toString();
     }
