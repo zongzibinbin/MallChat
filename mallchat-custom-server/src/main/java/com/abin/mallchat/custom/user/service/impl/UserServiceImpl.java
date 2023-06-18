@@ -146,6 +146,7 @@ public class UserServiceImpl implements UserService {
         return req.getReqList()
                 .stream()
                 .map(a -> batch.containsKey(a.getUid()) ? batch.get(a.getUid()) : SummeryInfoDTO.skip(a.getUid()))
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
