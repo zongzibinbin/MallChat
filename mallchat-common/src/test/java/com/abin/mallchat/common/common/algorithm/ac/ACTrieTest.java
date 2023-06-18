@@ -44,6 +44,17 @@ public class ACTrieTest {
         checkResult(matchResults.get(1), 1, 4, ALPHABET.get(1), text);
     }
 
+    @Test
+    public void test_VariousKeywordsMultiMatch2() {
+        final ACTrie trie = trie(ALPHABET);
+        final String text = "abcde";
+        List<MatchResult> matchResults = trie.matches(text);
+        assertEquals(3, matchResults.size());
+        checkResult(matchResults.get(0), 0, 3, ALPHABET.get(0), text);
+        checkResult(matchResults.get(1), 1, 4, ALPHABET.get(1), text);
+        checkResult(matchResults.get(2), 2, 5, ALPHABET.get(2), text);
+    }
+
     private void checkResult(MatchResult matchResult, int expectedStart, int expectedEnd, String expectedKeyword, String text) {
         assertEquals("Start of match should have been " + expectedStart, expectedStart, matchResult.getStartIndex());
         assertEquals("End of match should have been " + expectedEnd, expectedEnd, matchResult.getEndIndex());
