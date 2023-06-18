@@ -96,7 +96,6 @@ public class NettyWebSocketServer {
                 });
         // 启动服务器，监听端口，阻塞直到启动成功
         serverBootstrap.bind(WEB_SOCKET_PORT).sync();
-        System.out.println("启动成功");
     }
 
 }

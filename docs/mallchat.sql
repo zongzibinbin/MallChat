@@ -25,6 +25,7 @@ INSERT INTO `item_config` VALUES (2, 2, 'https://cdn-icons-png.flaticon.com/128/
 INSERT INTO `item_config` VALUES (3, 2, 'https://cdn-icons-png.flaticon.com/512/6198/6198527.png ', '抹茶聊天前10名注册的用户才能获得的专属徽章', '2023-05-07 17:50:31.100', '2023-05-07 18:12:01.448');
 INSERT INTO `item_config` VALUES (4, 2, 'https://cdn-icons-png.flaticon.com/512/10232/10232583.png', '抹茶聊天前100名注册的用户才能获得的专属徽章', '2023-05-07 17:50:31.109', '2023-05-07 17:56:36.059');
 INSERT INTO `item_config` VALUES (5, 2, 'https://cdn-icons-png.flaticon.com/128/2909/2909937.png', '抹茶知识星球成员的专属徽章', '2023-05-07 17:50:31.109', '2023-05-07 17:56:36.059');
+INSERT INTO `item_config` VALUES (6, 2, 'https://s2.loli.net/2023/06/15/O9FwjH4ciAuMSnL.png', '抹茶项目contributor专属徽章', '2023-05-07 17:50:31.109', '2023-05-07 17:56:36.059');
 
 -- ----------------------------
 -- Table structure for message
@@ -182,3 +183,10 @@ CREATE TABLE `user_role` (
   KEY `idx_create_time` (`create_time`) USING BTREE,
   KEY `idx_update_time` (`update_time`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户角色关系表';
+
+DROP TABLE IF EXISTS `sensitive_word`;
+CREATE TABLE `sensitive_word` (
+  `word` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '敏感词'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='敏感词库';
+INSERT INTO `sensitive_word` (`word`) VALUES ('TMD');
+INSERT INTO `sensitive_word` (`word`) VALUES ('tmd');
