@@ -1,7 +1,5 @@
 package com.abin.mallchat.common.common.utils;
 
-import com.abin.mallchat.common.common.algorithm.ac.ACTrie;
-import com.abin.mallchat.common.common.algorithm.ac.MatchResult;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
@@ -9,27 +7,21 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
-
-/**
- * 敏感词过滤
- *
- * @author zhaoyuhang
- * @since 2023/06/11
- */
 public final class SensitiveWordUtils {
-    private final static char mask_char = '*'; // 替代字符
-
-    private static ACTrie ac_trie = null;
+    private static Map<Character, Word> wordMap; // 敏感词Map
+    private final static char replace = '*'; // 替代字符
+    private final static char[] skip = new char[]{ // 遇到这些字符就会跳过
+            ' ', '!', '*', '-', '+', '_', '=', ',', '，', '.', '@', ';', ':', '；', '：'
+    };
 
     /**
-     * 有敏感词
+     * 判断文本中是否存在敏感词
      *
      * @param text 文本
-     * @return boolean
+     * @return true: 存在敏感词, false: 不存在敏感词
      */
     public static boolean hasSensitiveWord(String text) {
         if (StringUtils.isBlank(text)) return false;
@@ -37,29 +29,60 @@ public final class SensitiveWordUtils {
     }
 
     /**
+     * 过滤敏感词并替换为指定字符
+     *
+     * @param text 待替换文本
+     * @return 替换后的文本
+     */
+    /**
      * 敏感词替换
      *
      * @param text 待替换文本
      * @return 替换后的文本
      */
     public static String filter(String text) {
-        if (StringUtils.isBlank(text)) return text;
-        List<MatchResult> matchResults = ac_trie.matches(text);
-        StringBuffer result = new StringBuffer(text);
-        // matchResults是按照startIndex排序的，因此可以通过不断更新endIndex最大值的方式算出尚未被替代部分
-        int endIndex = 0;
-        for (MatchResult matchResult : matchResults) {
-            endIndex = Math.max(endIndex, matchResult.getEndIndex());
-            replaceBetween(result, matchResult.getStartIndex(), endIndex);
+        if (wordMap == null || wordMap.isEmpty() || StringUtils.isBlank(text)) return text;
+        char[] chars = text.toCharArray(); // 将文本转换为字符数组
+        int length = chars.length; // 文本长度
+        StringBuilder result = new StringBuilder(length); // 存储替换后的结果
+        int i = 0; // 当前遍历的字符索引
+        while (i < length) {
+            char c = chars[i]; // 当前字符
+            if (skip(c)) { // 如果是需要跳过的字符，则直接追加到结果中
+                i++;
+                continue;
+            }
+            int startIndex = i; // 敏感词匹配的起始索引
+            Map<Character, Word> currentMap = wordMap; // 当前层级的敏感词字典
+            int matchLength = 0; // 匹配到的敏感词长度
+            for (int j = i; j < length; j++) {
+                char ch = chars[j]; // 当前遍历的字符
+                if (skip(ch)) { // 如果是需要跳过的字符，则直接追加到结果中
+                    continue;
+                }
+                Word word = currentMap.get(ch); // 获取当前字符在当前层级的敏感词字典中对应的敏感词节点
+                if (word == null) { // 如果未匹配到敏感词节点，则终止循环
+                    break;
+                }
+                if (word.end) { // 如果当前节点是敏感词的最后一个节点，则记录匹配长度
+                    matchLength = j - startIndex + 1;
+                }
+                currentMap = word.next; // 进入下一层级的敏感词字典
+                if (word.next == null) { // 如果当前节点是敏感词的最后一个节点，则记录匹配长度
+                    matchLength = j - startIndex + 1;
+                }
+            }
+            if (matchLength > 0) { // 如果匹配到敏感词，则将对应的字符替换为指定替代字符
+                for (int j = startIndex; j < startIndex + matchLength; j++) {
+                    chars[j] = replace;
+                }
+            }
+            i += matchLength > 0 ? matchLength : 1; // 更新当前索引，跳过匹配到的敏感词
         }
+        result.append(chars); // 将匹配到的敏感词追加到结果中
         return result.toString();
     }
 
-    private static void replaceBetween(StringBuffer buffer, int startIndex, int endIndex) {
-        for (int i = startIndex; i < endIndex; i++) {
-            buffer.setCharAt(i, mask_char);
-        }
-    }
 
     /**
      * 加载敏感词列表
@@ -68,13 +91,34 @@ public final class SensitiveWordUtils {
      */
     public static void loadWord(List<String> words) {
         if (words == null) return;
-        ac_trie = new ACTrie(words);
+        words = words.stream().distinct().collect(Collectors.toList()); // 去重
+        wordMap = new HashMap<>(); // 创建敏感词字典的根节点
+        for (String word : words) {
+            if (word == null) continue;
+            char[] chars = word.toCharArray();
+            Map<Character, Word> currentMap = wordMap; // 当前层级的敏感词字典
+            for (int i = 0; i < chars.length; i++) {
+                char c = chars[i];
+                Word currentWord = currentMap.get(c);
+                if (currentWord == null) {
+                    Word newWord = new Word(c); // 创建新的敏感词节点
+                    currentMap.put(c, newWord); // 将节点添加到当前层级的敏感词字典中
+                    if (i == chars.length - 1) {
+                        newWord.end = true; // 添加结束标志
+                    }
+                    currentMap = newWord.next = new HashMap<>(); // 进入下一层级
+                } else {
+                    currentMap = currentWord.next; // 存在该字符的节点，则进入下一层级
+                }
+            }
+        }
     }
 
+
     /**
-     * 加载敏感词txt文件，每个敏感词独占一行，不可出现空格，空行，逗号等非文字内容,必须使用UTF-8编码
+     * 从文本文件中加载敏感词列表
      *
-     * @param path txt文件的绝对地址
+     * @param path 文本文件的绝对路径
      */
     public static void loadWordFromFile(String path) {
         String encoding = "UTF-8";
@@ -99,8 +143,40 @@ public final class SensitiveWordUtils {
         }
     }
 
+    /**
+     * 判断是否需要跳过当前字符
+     *
+     * @param c 待检测字符
+     * @return true: 需要跳过, false: 不需要跳过
+     */
+    private static boolean skip(char c) {
+        for (char skipChar : skip) {
+            if (skipChar == c) return true;
+        }
+        return false;
+    }
 
+    /**
+     * 敏感词类
+     */
+    private static class Word {
+        // 当前字符
+        private char c;
 
+        // 结束标识
+        private boolean end;
+
+        // 下一层级的敏感词字典
+        private Map<Character, Word> next;
+
+        public Word(char c) {
+            this.c = c;
+        }
+    }
+
+    public static void main(String[] args) {
+        List<String> strings = Arrays.asList("白日梦", "白痴", "白痴是你","TMD");
+        loadWord(strings);
+        System.out.println(filter("TMD,白痴是你吗"));
+    }
 }
-
-
