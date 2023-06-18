@@ -2,33 +2,26 @@ package com.abin.mallchat.common.common.utils;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
-
-/**
- * 敏感词过滤
- *
- * @author zhaoyuhang
- * @since 2023/06/11
- */
 public final class SensitiveWordUtils {
-    private static SensitiveWordList wordList;
+    private static Map<Character, Word> wordMap; // 敏感词Map
     private final static char replace = '*'; // 替代字符
     private final static char[] skip = new char[]{ // 遇到这些字符就会跳过
             ' ', '!', '*', '-', '+', '_', '=', ',', '，', '.', '@', ';', ':', '；', '：'
     };
 
     /**
-     * 有敏感词
+     * 判断文本中是否存在敏感词
      *
      * @param text 文本
-     * @return boolean
+     * @return true: 存在敏感词, false: 不存在敏感词
      */
     public static boolean hasSensitiveWord(String text) {
         if (StringUtils.isBlank(text)) return false;
@@ -36,62 +29,60 @@ public final class SensitiveWordUtils {
     }
 
     /**
+     * 过滤敏感词并替换为指定字符
+     *
+     * @param text 待替换文本
+     * @return 替换后的文本
+     */
+    /**
      * 敏感词替换
      *
      * @param text 待替换文本
      * @return 替换后的文本
      */
     public static String filter(String text) {
-        if (wordList == null || wordList.size() == 0 || StringUtils.isBlank(text)) return text;
-        char[] __char__ = text.toCharArray(); // 把String转化成char数组，便于遍历
-        int i, j;
-        Word word;
-        boolean flag; // 是否需要替换
-        for (i = 0; i < __char__.length; i++) { // 遍历所有字符
-            char c = __char__[i];
-            word = wordList.binaryGet(c); // 使用二分查找来寻找字符，提高效率
-            if (word != null) { // word != null说明找到了
-                flag = false;
-                j = i + 1;
-                while (j < __char__.length) { // 开始逐个比较后面的字符
-                    if (skip(__char__[j])) { // 跳过空格之类的无关字符
-                        j++;
-                        continue;
-                    }
-                    if (word.next != null) { // 字符串尚未结束，不确定是否存在敏感词
-                        /*
-                        以下代码并没有使用二分查找，因为以同一个字符开头的敏感词较少
-                        例如，wordList中记录了所有敏感词的开头第一个字，它的数量通常会有上千个
-                        假如现在锁定了字符“T”开头的敏感词，而“T”开头的敏感词只有10个，这时使用二分查找的效率反而低于顺序查找
-                         */
-                        word = word.next.get(__char__[j]);
-                        if (word == null) {
-                            break;
-                        }
-                        j++;
-                    } else { // 字符串已结束，存在敏感词汇
-                        flag = true;
-                        break;
-                    }
+        if (wordMap == null || wordMap.isEmpty() || StringUtils.isBlank(text)) return text;
+        char[] chars = text.toCharArray(); // 将文本转换为字符数组
+        int length = chars.length; // 文本长度
+        StringBuilder result = new StringBuilder(length); // 存储替换后的结果
+        int i = 0; // 当前遍历的字符索引
+        while (i < length) {
+            char c = chars[i]; // 当前字符
+            if (skip(c)) { // 如果是需要跳过的字符，则直接追加到结果中
+                i++;
+                continue;
+            }
+            int startIndex = i; // 敏感词匹配的起始索引
+            Map<Character, Word> currentMap = wordMap; // 当前层级的敏感词字典
+            int matchLength = 0; // 匹配到的敏感词长度
+            for (int j = i; j < length; j++) {
+                char ch = chars[j]; // 当前遍历的字符
+                if (skip(ch)) { // 如果是需要跳过的字符，则直接追加到结果中
+                    continue;
                 }
-                if (word != null && word.next == null) {
-                    flag = true;
+                Word word = currentMap.get(ch); // 获取当前字符在当前层级的敏感词字典中对应的敏感词节点
+                if (word == null) { // 如果未匹配到敏感词节点，则终止循环
+                    break;
                 }
-                if (flag) { // 如果flag==true，说明检测出敏感粗，需要替换
-                    while (i < j) {
-                        // if(skip(__char__[i])){ // 跳过空格之类的无关字符，如果要把空格也替换成'*'，则删除这个if语句
-                        //     i++;
-                        //     continue;
-                        // }
-                        __char__[i] = replace;
-                        i++;
-                    }
-                    i--;
+                if (word.end) { // 如果当前节点是敏感词的最后一个节点，则记录匹配长度
+                    matchLength = j - startIndex + 1;
+                }
+                currentMap = word.next; // 进入下一层级的敏感词字典
+                if (word.next == null) { // 如果当前节点是敏感词的最后一个节点，则记录匹配长度
+                    matchLength = j - startIndex + 1;
                 }
             }
+            if (matchLength > 0) { // 如果匹配到敏感词，则将对应的字符替换为指定替代字符
+                for (int j = startIndex; j < startIndex + matchLength; j++) {
+                    chars[j] = replace;
+                }
+            }
+            i += matchLength > 0 ? matchLength : 1; // 更新当前索引，跳过匹配到的敏感词
         }
-        return new String(__char__);
+        result.append(chars); // 将匹配到的敏感词追加到结果中
+        return result.toString();
     }
+
 
     /**
      * 加载敏感词列表
@@ -101,31 +92,33 @@ public final class SensitiveWordUtils {
     public static void loadWord(List<String> words) {
         if (words == null) return;
         words = words.stream().distinct().collect(Collectors.toList()); // 去重
-        char[] chars;
-        SensitiveWordList now;
-        Word word;
-        wordList = new SensitiveWordList();
-        for (String __word__ : words) {
-            if (__word__ == null) continue;
-            chars = __word__.toCharArray();
-            now = wordList;
-            word = null;
-            for (char c : chars) {
-                if (word != null) {
-                    if (word.next == null) word.next = new SensitiveWordList();
-                    now = word.next;
+        wordMap = new HashMap<>(); // 创建敏感词字典的根节点
+        for (String word : words) {
+            if (word == null) continue;
+            char[] chars = word.toCharArray();
+            Map<Character, Word> currentMap = wordMap; // 当前层级的敏感词字典
+            for (int i = 0; i < chars.length; i++) {
+                char c = chars[i];
+                Word currentWord = currentMap.get(c);
+                if (currentWord == null) {
+                    Word newWord = new Word(c); // 创建新的敏感词节点
+                    currentMap.put(c, newWord); // 将节点添加到当前层级的敏感词字典中
+                    if (i == chars.length - 1) {
+                        newWord.end = true; // 添加结束标志
+                    }
+                    currentMap = newWord.next = new HashMap<>(); // 进入下一层级
+                } else {
+                    currentMap = currentWord.next; // 存在该字符的节点，则进入下一层级
                 }
-                word = now.get(c);
-                if (word == null) word = now.add(c);
             }
         }
-        sort(wordList);
     }
 
+
     /**
-     * 加载敏感词txt文件，每个敏感词独占一行，不可出现空格，空行，逗号等非文字内容,必须使用UTF-8编码
+     * 从文本文件中加载敏感词列表
      *
-     * @param path txt文件的绝对地址
+     * @param path 文本文件的绝对路径
      */
     public static void loadWordFromFile(String path) {
         String encoding = "UTF-8";
@@ -151,101 +144,39 @@ public final class SensitiveWordUtils {
     }
 
     /**
-     * 对敏感词多叉树递增排序
-     *
-     * @param list 待排序List
-     */
-    private static void sort(SensitiveWordList list) {
-        if (list == null) return;
-        Collections.sort(list); // 递增排序
-        for (Word word : list) {
-            sort(word.next);
-        }
-    }
-
-    /**
-     * 判断是否跳过当前字符
+     * 判断是否需要跳过当前字符
      *
      * @param c 待检测字符
-     * @return true:需要跳过   false:不需要跳过
+     * @return true: 需要跳过, false: 不需要跳过
      */
     private static boolean skip(char c) {
-        for (char c1 : skip) {
-            if (c1 == c) return true;
+        for (char skipChar : skip) {
+            if (skipChar == c) return true;
         }
         return false;
     }
 
     /**
-     * 敏感词列表
-     *
-     * @author zhaoyuhang
-     * @since 2023/06/11
+     * 敏感词类
      */
-    public static class SensitiveWordList extends ArrayList<Word> {
-        public Word get(char c) {
-            for (Word w : this) {
-                if (w.c == c) return w;
-            }
-            return null;
-        }
+    private static class Word {
+        // 当前字符
+        private char c;
 
-        /**
-         * 二分查找，必须先升序排序
-         *
-         * @param c 需要查找的字符
-         * @return Word对象：如果找到   null:如果没找到
-         */
-        public Word binaryGet(char c) {
-            int left, right, key;
-            Word word;
-            left = 0;
-            right = this.size() - 1;
-            while (left <= right) {
-                key = (left + right) / 2;
-                word = get(key);
-                if (word.c == c) {
-                    return word;
-                } else if (word.c > c) {
-                    right = key - 1;
-                } else {
-                    left = key + 1;
-                }
-            }
-            return null;
-        }
+        // 结束标识
+        private boolean end;
 
-        public Word add(char c) {
-            Word word = new Word(c);
-            super.add(word);
-            return word;
-        }
-
-    }
-
-    /**
-     * 敏感词
-     *
-     * @author zhaoyuhang
-     * @since 2023/06/11
-     */
-    public static class Word implements Comparable<Word> {
-        public char c;
-        public SensitiveWordList next = null;
+        // 下一层级的敏感词字典
+        private Map<Character, Word> next;
 
         public Word(char c) {
             this.c = c;
         }
+    }
 
-        @Override
-        public int compareTo(Word word) {
-            return c - word.c;
-        }
-
-        public String toString() {
-            return c + "(" + (next == null ? null : next.size()) + ")";
-        }
+    public static void main(String[] args) {
+        List<String> strings = Arrays.asList("白日梦", "白痴", "白痴是你","TMD");
+        loadWord(strings);
+        System.out.println(filter("TMD,白痴是你吗"));
     }
 }
-
-
