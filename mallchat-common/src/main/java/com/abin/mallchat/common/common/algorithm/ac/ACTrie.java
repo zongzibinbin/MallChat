@@ -2,6 +2,7 @@ package com.abin.mallchat.common.common.algorithm.ac;
 
 import com.google.common.collect.Lists;
 
+import javax.annotation.concurrent.NotThreadSafe;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -9,6 +10,7 @@ import java.util.stream.Collectors;
  * aho-corasick算法（又称AC自动机算法）
  * Created by berg on 2023/6/18.
  */
+@NotThreadSafe
 public class ACTrie {
 
     // 根节点
@@ -20,7 +22,7 @@ public class ACTrie {
         for (String word : words) {
             addWord(word);
         }
-        initTrieFailover();
+        initFailover();
     }
 
     public void addWord(String word) {
@@ -34,11 +36,14 @@ public class ACTrie {
         walkNode.setLeaf(true);
     }
 
-    public void initTrieFailover() {
+    /**
+     * 初始化节点中的回退指针
+     */
+    private void initFailover() {
         //第一层的fail指针指向root
         Queue<ACTrieNode> queue = new LinkedList<>();
-        Map<Character, ACTrieNode> childrens = root.getChildren();
-        for (ACTrieNode node : childrens.values()) {
+        Map<Character, ACTrieNode> children = root.getChildren();
+        for (ACTrieNode node : children.values()) {
             node.setFailover(root);
             queue.offer(node);
         }
