@@ -114,6 +114,14 @@
             <artifactId>redisson-spring-boot-starter</artifactId>
             <version>3.17.1</version>
         </dependency>
+
+        <!-- Used for unit testing -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
