@@ -77,7 +77,7 @@ public class ACTrie {
             while (!walkNode.hasChild(c) && walkNode.getFailover() != null) {
                 walkNode = walkNode.getFailover();
             }
-            //如果因为当前节点的孩子节点有这个字符，则将temp替换为下面的孩子节点
+            //如果因为当前节点的孩子节点有这个字符，则将walkNode替换为下面的孩子节点
             if (walkNode.hasChild(c)) {
                 walkNode = walkNode.childOf(c);
                 // 检索到了敏感词
