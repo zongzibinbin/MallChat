@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.abin.mallchat.common.common.event.UserBlackEvent;
 import com.abin.mallchat.common.common.event.UserRegisterEvent;
 import com.abin.mallchat.common.common.utils.AssertUtil;
+import com.abin.mallchat.common.common.utils.SensitiveWordUtils;
 import com.abin.mallchat.common.user.dao.BlackDao;
 import com.abin.mallchat.common.user.dao.ItemConfigDao;
 import com.abin.mallchat.common.user.dao.UserBackpackDao;
@@ -74,7 +75,9 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void modifyName(Long uid, ModifyNameReq req) {
         //判断名字是不是重复
-        User oldUser = userDao.getByName(req.getName());
+        String newName = req.getName();
+        AssertUtil.isFalse(SensitiveWordUtils.hasSensitiveWord(newName), "名字中包含敏感词，请重新输入"); // 判断名字中有没有敏感词
+        User oldUser = userDao.getByName(newName);
         AssertUtil.isEmpty(oldUser, "名字已经被抢占了，请换一个哦~~");
         //判断改名卡够不够
         UserBackpack firstValidItem = userBackpackDao.getFirstValidItem(uid, ItemEnum.MODIFY_NAME_CARD.getId());
@@ -140,7 +143,11 @@ public class UserServiceImpl implements UserService {
         List<Long> uidList = getNeedSyncUidList(req.getReqList());
         //加载用户信息
         Map<Long, SummeryInfoDTO> batch = userSummaryCache.getBatch(uidList);
-        return new ArrayList<>(batch.values());
+        return req.getReqList()
+                .stream()
+                .map(a -> batch.containsKey(a.getUid()) ? batch.get(a.getUid()) : SummeryInfoDTO.skip(a.getUid()))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -148,7 +155,7 @@ public class UserServiceImpl implements UserService {
         return req.getReqList().stream().map(a -> {
             ItemConfig itemConfig = itemCache.getById(a.getItemId());
             if (Objects.nonNull(a.getLastModifyTime()) && a.getLastModifyTime() >= itemConfig.getUpdateTime().getTime()) {
-                return null;
+                return ItemInfoDTO.skip(a.getItemId());
             }
             ItemInfoDTO dto = new ItemInfoDTO();
             dto.setItemId(itemConfig.getId());

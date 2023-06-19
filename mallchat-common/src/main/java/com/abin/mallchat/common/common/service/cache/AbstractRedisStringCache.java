@@ -35,6 +35,7 @@ public abstract class AbstractRedisStringCache<IN, OUT> implements BatchCache<IN
 
     @Override
     public Map<IN, OUT> getBatch(List<IN> req) {
+        req = req.stream().distinct().collect(Collectors.toList());
         List<String> keys = req.stream().map(this::getKey).collect(Collectors.toList());
         List<OUT> valueList = RedisUtils.mget(keys, outClass);
         List<IN> loadReqs = new ArrayList<>();
