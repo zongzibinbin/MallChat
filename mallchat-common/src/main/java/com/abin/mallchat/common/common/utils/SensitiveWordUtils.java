@@ -1,5 +1,7 @@
 package com.abin.mallchat.common.common.utils;
 
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjectUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
@@ -34,53 +36,75 @@ public final class SensitiveWordUtils {
      * @param text 待替换文本
      * @return 替换后的文本
      */
-    /**
-     * 敏感词替换
-     *
-     * @param text 待替换文本
-     * @return 替换后的文本
-     */
     public static String filter(String text) {
-        if (wordMap == null || wordMap.isEmpty() || StringUtils.isBlank(text)) return text;
+        if (MapUtil.isEmpty(wordMap) || StringUtils.isBlank(text)) return text;
         char[] chars = text.toCharArray(); // 将文本转换为字符数组
+        int defaultReturn = -1;
+        //查找一次所有出现首位敏感词的索引
+        int nextIndex = findNextIndex(chars, 0, defaultReturn);
+        if(nextIndex == defaultReturn){
+            return text;
+        }
         int length = chars.length; // 文本长度
         StringBuilder result = new StringBuilder(length); // 存储替换后的结果
-        int i = 0; // 当前遍历的字符索引
+        int i = nextIndex; // 当前遍历的字符索引
         while (i < length) {
-            char c = chars[i]; // 当前字符
-            if (skip(c)) { // 如果是需要跳过的字符，则直接追加到结果中
-                i++;
-                continue;
-            }
-            int startIndex = i; // 敏感词匹配的起始索引
             Map<Character, Word> currentMap = wordMap; // 当前层级的敏感词字典
-            int matchLength = 0; // 匹配到的敏感词长度
+            int endReplaceIndex = i; //替换的起始索引
+            int skipLen = 0; //记录跳过的字符数
             for (int j = i; j < length; j++) {
                 char ch = chars[j]; // 当前遍历的字符
                 if (skip(ch)) { // 如果是需要跳过的字符，则直接追加到结果中
+                    skipLen++;
                     continue;
                 }
                 Word word = currentMap.get(ch); // 获取当前字符在当前层级的敏感词字典中对应的敏感词节点
-                if (word == null) { // 如果未匹配到敏感词节点，则终止循环
+                if(ObjectUtil.isEmpty(word)){
                     break;
                 }
-                if (word.end) { // 如果当前节点是敏感词的最后一个节点，则记录匹配长度
-                    matchLength = j - startIndex + 1;
-                }
                 currentMap = word.next; // 进入下一层级的敏感词字典
-                if (word.next == null) { // 如果当前节点是敏感词的最后一个节点，则记录匹配长度
-                    matchLength = j - startIndex + 1;
+                boolean empty = ObjectUtil.isEmpty(currentMap);
+                if (word.end || empty) {
+                    endReplaceIndex = j;
+                    if(empty){
+                        break;
+                    }
                 }
             }
-            if (matchLength > 0) { // 如果匹配到敏感词，则将对应的字符替换为指定替代字符
-                for (int j = startIndex; j < startIndex + matchLength; j++) {
+            //默认增加1或者跳过的数量
+            int nextStartIndex = i + (skipLen > 0 ? skipLen : 1);
+            // 如果匹配到敏感词，则将对应的字符替换为指定替代字符
+            if (endReplaceIndex > i + skipLen) {
+                for (int j = i + skipLen; j <= endReplaceIndex; j++) {
                     chars[j] = replace;
                 }
+                //更新下一个索引为匹配到最后一个的下一位
+                nextStartIndex = endReplaceIndex + 1;
             }
-            i += matchLength > 0 ? matchLength : 1; // 更新当前索引，跳过匹配到的敏感词
+            //查找下一个出现第一个敏感词的索引
+            i = findNextIndex(chars, nextStartIndex, length);
         }
         result.append(chars); // 将匹配到的敏感词追加到结果中
         return result.toString();
+    }
+
+    /**
+     * 查找下一个索引
+     *
+     * @param chars         需要处理的敏感词char数组
+     * @param startIndex    开始索引
+     * @param defaultReturn 默认返回
+     * @return int 下一个索引值
+     */
+    private static int findNextIndex(char[] chars, int startIndex, int defaultReturn) {
+        Set<Character> characters = wordMap.keySet();
+        int length = chars.length;
+        for (int i = startIndex; i < length; i++) {
+            if(characters.contains(chars[i])){
+                return i;
+            }
+        }
+        return defaultReturn;
     }
 
 
@@ -175,8 +199,8 @@ public final class SensitiveWordUtils {
     }
 
     public static void main(String[] args) {
-        List<String> strings = Arrays.asList("白日梦", "白痴", "白痴是你","TMD");
+        List<String> strings = Arrays.asList("白日梦", "白痴不白痴", "白痴是你","TMD");
         loadWord(strings);
-        System.out.println(filter("TMD,白痴是你吗"));
+        System.out.println(filter("TMD,白痴不白痴不白你  ,,白痴是你吗"));
     }
 }
