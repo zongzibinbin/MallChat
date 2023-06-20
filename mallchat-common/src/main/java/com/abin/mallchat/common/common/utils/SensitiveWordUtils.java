@@ -50,12 +50,11 @@ public final class SensitiveWordUtils {
         int i = nextIndex; // 当前遍历的字符索引
         while (i < length) {
             Map<Character, Word> currentMap = wordMap; // 当前层级的敏感词字典
+            int startReplaceIndex = i;
             int endReplaceIndex = i; //替换的起始索引
-            int skipLen = 0; //记录跳过的字符数
             for (int j = i; j < length; j++) {
                 char ch = chars[j]; // 当前遍历的字符
                 if (skip(ch)) { // 如果是需要跳过的字符，则直接追加到结果中
-                    skipLen++;
                     continue;
                 }
                 Word word = currentMap.get(ch); // 获取当前字符在当前层级的敏感词字典中对应的敏感词节点
@@ -71,15 +70,13 @@ public final class SensitiveWordUtils {
                     }
                 }
             }
-            //默认增加1或者跳过的数量
-            int nextStartIndex = i + (skipLen > 0 ? skipLen : 1);
+            //默认下一个索引为匹配到最后一个的下一位
+            int nextStartIndex = endReplaceIndex + 1;
             // 如果匹配到敏感词，则将对应的字符替换为指定替代字符
-            if (endReplaceIndex > i + skipLen) {
-                for (int j = i + skipLen; j <= endReplaceIndex; j++) {
+            if (endReplaceIndex > startReplaceIndex) {
+                for (int j = startReplaceIndex; j <= endReplaceIndex; j++) {
                     chars[j] = replace;
                 }
-                //更新下一个索引为匹配到最后一个的下一位
-                nextStartIndex = endReplaceIndex + 1;
             }
             //查找下一个出现第一个敏感词的索引
             i = findNextIndex(chars, nextStartIndex, length);
