@@ -4,10 +4,13 @@ import cn.hutool.core.date.StopWatch;
 import cn.hutool.json.JSONUtil;
 import com.abin.mallchat.common.common.domain.dto.RequestInfo;
 import com.abin.mallchat.common.common.utils.RequestHolder;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -17,6 +20,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -47,6 +51,7 @@ public class WebLogAspect {
         HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
         String method = request.getMethod();
         String uri = request.getRequestURI();
+        String apiName = getApiName(joinPoint);
         //如果参数有HttpRequest,ServletResponse，直接移除，不打印这些
         List<Object> paramList = Stream.of(joinPoint.getArgs())
                 .filter(args -> !(args instanceof ServletRequest))
@@ -56,7 +61,7 @@ public class WebLogAspect {
         RequestInfo requestInfo = RequestHolder.get();
         String userHeaderStr = JSONUtil.toJsonStr(requestInfo);
         if (log.isInfoEnabled()) {
-            log.info("[{}][{}]【base:{}】【request:{}】", method, uri, userHeaderStr, printParamStr);
+            log.info("[{}][{}][{}]【base:{}】【request:{}】", apiName, method, uri, userHeaderStr, printParamStr);
         }
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
@@ -65,10 +70,25 @@ public class WebLogAspect {
         long cost = stopWatch.getTotalTimeMillis();
         String printResultStr = JSONUtil.toJsonStr(result);
         if (log.isInfoEnabled()) {
-            log.info("[{}]【response:{}】[cost:{}ms]", uri, printResultStr, cost);
+            log.info("[{}][{}]【response:{}】[cost:{}ms]", apiName, uri, printResultStr, cost);
         }
         return result;
     }
 
+    /**
+     * 获取api名称
+     *
+     * @return api名称
+     */
+    private String getApiName(ProceedingJoinPoint joinPoint) {
+        return Optional.of(joinPoint)
+                .map(JoinPoint::getSignature)
+                .filter(signature -> signature instanceof MethodSignature)
+                .map(signature -> (MethodSignature) signature)
+                .map(MethodSignature::getMethod)
+                .map(method -> method.getDeclaredAnnotation(ApiOperation.class))
+                .map(ApiOperation::value)
+                .orElse("");
+    }
 
 }
