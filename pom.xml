@@ -44,6 +44,7 @@
         <weixin-java-mp.version>4.4.0</weixin-java-mp.version>
         <mybatis-plus-boot-starter.version>3.4.0</mybatis-plus-boot-starter.version>
         <jsoup.version>1.15.3</jsoup.version>
+        <ip2region.version>2.7.0</ip2region.version>
     </properties>
 
     <dependencyManagement>
@@ -112,6 +113,12 @@
                 <groupId>com.aliyun.oss</groupId>
                 <artifactId>aliyun-sdk-oss</artifactId>
                 <version>${aliyun-oss.version}</version>
+            </dependency>
+            <!-- ip2region -->
+            <dependency>
+                <groupId>org.lionsoul</groupId>
+                <artifactId>ip2region</artifactId>
+                <version>${ip2region.version}</version>
             </dependency>
 
         </dependencies>
