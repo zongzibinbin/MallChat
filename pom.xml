@@ -34,7 +34,7 @@
         <mysql-connector.version>8.0.29</mysql-connector.version>
         <spring-data-commons.version>2.7.5</spring-data-commons.version>
         <jjwt.version>0.9.1</jjwt.version>
-        <aliyun-oss.version>2.5.0</aliyun-oss.version>
+        <aliyun-oss.version>3.16.0</aliyun-oss.version>
         <logstash-logback.version>7.2</logstash-logback.version>
         <minio.version>8.4.5</minio.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
