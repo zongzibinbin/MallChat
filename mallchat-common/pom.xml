@@ -114,6 +114,10 @@
             <artifactId>redisson-spring-boot-starter</artifactId>
             <version>3.17.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.lionsoul</groupId>
+            <artifactId>ip2region</artifactId>
+        </dependency>
 
         <!-- Used for unit testing -->
         <dependency>
