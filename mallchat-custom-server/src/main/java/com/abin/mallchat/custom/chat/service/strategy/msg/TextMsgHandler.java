@@ -46,7 +46,7 @@ public class TextMsgHandler extends AbstractMsgHandler {
     private UserInfoCache userInfoCache;
     @Autowired
     private IRoleService iRoleService;
-    @Autowired
+    
     private static final PrioritizedUrlTitleDiscover URL_TITLE_DISCOVER = new PrioritizedUrlTitleDiscover();
 
     @Override

@@ -90,7 +90,6 @@ public class WebSocketServiceImpl implements WebSocketService {
      */
     @SneakyThrows
     @Override
-    @FrequencyControl(time = 10, count = 2, spEl = "T(com.abin.mallchat.common.common.utils.RequestHolder).get().getIp()")
     @FrequencyControl(time = 100, count = 5, spEl = "T(com.abin.mallchat.common.common.utils.RequestHolder).get().getIp()")
     public void handleLoginReq(Channel channel) {
         //生成随机不重复的登录码

@@ -143,7 +143,11 @@ public class UserServiceImpl implements UserService {
         List<Long> uidList = getNeedSyncUidList(req.getReqList());
         //加载用户信息
         Map<Long, SummeryInfoDTO> batch = userSummaryCache.getBatch(uidList);
-        return new ArrayList<>(batch.values());
+        return req.getReqList()
+                .stream()
+                .map(a -> batch.containsKey(a.getUid()) ? batch.get(a.getUid()) : SummeryInfoDTO.skip(a.getUid()))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -151,7 +155,7 @@ public class UserServiceImpl implements UserService {
         return req.getReqList().stream().map(a -> {
             ItemConfig itemConfig = itemCache.getById(a.getItemId());
             if (Objects.nonNull(a.getLastModifyTime()) && a.getLastModifyTime() >= itemConfig.getUpdateTime().getTime()) {
-                return null;
+                return ItemInfoDTO.skip(a.getItemId());
             }
             ItemInfoDTO dto = new ItemInfoDTO();
             dto.setItemId(itemConfig.getId());
