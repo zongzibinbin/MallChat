@@ -3,15 +3,62 @@ package com.abin.mallchat.common.common.utils;
 import cn.hutool.core.util.ObjectUtil;
 import com.abin.mallchat.common.common.exception.BusinessErrorEnum;
 import com.abin.mallchat.common.common.exception.BusinessException;
+import com.abin.mallchat.common.common.exception.CommonErrorEnum;
 import com.abin.mallchat.common.common.exception.ErrorEnum;
+import org.hibernate.validator.HibernateValidator;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
 import java.text.MessageFormat;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 校验工具类
  */
 public class AssertUtil {
+
+    /**
+     * 校验到失败就结束
+     */
+    private static Validator failFastValidator = Validation.byProvider(HibernateValidator.class)
+            .configure()
+            .failFast(true)
+            .buildValidatorFactory().getValidator();
+
+    /**
+     * 全部校验
+     */
+    private static Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+
+    /**
+     * 注解验证参数(校验到失败就结束)
+     * @param obj
+     */
+    public static <T> void fastFailValidate(T obj) {
+        Set<ConstraintViolation<T>> constraintViolations = failFastValidator.validate(obj);
+        if (constraintViolations.size() > 0) {
+            throwException(CommonErrorEnum.PARAM_VALID,constraintViolations.iterator().next().getMessage());
+        }
+    }
+
+    /**
+     * 注解验证参数(全部校验,返回异常信息集合)
+     * @param obj
+     */
+    public static <T> List<String> allCheckValidate(T obj) {
+        Set<ConstraintViolation<T>> constraintViolations = validator.validate(obj);
+        if (constraintViolations.size() > 0) {
+            List<String> errorMessages = new LinkedList<String>();
+            Iterator<ConstraintViolation<T>> iterator = constraintViolations.iterator();
+            while (iterator.hasNext()) {
+                ConstraintViolation<T> violation = iterator.next();
+                errorMessages.add(violation.getMessage());
+            }
+            return errorMessages;
+        }
+        return new LinkedList<String>();
+    }
 
     //如果不是true，则抛异常
     public static void isTrue(boolean expression, String msg) {
