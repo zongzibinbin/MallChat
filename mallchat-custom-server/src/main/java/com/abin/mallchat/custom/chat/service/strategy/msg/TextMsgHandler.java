@@ -66,7 +66,7 @@ public class TextMsgHandler extends AbstractMsgHandler {
             AssertUtil.equal(replyMsg.getRoomId(), request.getRoomId(), "只能回复相同会话内的消息");
         }
         if (CollectionUtil.isNotEmpty(body.getAtUidList())) {
-            AssertUtil.isTrue(body.getAtUidList().size() > 10, "一次别艾特这么多人");
+            AssertUtil.isTrue(body.getAtUidList().size() < 10, "一次别艾特这么多人");
             List<Long> atUidList = body.getAtUidList();
             Map<Long, User> batch = userInfoCache.getBatch(atUidList);
             AssertUtil.equal(atUidList.size(), batch.values().size(), "@用户不存在");
