@@ -12,7 +12,7 @@ mybatis-plus:
 spring:
   profiles:
     #运行的环境
-    active: my-prod
+    active: test
   application:
     name: mallchat
   datasource:
@@ -37,8 +37,8 @@ spring:
     database: 0
     # 连接超时时间
     timeout: 1800000
-    # 设置密码
-    password: ${mallchat.redis.password}
+#    # 设置密码
+#    password: ${mallchat.redis.password}
     lettuce:
       pool:
         # 最大阻塞等待时间，负数表示没有限制
@@ -63,3 +63,8 @@ wx:
         secret: ${mallchat.wx.secret} # 公众号的appsecret
         token: ${mallchat.wx.token} # 接口配置里的Token值
         aesKey: ${mallchat.wx.aesKey} # 接口配置里的EncodingAESKey值
+openai:
+  use-openai: true
+  ai-user-id: xxxxx
+  key: xxxxxxx
+  proxy-url: https://xxxxxxx

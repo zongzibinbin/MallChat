@@ -38,6 +38,7 @@ import com.abin.mallchat.custom.chat.service.strategy.mark.MsgMarkFactory;
 import com.abin.mallchat.custom.chat.service.strategy.msg.AbstractMsgHandler;
 import com.abin.mallchat.custom.chat.service.strategy.msg.MsgHandlerFactory;
 import com.abin.mallchat.custom.chat.service.strategy.msg.RecallMsgHandler;
+import com.abin.mallchat.custom.openai.event.OpenAIEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,6 +96,7 @@ public class ChatServiceImpl implements ChatService {
         msgHandler.saveMsg(insert, request);
         //发布消息发送事件
         applicationEventPublisher.publishEvent(new MessageSendEvent(this, insert.getId()));
+        applicationEventPublisher.publishEvent(new OpenAIEvent(this, insert.getId()));
         return insert.getId();
     }
 

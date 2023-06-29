@@ -36,6 +36,11 @@ public class RedisKey {
      */
     public static final String USER_SUMMARY_STRING = "userSummary:uid_%d";
 
+    /**
+     * 用户AI聊天次数
+     */
+    public static final String USER_CHAT_NUM = "userAIChatNum:uid_%d";
+
     public static String getKey(String key, Object... objects) {
         return BASE_KEY + String.format(key, objects);
     }
