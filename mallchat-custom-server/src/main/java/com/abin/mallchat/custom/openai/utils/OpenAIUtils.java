@@ -5,11 +5,13 @@ import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import com.abin.mallchat.common.common.exception.BusinessException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 public class OpenAIUtils {
 
     private static final String URL = "https://api.openai.com/v1/completions";
@@ -73,7 +75,13 @@ public class OpenAIUtils {
     }
 
     public static String parseText(String body) {
+        log.info("body >>> " + body);
         JSONObject jsonObj = new JSONObject(body);
+        JSONObject error = jsonObj.getJSONObject("error");
+        if (error != null) {
+            log.error("error >>> " + error);
+           return "闹脾气了，等会再试试吧~";
+        }
         JSONArray choicesArr = jsonObj.getJSONArray("choices");
         JSONObject choiceObj = choicesArr.getJSONObject(0);
         return choiceObj.getStr("text");
