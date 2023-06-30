@@ -1,11 +1,11 @@
 package com.abin.mallchat.common.common.utils;
 
 import cn.hutool.core.util.ObjectUtil;
-import com.abin.mallchat.common.common.exception.BusinessErrorEnum;
-import com.abin.mallchat.common.common.exception.BusinessException;
-import com.abin.mallchat.common.common.exception.CommonErrorEnum;
-import com.abin.mallchat.common.common.exception.ErrorEnum;
+import com.abin.mallchat.common.common.exception.*;
+import lombok.SneakyThrows;
 import org.hibernate.validator.HibernateValidator;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -43,21 +43,41 @@ public class AssertUtil {
     }
 
     /**
-     * 注解验证参数(全部校验,返回异常信息集合)
+     * 注解验证参数(全部校验,抛出异常)
      * @param obj
      */
-    public static <T> List<String> allCheckValidate(T obj) {
+    public static <T> void allCheckValidateThrow(T obj) {
         Set<ConstraintViolation<T>> constraintViolations = validator.validate(obj);
         if (constraintViolations.size() > 0) {
-            List<String> errorMessages = new LinkedList<String>();
+            StringBuilder errorMsg = new StringBuilder();
             Iterator<ConstraintViolation<T>> iterator = constraintViolations.iterator();
             while (iterator.hasNext()) {
                 ConstraintViolation<T> violation = iterator.next();
-                errorMessages.add(violation.getMessage());
+                //拼接异常信息
+                errorMsg.append(violation.getPropertyPath().toString()).append(":").append(violation.getMessage()).append(",");
+            }
+            //去掉最后一个逗号
+            throwException(errorMsg.toString().substring(0,errorMsg.length()-1));
+        }
+    }
+
+
+    /**
+     * 注解验证参数(全部校验,返回异常信息集合)
+     * @param obj
+     */
+    public static <T> Map<String,String> allCheckValidate(T obj) {
+        Set<ConstraintViolation<T>> constraintViolations = validator.validate(obj);
+        if (constraintViolations.size() > 0) {
+            Map<String,String> errorMessages= new HashMap<>();
+            Iterator<ConstraintViolation<T>> iterator = constraintViolations.iterator();
+            while (iterator.hasNext()) {
+                ConstraintViolation<T> violation = iterator.next();
+                errorMessages.put(violation.getPropertyPath().toString(),violation.getMessage());
             }
             return errorMessages;
         }
-        return new LinkedList<String>();
+        return new HashMap<>();
     }
 
     //如果不是true，则抛异常
