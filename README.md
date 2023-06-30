@@ -10,6 +10,7 @@ MallChat的后端项目，是一个既能购物又能即时聊天的电商系统
     <a href="https://github.com/Evansy/MallChatWeb"><img src="https://img.shields.io/badge/前端-项目地址-blueviolet.svg?style=plasticr"></a>
 </p>
 
+[![UNIT TEST](https://github.com/zongzibinbin/MallChat/actions/workflows/unittest.yml/badge.svg?branch=main)](https://github.com/zhongzhibinbin/MallChat/actions/workflows/unittest.yml)
 
 ## 项目导航
 
