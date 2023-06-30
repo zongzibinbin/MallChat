@@ -28,4 +28,12 @@ public class MessageExtra implements Serializable {
     private MsgRecall recall;
     //艾特的uid
     private List<Long> atUidList;
+    //文件消息
+    private FileMsgDTO fileMsg;
+    //图片消息
+    private ImgMsgDTO imgMsgDTO;
+    //语音消息
+    private SoundMsgDTO soundMsgDTO;
+    //文件消息
+    private VideoMsgDTO videoMsgDTO;
 }

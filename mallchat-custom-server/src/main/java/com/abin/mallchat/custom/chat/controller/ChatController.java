@@ -15,7 +15,6 @@ import com.abin.mallchat.custom.user.service.impl.UserServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +22,6 @@ import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -59,20 +57,6 @@ public class ChatController {
         return ApiResult.success(memberPage);
     }
 
-    @GetMapping("/public/member/page/v1")
-    @ApiOperation("群成员列表/v1")
-    @FrequencyControl(time = 120, count = 20, target = FrequencyControl.Target.IP)
-    public ApiResult<CursorPageBaseResp<ChatMemberRespV1>> getMemberPage1(@Valid CursorPageBaseReq request) {
-        CursorPageBaseResp<ChatMemberResp> memberPage = chatService.getMemberPage(request);
-        filterBlackMember(memberPage);
-        List<ChatMemberRespV1> collect = memberPage.getList().stream().map(a -> {
-            ChatMemberRespV1 v1 = new ChatMemberRespV1();
-            BeanUtils.copyProperties(a, v1);
-            return v1;
-        }).collect(Collectors.toList());
-        return ApiResult.success(CursorPageBaseResp.init(memberPage, collect));
-    }
-
     @GetMapping("/member/list")
     @ApiOperation("房间内的所有群成员列表-@专用")
     public ApiResult<List<ChatMemberListResp>> getMemberList(@Valid ChatMessageMemberReq chatMessageMemberReq) {
@@ -97,20 +81,6 @@ public class ChatController {
     @Autowired
     private UserServiceImpl userService;
 
-    @GetMapping("/public/msg/page/v1")
-    @ApiOperation("消息列表/v1")
-    @FrequencyControl(time = 120, count = 20, target = FrequencyControl.Target.IP)
-    public ApiResult<CursorPageBaseResp<ChatMessageRespV1>> getMsgPage(@Valid ChatMessagePageReq request) {
-        CursorPageBaseResp<ChatMessageResp> msgPage = chatService.getMsgPage(request, RequestHolder.get().getUid());
-        filterBlackMsg(msgPage);
-        List<ChatMessageRespV1> collect = msgPage.getList().stream().map(a -> {
-            ChatMessageRespV1 v1 = new ChatMessageRespV1();
-            BeanUtils.copyProperties(a, v1);
-            return v1;
-        }).collect(Collectors.toList());
-        return ApiResult.success(CursorPageBaseResp.init(msgPage, collect));
-    }
-
     @GetMapping("/public/msg/page")
     @ApiOperation("消息列表")
     @FrequencyControl(time = 120, count = 20, target = FrequencyControl.Target.IP)
@@ -129,7 +99,7 @@ public class ChatController {
 
     @PostMapping("/msg")
     @ApiOperation("发送消息")
-    @FrequencyControl(time = 5, count = 2, target = FrequencyControl.Target.UID)
+    @FrequencyControl(time = 5, count = 3, target = FrequencyControl.Target.UID)
     @FrequencyControl(time = 30, count = 5, target = FrequencyControl.Target.UID)
     @FrequencyControl(time = 60, count = 10, target = FrequencyControl.Target.UID)
     public ApiResult<ChatMessageResp> sendMsg(@Valid @RequestBody ChatMessageReq request) {

@@ -5,10 +5,10 @@ import com.abin.mallchat.common.sensitive.dao.SensitiveWordDao;
 import com.abin.mallchat.common.sensitive.domain.SensitiveWord;
 import com.abin.mallchat.common.sensitive.service.ISensitiveWordService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
 import java.util.List;

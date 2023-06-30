@@ -1,6 +1,7 @@
 package com.abin.mallchat.custom.chat.service.strategy.msg;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import com.abin.mallchat.common.chat.dao.MessageDao;
 import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.chat.domain.entity.msg.MessageExtra;
@@ -20,7 +21,6 @@ import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessageReq;
 import com.abin.mallchat.custom.chat.domain.vo.request.msg.TextMsgReq;
 import com.abin.mallchat.custom.chat.domain.vo.response.msg.TextMsgResp;
 import com.abin.mallchat.custom.chat.service.adapter.MessageAdapter;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -65,7 +65,7 @@ public class TextMsgHandler extends AbstractMsgHandler {
             AssertUtil.isNotEmpty(replyMsg, "回复消息不存在");
             AssertUtil.equal(replyMsg.getRoomId(), request.getRoomId(), "只能回复相同会话内的消息");
         }
-        if (CollectionUtils.isNotEmpty(body.getAtUidList())) {
+        if (CollectionUtil.isNotEmpty(body.getAtUidList())) {
             AssertUtil.isTrue(body.getAtUidList().size() > 10, "一次别艾特这么多人");
             List<Long> atUidList = body.getAtUidList();
             Map<Long, User> batch = userInfoCache.getBatch(atUidList);
@@ -96,7 +96,7 @@ public class TextMsgHandler extends AbstractMsgHandler {
         Map<String, String> urlTitleMap = URL_TITLE_DISCOVER.getContentTitleMap(body.getContent());
         extra.setUrlTitleMap(urlTitleMap);
         //艾特功能
-        if (CollectionUtils.isNotEmpty(body.getAtUidList())) {
+        if (CollectionUtil.isNotEmpty(body.getAtUidList())) {
             extra.setAtUidList(body.getAtUidList());
 
         }

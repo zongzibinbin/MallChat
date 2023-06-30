@@ -9,6 +9,8 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -28,13 +30,19 @@ public class LockService {
         try {
             return supplier.get();//执行锁内的代码逻辑
         } finally {
-            lock.unlock();
+            if (lock.isLocked() && lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
         }
     }
 
     @SneakyThrows
     public <T> T executeWithLock(String key, int waitTime, TimeUnit unit, Supplier<T> supplier) {
         return executeWithLockThrows(key, waitTime, unit, supplier::get);
+    }
+
+    public <T> T executeWithLock(String key, Supplier<T> supplier) {
+        return executeWithLock(key, -1, TimeUnit.MILLISECONDS, supplier);
     }
 
     @FunctionalInterface
@@ -46,5 +54,16 @@ public class LockService {
          * @return a result
          */
         T get() throws Throwable;
+    }
+
+
+    public static void main(String[] args) {
+        List<String> sensitiveList = Arrays.asList("abcd", "abcbba", "adabca");
+        String text = "abcdefg";
+        for (String s : sensitiveList) {
+            boolean hit = text.contains(s);
+            System.out.println(hit);
+        }
+
     }
 }

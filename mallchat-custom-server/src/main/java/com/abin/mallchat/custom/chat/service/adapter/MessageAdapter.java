@@ -32,6 +32,7 @@ public class MessageAdapter {
         return Message.builder()
                 .fromUid(uid)
                 .roomId(request.getRoomId())
+                .type(request.getMsgType())
                 .status(MessageStatusEnum.NORMAL.getStatus())
                 .build();
 

@@ -16,8 +16,12 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Getter
 public enum MessageTypeEnum {
-    TEXT(1, "正常"),
+    TEXT(1, "正常消息"),
     RECALL(2, "撤回消息"),
+    IMG(3, "图片"),
+    FILE(4, "文件"),
+    SOUND(5, "语音"),
+    VIDEO(6, "视频"),
     ;
 
     private final Integer type;
