@@ -44,7 +44,7 @@ public class SoundMsgHandler extends AbstractMsgHandler {
 
     @Override
     public Object showMsg(Message msg) {
-        return msg.getExtra().getFileMsg();
+        return msg.getExtra().getSoundMsgDTO();
     }
 
     @Override
