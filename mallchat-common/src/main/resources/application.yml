@@ -38,7 +38,7 @@ spring:
     # 连接超时时间
     timeout: 1800000
 #    # 设置密码
-#    password: ${mallchat.redis.password}
+    password: ${mallchat.redis.password}
     lettuce:
       pool:
         # 最大阻塞等待时间，负数表示没有限制
