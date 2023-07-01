@@ -1,6 +1,7 @@
 package com.abin.mallchat.custom.common.intecepter;
 
 import com.abin.mallchat.common.common.constant.MDCKey;
+import com.abin.mallchat.common.common.utils.UUIDUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 
@@ -20,7 +21,7 @@ public class HttpTraceIdFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        String tid = UUID.randomUUID().toString();
+        String tid = UUIDUtil.getId();
         MDC.put(MDCKey.TID, tid);
         chain.doFilter(request, response);
     }

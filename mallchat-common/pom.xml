@@ -112,6 +112,11 @@
             <groupId>io.minio</groupId>
             <artifactId>minio</artifactId>
         </dependency>
+        <!--UUID生成器-->
+        <dependency>
+            <groupId>com.github.yitter</groupId>
+            <artifactId>yitter-idgenerator</artifactId>
+        </dependency>
         <!-- Used for unit testing -->
         <dependency>
             <groupId>junit</groupId>
