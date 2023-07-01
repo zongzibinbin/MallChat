@@ -1,5 +1,8 @@
 package com.abin.mallchat.custom.user.websocket;
 
+import com.abin.mallchat.custom.common.handshake.HandshakeEvent;
+import com.abin.mallchat.custom.common.handshake.HandshakeHandler;
+import com.abin.mallchat.custom.common.handshake.HandshakePredicate;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -17,7 +20,9 @@ import io.netty.handler.stream.ChunkedWriteHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.NettyRuntime;
 import io.netty.util.concurrent.Future;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
@@ -25,7 +30,17 @@ import javax.annotation.PreDestroy;
 
 @Slf4j
 @Configuration
+@RequiredArgsConstructor
 public class NettyWebSocketServer {
+
+    /**
+     * 握手鉴权处理类
+     *
+     * @Author Macro Chen
+     * @see HandshakeHandler
+     */
+    private final HandshakeHandler handshakeHandler;
+
     public static final int WEB_SOCKET_PORT = 8090;
     // 创建线程池执行器
     private EventLoopGroup bossGroup = new NioEventLoopGroup(1);
@@ -90,6 +105,8 @@ public class NettyWebSocketServer {
                          *      是通过一个状态码 101 来切换的
                          */
                         pipeline.addLast(new WebSocketServerProtocolHandler("/"));
+                        // 添加ws握手鉴权
+                        pipeline.addLast(handshakeHandler);
                         // 自定义handler ，处理业务逻辑
                         pipeline.addLast(new NettyWebSocketServerHandler());
                     }

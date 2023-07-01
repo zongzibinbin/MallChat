@@ -1,6 +1,7 @@
 package com.abin.mallchat.common.common.domain.vo.response;
 
 import com.abin.mallchat.common.common.exception.ErrorEnum;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -49,6 +50,14 @@ public class ApiResult<T> {
         result.setSuccess(Boolean.FALSE);
         result.setErrCode(errorEnum.getErrorCode());
         result.setErrMsg(errorEnum.getErrorMsg());
+        return result;
+    }
+
+    public static <T> ApiResult<T> unauthorized() {
+        ApiResult<T> result = new ApiResult<T>();
+        result.setSuccess(Boolean.FALSE);
+        result.setErrCode(HttpResponseStatus.UNAUTHORIZED.code());
+        result.setErrMsg(HttpResponseStatus.UNAUTHORIZED.reasonPhrase());
         return result;
     }
 
