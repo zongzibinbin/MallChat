@@ -1,4 +1,4 @@
-package com.abin.mallchat.custom.openai.utils;
+package com.abin.mallchat.custom.chatai.utils;
 
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
-public class OpenAIUtils {
+public class ChatGPTUtils {
 
     private static final String URL = "https://api.openai.com/v1/completions";
 
@@ -56,7 +56,7 @@ public class OpenAIUtils {
 
     private String proxyUrl;
 
-    public OpenAIUtils(String key) {
+    public ChatGPTUtils(String key) {
         HashMap<String, String> _headers_ = new HashMap<>();
         _headers_.put("Content-Type", "application/json");
         if (StringUtils.isBlank(key)) {
@@ -66,8 +66,8 @@ public class OpenAIUtils {
         this.headers = _headers_;
     }
 
-    public static OpenAIUtils create(String key) {
-        return new OpenAIUtils(key);
+    public static ChatGPTUtils create(String key) {
+        return new ChatGPTUtils(key);
     }
 
     public static String parseText(HttpResponse response) {
@@ -87,47 +87,47 @@ public class OpenAIUtils {
         return choiceObj.getStr("text");
     }
 
-    public OpenAIUtils model(String model) {
+    public ChatGPTUtils model(String model) {
         this.model = model;
         return this;
     }
 
-    public OpenAIUtils timeout(int timeout) {
+    public ChatGPTUtils timeout(int timeout) {
         this.timeout = timeout;
         return this;
     }
 
-    public OpenAIUtils maxTokens(int maxTokens) {
+    public ChatGPTUtils maxTokens(int maxTokens) {
         this.maxTokens = maxTokens;
         return this;
     }
 
-    public OpenAIUtils temperature(int temperature) {
+    public ChatGPTUtils temperature(int temperature) {
         this.temperature = temperature;
         return this;
     }
 
-    public OpenAIUtils topP(int topP) {
+    public ChatGPTUtils topP(int topP) {
         this.topP = topP;
         return this;
     }
 
-    public OpenAIUtils frequencyPenalty(int frequencyPenalty) {
+    public ChatGPTUtils frequencyPenalty(int frequencyPenalty) {
         this.frequencyPenalty = frequencyPenalty;
         return this;
     }
 
-    public OpenAIUtils presencePenalty(int presencePenalty) {
+    public ChatGPTUtils presencePenalty(int presencePenalty) {
         this.presencePenalty = presencePenalty;
         return this;
     }
 
-    public OpenAIUtils prompt(String prompt) {
+    public ChatGPTUtils prompt(String prompt) {
         this.prompt = prompt;
         return this;
     }
 
-    public OpenAIUtils proxyUrl(String proxyUrl) {
+    public ChatGPTUtils proxyUrl(String proxyUrl) {
         this.proxyUrl = proxyUrl;
         return this;
     }
@@ -149,7 +149,7 @@ public class OpenAIUtils {
     }
 
     public static void main(String[] args) {
-        HttpResponse send = OpenAIUtils.create("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")
+        HttpResponse send = ChatGPTUtils.create("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")
                 .timeout(30 * 1000)
                 .prompt("Spring的启动流程是什么")
                 .send();

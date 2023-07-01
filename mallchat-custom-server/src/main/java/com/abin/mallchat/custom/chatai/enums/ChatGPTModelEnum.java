@@ -1,4 +1,4 @@
-package com.abin.mallchat.custom.openai.enums;
+package com.abin.mallchat.custom.chatai.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Getter
-public enum OpenAIModelEnums {
+public enum ChatGPTModelEnum {
     // chat
     GPT_35_TURBO("gpt-3.5-turbo", 3, 40000),
     GPT_35_TURBO_0301("gpt-3.5-turbo-0301", 3, 40000),
@@ -79,13 +79,13 @@ public enum OpenAIModelEnums {
      */
     private final Integer TPM;
 
-    private static final Map<String, OpenAIModelEnums> cache;
+    private static final Map<String, ChatGPTModelEnum> cache;
 
     static {
-        cache = Arrays.stream(OpenAIModelEnums.values()).collect(Collectors.toMap(OpenAIModelEnums::getName, Function.identity()));
+        cache = Arrays.stream(ChatGPTModelEnum.values()).collect(Collectors.toMap(ChatGPTModelEnum::getName, Function.identity()));
     }
 
-    public static OpenAIModelEnums of(String name) {
+    public static ChatGPTModelEnum of(String name) {
         return cache.get(name);
     }
 

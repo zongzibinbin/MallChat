@@ -11,9 +11,13 @@ import javax.validation.constraints.NotNull;
 
 
 /**
+ * 聊天信息点播
  * Description: 消息发送请求体
  * Author: <a href="https://github.com/zongzibinbin">abin</a>
  * Date: 2023-03-23
+ *
+ * @author zhaoyuhang
+ * @date 2023/06/30
  */
 @Data
 @Builder
