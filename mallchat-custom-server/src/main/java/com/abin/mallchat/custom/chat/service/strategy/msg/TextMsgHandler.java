@@ -57,8 +57,7 @@ public class TextMsgHandler extends AbstractMsgHandler {
     @Override
     public void checkMsg(ChatMessageReq request, Long uid) {
         TextMsgReq body = BeanUtil.toBean(request.getBody(), TextMsgReq.class);
-        AssertUtil.isNotEmpty(body.getContent(), "内容不能为空");
-        AssertUtil.isTrue(body.getContent().length() < 500, "消息内容过长，服务器扛不住啊，兄dei");
+        AssertUtil.allCheckValidateThrow(body);
         //校验下回复消息
         if (Objects.nonNull(body.getReplyMsgId())) {
             Message replyMsg = messageDao.getById(body.getReplyMsgId());

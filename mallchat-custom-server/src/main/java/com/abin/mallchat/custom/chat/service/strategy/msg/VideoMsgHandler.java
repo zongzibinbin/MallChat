@@ -6,6 +6,7 @@ import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.chat.domain.entity.msg.MessageExtra;
 import com.abin.mallchat.common.chat.domain.entity.msg.VideoMsgDTO;
 import com.abin.mallchat.common.chat.domain.enums.MessageTypeEnum;
+import com.abin.mallchat.common.common.utils.AssertUtil;
 import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessageReq;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,6 +30,8 @@ public class VideoMsgHandler extends AbstractMsgHandler {
 
     @Override
     public void checkMsg(ChatMessageReq request, Long uid) {
+        VideoMsgDTO body = BeanUtil.toBean(request.getBody(), VideoMsgDTO.class);
+        AssertUtil.allCheckValidateThrow(body);
     }
 
     @Override
