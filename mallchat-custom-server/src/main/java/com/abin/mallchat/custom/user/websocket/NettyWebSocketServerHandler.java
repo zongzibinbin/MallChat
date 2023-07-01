@@ -66,6 +66,7 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
             }
         } else if (evt == WebSocketServerProtocolHandler.ServerHandshakeStateEvent.HANDSHAKE_COMPLETE) {
             getService().connect(ctx.channel());
+            getService().authorize(ctx.channel(), new WSAuthorize(NettyUtil.getAttr(ctx.channel(), NettyUtil.TOKEN)));
         }
         super.userEventTriggered(ctx, evt);
     }
@@ -92,10 +93,7 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
                 log.info("请求二维码 = " + msg.text());
                 break;
             case HEARTBEAT:
-                break;
-            case AUTHORIZE:
-                getService().authorize(ctx.channel(), JSONUtil.toBean(wsBaseReq.getData(), WSAuthorize.class));
-                log.info("主动认证 = " + msg.text());
+                log.info("心跳");
                 break;
             default:
                 log.info("未知类型");

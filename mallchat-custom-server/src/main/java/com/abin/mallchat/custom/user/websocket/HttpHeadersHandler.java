@@ -10,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.net.InetSocketAddress;
 
 public class HttpHeadersHandler extends ChannelInboundHandlerAdapter {
-    private AttributeKey<String> key = AttributeKey.valueOf("Id");
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -22,6 +21,8 @@ public class HttpHeadersHandler extends ChannelInboundHandlerAdapter {
                 ip = address.getAddress().getHostAddress();
             }
             NettyUtil.setAttr(ctx.channel(), NettyUtil.IP, ip);
+            String token = headers.get("token");
+            NettyUtil.setAttr(ctx.channel(), NettyUtil.TOKEN, token);
         }
         ctx.fireChannelRead(msg);
     }
