@@ -86,6 +86,7 @@ public class TextMsgHandler extends AbstractMsgHandler {
         update.setContent(SensitiveWordUtils.filter(body.getContent()));
         update.setExtra(extra);
         //如果有回复消息
+
         if (Objects.nonNull(body.getReplyMsgId())) {
             Integer gapCount = messageDao.getGapCount(request.getRoomId(), body.getReplyMsgId(), msg.getId());
             update.setGapCount(gapCount);
