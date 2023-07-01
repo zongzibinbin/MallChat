@@ -93,7 +93,10 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
                 log.info("请求二维码 = " + msg.text());
                 break;
             case HEARTBEAT:
-                log.info("心跳");
+                break;
+            case AUTHORIZE:
+                getService().authorize(ctx.channel(), JSONUtil.toBean(wsBaseReq.getData(), WSAuthorize.class));
+                log.info("主动认证 = " + msg.text());
                 break;
             default:
                 log.info("未知类型");
