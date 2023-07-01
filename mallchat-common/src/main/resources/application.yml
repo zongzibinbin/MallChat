@@ -65,11 +65,11 @@ wx:
         aesKey: ${mallchat.wx.aesKey} # 接口配置里的EncodingAESKey值
 chatai:
   chatgpt:
-    use: true
-    AIUserId: 10450
-    key: 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
+    use: false
+    AIUserId: 10452
+    key: xxxxx
   chatglm2:
-    use: true
-    url: http://vastmiao.natapp1.cc
+    use: false
+    url: xxxxx
     minute: 3 # 每个用户每3分钟可以请求一次
     AIUserId: 10451

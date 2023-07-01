@@ -141,6 +141,8 @@ public class ChatGPTUtils {
         param.set("top_p", topP);
         param.set("frequency_penalty", frequencyPenalty);
         param.set("presence_penalty", presencePenalty);
+        log.info("headers >>> " + headers);
+        log.info("param >>> " + param);
         return HttpUtil.createPost(StringUtils.isNotBlank(proxyUrl) ? proxyUrl : URL)
                 .addHeaders(headers)
                 .body(param.toString())

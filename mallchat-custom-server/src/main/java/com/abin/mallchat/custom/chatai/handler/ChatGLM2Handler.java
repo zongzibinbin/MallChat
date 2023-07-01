@@ -28,7 +28,7 @@ public class ChatGLM2Handler extends AbstractChatAIHandler {
             "没给钱，矿工了。。。。",
             "服务器被你们玩儿坏了。。。。",
             "你们这群人，我都不想理你们了。。。。",
-            "还艾特我呢？那是另外的价钱。。。。",
+            "艾特我那是另外的价钱。。。。",
             "得加钱");
 
 
@@ -67,6 +67,7 @@ public class ChatGLM2Handler extends AbstractChatAIHandler {
                         .create()
                         .url(glm2Properties.getUrl())
                         .prompt(content)
+                        .timeout(glm2Properties.getTimeout())
                         .send();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -123,7 +124,7 @@ public class ChatGLM2Handler extends AbstractChatAIHandler {
 //        if (CollectionUtils.isEmpty(extra.getAtUidList())) {
 //            return false;
 //        }
-//        if (!extra.getAtUidList().contains(ChatAIServiceImpl.AI_USER_ID)) {
+//        if (!extra.getAtUidList().contains(glm2Properties.getAIUserId())) {
 //            return false;
 //        }
 

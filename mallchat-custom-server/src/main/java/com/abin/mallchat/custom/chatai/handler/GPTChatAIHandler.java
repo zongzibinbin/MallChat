@@ -36,26 +36,38 @@ public class GPTChatAIHandler extends AbstractChatAIHandler {
 
     @Override
     protected String doChat(Message message) {
-        String content = message.getContent().replace("@" +chatGPTProperties.getAIUserName(), "").trim();
+        String content = message.getContent().replace("@" + chatGPTProperties.getAIUserName(), "").trim();
         Long uid = message.getFromUid();
         Long chatNum;
         String text;
-        if ((chatNum = userChatNumInrc(uid)) > chatGPTProperties.getLimit()) {
+        if ((chatNum = getUserChatNum(uid)) > chatGPTProperties.getLimit()) {
             text = "你今天已经和我聊了" + chatNum + "次了，我累了，明天再聊吧";
         } else {
-            HttpResponse response = ChatGPTUtils.create(chatGPTProperties.getKey())
-                    .proxyUrl(chatGPTProperties.getProxyUrl())
-                    .model(chatGPTProperties.getModelName())
-                    .prompt(content)
-                    .send();
-            text = ChatGPTUtils.parseText(response);
+            HttpResponse response = null;
+            try {
+                response = ChatGPTUtils.create(chatGPTProperties.getKey())
+                        .proxyUrl(chatGPTProperties.getProxyUrl())
+                        .model(chatGPTProperties.getModelName())
+                        .prompt(content)
+                        .send();
+                text = ChatGPTUtils.parseText(response);
+                userChatNumInrc(uid);
+            } catch (Exception e) {
+                e.printStackTrace();
+                text = "我累了，明天再聊吧";
+            }
         }
         return text;
     }
 
     private Long userChatNumInrc(Long uid) {
-        //todo:白名单
         return RedisUtils.inc(RedisKey.getKey(RedisKey.USER_CHAT_NUM, uid), DateUtils.getEndTimeByToday().intValue(), TimeUnit.MILLISECONDS);
+    }
+
+    private Long getUserChatNum(Long uid) {
+        Long num = RedisUtils.get(RedisKey.getKey(RedisKey.USER_CHAT_NUM, uid), Long.class);
+        return num == null ? 0 : num;
+
     }
 
 
@@ -73,7 +85,7 @@ public class GPTChatAIHandler extends AbstractChatAIHandler {
 //        if (CollectionUtils.isEmpty(extra.getAtUidList())) {
 //            return false;
 //        }
-//        if (!extra.getAtUidList().contains(ChatAIServiceImpl.AI_USER_ID)) {
+//        if (!extra.getAtUidList().contains(chatGPTProperties.getAIUserId())) {
 //            return false;
 //        }
 

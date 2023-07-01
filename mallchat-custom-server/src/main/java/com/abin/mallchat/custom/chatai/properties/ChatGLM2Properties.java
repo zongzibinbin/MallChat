@@ -36,8 +36,13 @@ public class ChatGLM2Properties {
     private String AIUserName;
 
     /**
-     * 每个用户每3分钟可以请求一次
+     * 每个用户每?分钟可以请求一次
      */
     private Long minute = 3L;
+
+    /**
+     * 超时
+     */
+    private Integer timeout = 60*1000;
 
 }

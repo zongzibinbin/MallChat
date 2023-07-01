@@ -42,8 +42,6 @@ public class ChatGLM2Utils {
     }
 
 
-
-
     public ChatGLM2Utils url(String url) {
         this.url = url;
         return this;
@@ -59,6 +57,7 @@ public class ChatGLM2Utils {
         this.prompt = prompt;
         return this;
     }
+
     public HttpResponse send() {
         JSONObject param = new JSONObject();
         param.set("prompt", prompt);
