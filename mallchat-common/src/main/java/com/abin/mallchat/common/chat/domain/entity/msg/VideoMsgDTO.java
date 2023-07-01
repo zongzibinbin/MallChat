@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 /**
  * Description: 视频消息入参
@@ -23,20 +22,23 @@ import java.math.BigDecimal;
 public class VideoMsgDTO implements Serializable {
     private static final long serialVersionUID = 1L;
     @ApiModelProperty("大小（字节）")
+    @NotNull
     private Long size;
 
     @ApiModelProperty("下载地址")
+    @NotBlank
     private String url;
 
     @ApiModelProperty("缩略图宽度（像素）")
     @NotNull
-    private Integer thumbWidth = BigDecimal.ROUND_HALF_DOWN;
+    private Integer thumbWidth;
 
     @ApiModelProperty("缩略图高度（像素）")
     @NotNull
     private Integer thumbHeight;
 
     @ApiModelProperty("缩略图大小（字节）")
+    @NotNull
     private Long thumbSize;
 
     @ApiModelProperty("缩略图下载地址")

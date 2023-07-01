@@ -1,11 +1,11 @@
 package com.abin.mallchat.common.common.utils;
 
 import cn.hutool.core.util.ObjectUtil;
-import com.abin.mallchat.common.common.exception.*;
-import lombok.SneakyThrows;
+import com.abin.mallchat.common.common.exception.BusinessErrorEnum;
+import com.abin.mallchat.common.common.exception.BusinessException;
+import com.abin.mallchat.common.common.exception.CommonErrorEnum;
+import com.abin.mallchat.common.common.exception.ErrorEnum;
 import org.hibernate.validator.HibernateValidator;
-import org.springframework.validation.BindException;
-import org.springframework.validation.BindingResult;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -57,7 +57,7 @@ public class AssertUtil {
                 errorMsg.append(violation.getPropertyPath().toString()).append(":").append(violation.getMessage()).append(",");
             }
             //去掉最后一个逗号
-            throwException(errorMsg.toString().substring(0,errorMsg.length()-1));
+            throwException(CommonErrorEnum.PARAM_VALID, errorMsg.toString().substring(0, errorMsg.length() - 1));
         }
     }
 
