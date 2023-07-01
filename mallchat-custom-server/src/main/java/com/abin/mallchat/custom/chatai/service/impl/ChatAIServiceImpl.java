@@ -17,8 +17,8 @@ public class ChatAIServiceImpl implements IChatAIService {
         if (extra == null) {
             return;
         }
-        AbstractChatAIHandler chatAI = ChatAIHandlerFactory.getChatAIHandlerByName(message.getContent());
-//        AbstractChatAIHandler chatAI = ChatAIHandlerFactory.getChatAIHandlerById(extra.getAtUidList());
+//        AbstractChatAIHandler chatAI = ChatAIHandlerFactory.getChatAIHandlerByName(message.getContent());
+        AbstractChatAIHandler chatAI = ChatAIHandlerFactory.getChatAIHandlerById(extra.getAtUidList());
         if (chatAI != null) {
             chatAI.chat(message);
         }
