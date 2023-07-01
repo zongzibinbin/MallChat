@@ -36,6 +36,16 @@ public class RedisKey {
      */
     public static final String USER_SUMMARY_STRING = "userSummary:uid_%d";
 
+    /**
+     * 用户GPT聊天次数
+     */
+    public static final String USER_CHAT_NUM = "useChatGPTNum:uid_%d";
+
+    /**
+     * 用户上次使用GLM使用时间
+     */
+    public static final String USER_GLM2_TIME_LAST = "userGLM2UseTime:uid_%d";
+
     public static String getKey(String key, Object... objects) {
         return BASE_KEY + String.format(key, objects);
     }
