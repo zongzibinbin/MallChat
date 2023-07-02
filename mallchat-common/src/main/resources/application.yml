@@ -38,7 +38,7 @@ spring:
     # 连接超时时间
     timeout: 1800000
 #    # 设置密码
-#    password: ${mallchat.redis.password}
+    password: ${mallchat.redis.password}
     lettuce:
       pool:
         # 最大阻塞等待时间，负数表示没有限制
@@ -67,9 +67,9 @@ chatai:
   chatgpt:
     use: true
     AIUserId: 10452
-    key: xxxxx
+    key: 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
   chatglm2:
     use: true
-    url: xxxxx
+    url: http://vastmiao.natapp1.cc
     minute: 3 # 每个用户每3分钟可以请求一次
-    AIUserId: 10451
+
