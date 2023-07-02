@@ -1,5 +1,6 @@
 package com.abin.mallchat.custom.user.websocket;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONUtil;
 import com.abin.mallchat.custom.user.domain.enums.WSReqTypeEnum;
@@ -66,6 +67,10 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
             }
         } else if (evt == WebSocketServerProtocolHandler.ServerHandshakeStateEvent.HANDSHAKE_COMPLETE) {
             getService().connect(ctx.channel());
+            String token = NettyUtil.getAttr(ctx.channel(), NettyUtil.TOKEN);
+            if (StrUtil.isNotBlank(token)) {
+                getService().authorize(ctx.channel(), new WSAuthorize(token));
+            }
         }
         super.userEventTriggered(ctx, evt);
     }
