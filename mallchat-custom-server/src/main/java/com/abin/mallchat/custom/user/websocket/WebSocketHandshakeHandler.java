@@ -1,6 +1,8 @@
 package com.abin.mallchat.custom.user.websocket;
 
 
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -19,9 +21,20 @@ public class WebSocketHandshakeHandler extends ChannelInboundHandlerAdapter {
             WebSocketServerHandshakerFactory handshakeFactory = new WebSocketServerHandshakerFactory(
                     request.uri(), token, false);
             WebSocketServerHandshaker handshake = handshakeFactory.newHandshaker(request);
-            handshake.handshake(ctx.channel(), request);
-            // 手动触发WebSocket握手状态事件
-            ctx.pipeline().fireUserEventTriggered(WebSocketServerProtocolHandler.ServerHandshakeStateEvent.HANDSHAKE_COMPLETE);
+            final ChannelFuture handshakeFuture = handshake.handshake(ctx.channel(), request);
+            ctx.pipeline().remove(this);
+            handshakeFuture.addListener(new ChannelFutureListener() {
+                @Override
+                public void operationComplete(ChannelFuture future) {
+                    if (!future.isSuccess()) {
+                        ctx.fireExceptionCaught(future.cause());
+                    } else {
+                        // 手动触发WebSocket握手状态事件
+                        ctx.fireUserEventTriggered(
+                                WebSocketServerProtocolHandler.ServerHandshakeStateEvent.HANDSHAKE_COMPLETE);
+                    }
+                }
+            });
         } else {
             super.channelRead(ctx, msg);
         }

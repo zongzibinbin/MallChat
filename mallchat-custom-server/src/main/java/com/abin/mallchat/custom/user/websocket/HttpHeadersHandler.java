@@ -20,6 +20,7 @@ public class HttpHeadersHandler extends ChannelInboundHandlerAdapter {
                 ip = address.getAddress().getHostAddress();
             }
             NettyUtil.setAttr(ctx.channel(), NettyUtil.IP, ip);
+            ctx.pipeline().remove(this);
         }
         ctx.fireChannelRead(msg);
     }
