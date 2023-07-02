@@ -2,6 +2,7 @@ package com.abin.mallchat.custom.chatai.handler;
 
 import cn.hutool.http.HttpResponse;
 import com.abin.mallchat.common.chat.domain.entity.Message;
+import com.abin.mallchat.common.chat.domain.entity.msg.MessageExtra;
 import com.abin.mallchat.common.common.constant.RedisKey;
 import com.abin.mallchat.common.common.utils.RedisUtils;
 import com.abin.mallchat.custom.chatai.properties.ChatGLM2Properties;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -69,11 +71,11 @@ public class ChatGLM2Handler extends AbstractChatAIHandler {
                         .prompt(content)
                         .timeout(glm2Properties.getTimeout())
                         .send();
+                text = ChatGLM2Utils.parseText(response);
             } catch (Exception e) {
                 e.printStackTrace();
                 return getErrorText();
             }
-            text = ChatGLM2Utils.parseText(response);
             if (StringUtils.isNotBlank(text)) {
                 RedisUtils.set(RedisKey.getKey(USER_GLM2_TIME_LAST, uid), new Date(), glm2Properties.getMinute(), TimeUnit.MINUTES);
             }
@@ -116,17 +118,16 @@ public class ChatGLM2Handler extends AbstractChatAIHandler {
             return false;
         }
         /* 前端传@信息后取消注释 */
-
-//        MessageExtra extra = message.getExtra();
-//        if (extra == null) {
-//            return false;
-//        }
-//        if (CollectionUtils.isEmpty(extra.getAtUidList())) {
-//            return false;
-//        }
-//        if (!extra.getAtUidList().contains(glm2Properties.getAIUserId())) {
-//            return false;
-//        }
+        MessageExtra extra = message.getExtra();
+        if (extra == null) {
+            return false;
+        }
+        if (CollectionUtils.isEmpty(extra.getAtUidList())) {
+            return false;
+        }
+        if (!extra.getAtUidList().contains(glm2Properties.getAIUserId())) {
+            return false;
+        }
 
         if (StringUtils.isBlank(message.getContent())) {
             return false;
