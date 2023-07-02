@@ -63,3 +63,14 @@ wx:
         secret: ${mallchat.wx.secret} # 公众号的appsecret
         token: ${mallchat.wx.token} # 接口配置里的Token值
         aesKey: ${mallchat.wx.aesKey} # 接口配置里的EncodingAESKey值
+chatai:
+  chatgpt:
+    use: ${mallchat.chatgpt.use}
+    AIUserId: ${mallchat.chatgpt.uid}
+    key: ${mallchat.chatgpt.key}
+    proxyUrl: ${mallchat.chatgpt.proxyUrl}
+  chatglm2:
+    use: ${mallchat.chatglm2.use}
+    url: ${mallchat.chatglm2.url}
+    minute: 3 # 每个用户每3分钟可以请求一次
+    AIUserId: ${mallchat.chatglm2.uid}
