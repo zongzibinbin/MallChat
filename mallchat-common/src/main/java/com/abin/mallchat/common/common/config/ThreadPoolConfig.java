@@ -1,9 +1,6 @@
 package com.abin.mallchat.common.common.config;
 
-import cn.hutool.core.thread.NamedThreadFactory;
-import cn.hutool.core.thread.ThreadFactoryBuilder;
 import com.abin.mallchat.common.common.factory.MyThreadFactory;
-import com.abin.mallchat.common.common.handler.GlobalUncaughtExceptionHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -11,9 +8,7 @@ import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.*;
 
 /**
  * Description: 线程池配置
@@ -31,6 +26,9 @@ public class ThreadPoolConfig implements AsyncConfigurer {
      * websocket通信线程池
      */
     public static final String WS_EXECUTOR = "websocketExecutor";
+
+
+    public static final String AICHAT_EXECUTOR = "aichatExecutor";
 
     @Override
     public Executor getAsyncExecutor() {
@@ -64,5 +62,15 @@ public class ThreadPoolConfig implements AsyncConfigurer {
         return executor;
     }
 
-
+    @Bean(AICHAT_EXECUTOR)
+    public ThreadPoolTaskExecutor chatAiExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(10);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(15);
+        executor.setThreadNamePrefix("aichat-executor-");
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());//满了直接丢弃，默认为不重要消息推送
+        executor.setThreadFactory(new MyThreadFactory(executor));
+        return executor;
+    }
 }
