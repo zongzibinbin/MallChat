@@ -4,13 +4,11 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.util.AttributeKey;
 import org.apache.commons.lang3.StringUtils;
 
 import java.net.InetSocketAddress;
 
 public class HttpHeadersHandler extends ChannelInboundHandlerAdapter {
-    private AttributeKey<String> key = AttributeKey.valueOf("Id");
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
