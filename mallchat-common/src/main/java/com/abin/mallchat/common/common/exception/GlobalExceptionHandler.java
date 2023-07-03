@@ -42,7 +42,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = NullPointerException.class)
     public ApiResult exceptionHandler(NullPointerException e) {
-        log.error("null point exception！The reason is:{}", e.getMessage(), e);
+        log.error("null point exception！The reason is: ", e);
         return ApiResult.fail(CommonErrorEnum.SYSTEM_ERROR);
     }
 

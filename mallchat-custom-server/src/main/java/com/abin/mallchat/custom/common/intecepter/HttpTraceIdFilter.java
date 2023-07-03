@@ -23,6 +23,7 @@ public class HttpTraceIdFilter implements Filter {
         String tid = UUID.randomUUID().toString();
         MDC.put(MDCKey.TID, tid);
         chain.doFilter(request, response);
+        MDC.remove(MDCKey.TID);
     }
 
 }
