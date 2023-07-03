@@ -3,7 +3,7 @@ package com.abin.mallchat.common.common.aspect;
 import cn.hutool.core.util.StrUtil;
 import com.abin.mallchat.common.common.annotation.FrequencyControl;
 import com.abin.mallchat.common.common.domain.dto.FrequencyControlDTO;
-import com.abin.mallchat.common.common.service.FrequencyControlService;
+import com.abin.mallchat.common.common.service.frequecycontrol.AbstractFrequencyControlService;
 import com.abin.mallchat.common.common.utils.RequestHolder;
 import com.abin.mallchat.common.common.utils.SpElUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +11,6 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
@@ -28,10 +27,8 @@ import java.util.stream.Collectors;
 @Slf4j
 @Aspect
 @Component
-public class FrequencyControlAspect {
+public class FrequencyControlAspect extends AbstractFrequencyControlService {
 
-    @Autowired
-    private FrequencyControlService frequencyControlService;
 
     @Around("@annotation(com.abin.mallchat.common.common.annotation.FrequencyControl)||@annotation(com.abin.mallchat.common.common.annotation.FrequencyControlContainer)")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -57,7 +54,7 @@ public class FrequencyControlAspect {
         // 将注解的参数转换为编程式调用需要的参数
         List<FrequencyControlDTO> frequencyControlDTOS = keyMap.entrySet().stream().map(entrySet -> buildFrequencyControlDTO(entrySet.getKey(), entrySet.getValue())).collect(Collectors.toList());
         // 调用编程式注解
-        return frequencyControlService.executeWithFrequencyControl(frequencyControlDTOS, joinPoint::proceed, false);
+        return executeWithFrequencyControlList(frequencyControlDTOS, joinPoint::proceed);
     }
 
     /**
@@ -74,5 +71,18 @@ public class FrequencyControlAspect {
         frequencyControlDTO.setUnit(frequencyControl.unit());
         frequencyControlDTO.setKey(key);
         return frequencyControlDTO;
+    }
+
+    /**
+     * @return false表示频控注解的Key是要自己生成的
+     */
+    @Override
+    public boolean generateRedisKey() {
+        return false;
+    }
+
+    @Override
+    public String getKeyPrefix() {
+        return null;
     }
 }
