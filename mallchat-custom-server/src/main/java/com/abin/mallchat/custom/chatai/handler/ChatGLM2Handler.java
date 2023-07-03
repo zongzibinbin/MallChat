@@ -7,6 +7,7 @@ import com.abin.mallchat.common.common.constant.RedisKey;
 import com.abin.mallchat.common.common.utils.RedisUtils;
 import com.abin.mallchat.custom.chatai.properties.ChatGLM2Properties;
 import com.abin.mallchat.custom.chatai.utils.ChatGLM2Utils;
+import com.abin.mallchat.custom.user.domain.vo.response.user.UserInfoResp;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,27 +37,42 @@ public class ChatGLM2Handler extends AbstractChatAIHandler {
 
     private static final Random RANDOM = new Random();
 
+    private static String AI_NAME;
+
     @Autowired
     private ChatGLM2Properties glm2Properties;
+
+    @Override
+    protected void init() {
+        super.init();
+        if (isUse()) {
+            UserInfoResp userInfo = userService.getUserInfo(glm2Properties.getAIUserId());
+            if (userInfo == null) {
+                log.error("根据AIUserId:{} 找不到用户信息", glm2Properties.getAIUserId());
+                throw new RuntimeException("根据AIUserId找不到用户信息");
+            }
+            if (StringUtils.isBlank(userInfo.getName())) {
+                log.warn("根据AIUserId:{} 找到的用户信息没有name", glm2Properties.getAIUserId());
+                throw new RuntimeException("根据AIUserId: " + glm2Properties.getAIUserId() + " 找到的用户没有名字");
+            }
+            AI_NAME = userInfo.getName();
+        }
+    }
+
+    @Override
+    protected boolean isUse() {
+        return glm2Properties.isUse();
+    }
 
     @Override
     public Long getChatAIUserId() {
         return glm2Properties.getAIUserId();
     }
 
-    @Override
-    public String getChatAIName() {
-        if (StringUtils.isNotBlank(glm2Properties.getAIUserName())) {
-            return glm2Properties.getAIUserName();
-        }
-        String name = userService.getUserInfo(glm2Properties.getAIUserId()).getName();
-        glm2Properties.setAIUserName(name);
-        return name;
-    }
 
     @Override
     protected String doChat(Message message) {
-        String content = message.getContent().replace("@" +glm2Properties.getAIUserName(), "").trim();
+        String content = message.getContent().replace("@" + AI_NAME, "").trim();
         Long uid = message.getFromUid();
         Long minute;
         String text;
@@ -73,7 +89,7 @@ public class ChatGLM2Handler extends AbstractChatAIHandler {
                         .send();
                 text = ChatGLM2Utils.parseText(response);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.warn("glm2 doChat warn:", e);
                 return getErrorText();
             }
             if (StringUtils.isNotBlank(text)) {
@@ -132,7 +148,7 @@ public class ChatGLM2Handler extends AbstractChatAIHandler {
         if (StringUtils.isBlank(message.getContent())) {
             return false;
         }
-        return StringUtils.contains(message.getContent(), "@" + glm2Properties.getAIUserName())
-                && StringUtils.isNotBlank(message.getContent().replace(glm2Properties.getAIUserName(), "").trim());
+        return StringUtils.contains(message.getContent(), "@" + AI_NAME)
+                && StringUtils.isNotBlank(message.getContent().replace(AI_NAME, "").trim());
     }
 }

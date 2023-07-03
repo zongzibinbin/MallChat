@@ -31,11 +31,6 @@ public class ChatGLM2Properties {
     private Long AIUserId;
 
     /**
-     * 机器人名称
-     */
-    private String AIUserName;
-
-    /**
      * 每个用户每?分钟可以请求一次
      */
     private Long minute = 3L;

@@ -29,13 +29,21 @@ public abstract class AbstractChatAIHandler {
     protected UserService userService;
 
     @PostConstruct
-    private void init() {
-        ChatAIHandlerFactory.register(getChatAIUserId(), getChatAIName(), this);
+    protected void init() {
+        if (isUse()) {
+            ChatAIHandlerFactory.register(getChatAIUserId(), this);
+        }
     }
+
+    /**
+     * 是否启用
+     *
+     * @return boolean
+     */
+    protected abstract boolean isUse();
+
     // 获取机器人id
     public abstract Long getChatAIUserId();
-    // 获取机器人名称
-    public abstract String getChatAIName();
 
     public void chat(Message message) {
         if (!supports(message)) {
@@ -44,7 +52,7 @@ public abstract class AbstractChatAIHandler {
         threadPoolTaskExecutor.execute(() -> {
             String text = doChat(message);
             if (StringUtils.isNotBlank(text)) {
-                answerMsg(text, message.getRoomId(), message.getFromUid());
+                answerMsg(text, message);
             }
         });
     }
@@ -66,30 +74,34 @@ public abstract class AbstractChatAIHandler {
     protected abstract String doChat(Message message);
 
 
-    protected void answerMsg(String text, Long roomId, Long uid) {
-        UserInfoResp userInfo = userService.getUserInfo(uid);
+    protected void answerMsg(String text, Message replyMessage) {
+        UserInfoResp userInfo = userService.getUserInfo(replyMessage.getFromUid());
         text = "@" + userInfo.getName() + " " + text;
-        if (text.length() < 450) {
-            save(text, roomId, uid);
-        }else {
-            int maxLen = 450;
+        if (text.length() < 800) {
+            save(text, replyMessage);
+        } else {
+            int maxLen = 800;
             int len = text.length();
             int count = (len + maxLen - 1) / maxLen;
 
             for (int i = 0; i < count; i++) {
                 int start = i * maxLen;
                 int end = Math.min(start + maxLen, len);
-                save(text.substring(start, end), roomId, uid);
+                save(text.substring(start, end), replyMessage);
             }
         }
     }
 
-    private void save(String text, Long roomId, Long uid) {
+    private void save(String text, Message replyMessage) {
+        Long roomId = replyMessage.getRoomId();
+        Long uid = replyMessage.getFromUid();
+        Long id = replyMessage.getId();
         ChatMessageReq answerReq = new ChatMessageReq();
         answerReq.setRoomId(roomId);
         answerReq.setMsgType(MessageTypeEnum.TEXT.getType());
         TextMsgReq textMsgReq = new TextMsgReq();
         textMsgReq.setContent(text);
+        textMsgReq.setReplyMsgId(replyMessage.getId());
         textMsgReq.setAtUidList(Collections.singletonList(uid));
         answerReq.setBody(textMsgReq);
         chatService.sendMsg(answerReq, getChatAIUserId());
