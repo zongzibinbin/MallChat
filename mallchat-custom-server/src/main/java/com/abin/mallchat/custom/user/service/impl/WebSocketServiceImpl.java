@@ -29,6 +29,7 @@ import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
@@ -140,7 +141,10 @@ public class WebSocketServiceImpl implements WebSocketService {
         }
     }
 
+    // 这里可以加异步或者事件去处理登录
+    // 因为登录和推送消息其实是不用同步的两个步骤 这样可以加快连接的速度不占用nio线程
     @Override
+    @Async
     public void authorize(Channel channel, WSAuthorize wsAuthorize) {
         //校验token
         boolean verifySuccess = loginService.verify(wsAuthorize.getToken());
