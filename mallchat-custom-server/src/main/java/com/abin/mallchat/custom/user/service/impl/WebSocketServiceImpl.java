@@ -2,7 +2,6 @@ package com.abin.mallchat.custom.user.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.abin.mallchat.common.common.annotation.FrequencyControl;
 import com.abin.mallchat.common.common.config.ThreadPoolConfig;
@@ -117,7 +116,7 @@ public class WebSocketServiceImpl implements WebSocketService {
      */
     private Integer generateLoginCode(Channel channel) {
         do {
-            CODE.set(RandomUtil.randomInt(Integer.MAX_VALUE));
+            CODE.getAndIncrement();
         } while (WAIT_LOGIN_MAP.asMap().containsKey(CODE.get())
                 || Objects.isNull(WAIT_LOGIN_MAP.get(CODE.get(), c -> channel)));
         return CODE.get();
