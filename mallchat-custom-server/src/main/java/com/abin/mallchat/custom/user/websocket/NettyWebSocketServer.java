@@ -10,7 +10,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
-import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
@@ -90,7 +89,6 @@ public class NettyWebSocketServer {
                          *      是通过一个状态码 101 来切换的
                          */
                         pipeline.addLast(new NettyWebSocketServerProtocolHandler("/"));
-                        new WebSocketServerProtocolHandler("/");
                         // 自定义handler ，处理业务逻辑
                         pipeline.addLast(new NettyWebSocketServerHandler());
                     }
