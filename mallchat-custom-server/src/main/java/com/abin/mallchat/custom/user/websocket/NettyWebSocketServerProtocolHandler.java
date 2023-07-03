@@ -8,6 +8,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.Utf8FrameValidator;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolConfig;
@@ -35,6 +36,10 @@ public class NettyWebSocketServerProtocolHandler extends WebSocketServerProtocol
         ChannelPipeline cp = ctx.pipeline();
         if (cp.get(WebSocketHandshakeHandler.class) == null) {
             cp.addBefore(ctx.name(), WebSocketHandshakeHandler.class.getName(), new WebSocketHandshakeHandler(this.webSocketServerProtocolConfig));
+        }
+
+        if (this.webSocketServerProtocolConfig.decoderConfig().withUTF8Validator() && cp.get(Utf8FrameValidator.class) == null) {
+            cp.addBefore(ctx.name(), Utf8FrameValidator.class.getName(), new Utf8FrameValidator(this.webSocketServerProtocolConfig.decoderConfig().closeOnProtocolViolation()));
         }
 
     }
