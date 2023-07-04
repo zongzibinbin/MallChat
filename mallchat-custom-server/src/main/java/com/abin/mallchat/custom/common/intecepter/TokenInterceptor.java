@@ -45,6 +45,11 @@ public class TokenInterceptor implements HandlerInterceptor {
         return true;
     }
 
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        MDC.remove(MDCKey.UID);
+    }
+
     /**
      * 判断是不是公共方法，可以未登录访问的
      *
