@@ -2,6 +2,7 @@ package com.abin.mallchat.custom.chatai.frequencycontrol;
 
 import com.abin.mallchat.common.common.constant.RedisKey;
 import com.abin.mallchat.common.common.service.frequecycontrol.AbstractFrequencyControlService;
+import com.abin.mallchat.common.common.utils.DateUtils;
 import com.abin.mallchat.common.common.utils.RedisUtils;
 import com.abin.mallchat.custom.chatai.dto.FrequencyControlWithUidDTO;
 import com.abin.mallchat.custom.chatai.properties.ChatGPTProperties;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @EqualsAndHashCode(callSuper = true)
 @Slf4j
@@ -37,6 +39,10 @@ public class GPTChatAIHandlerFrequencyController extends AbstractFrequencyContro
 
     @Override
     protected void addFrequencyControlStatisticsCount(Map<String, FrequencyControlWithUidDTO> frequencyControlMap) {
-
+        // 理论上只会有一个
+        FrequencyControlWithUidDTO frequencyControlWithUidDTO = new ArrayList<>(frequencyControlMap.values()).get(0);
+        Long uid = frequencyControlWithUidDTO.getUid();
+        // 增加用户聊天次数
+        RedisUtils.inc(RedisKey.getKey(RedisKey.USER_CHAT_NUM, uid), DateUtils.getEndTimeByToday().intValue(), TimeUnit.MILLISECONDS);
     }
 }

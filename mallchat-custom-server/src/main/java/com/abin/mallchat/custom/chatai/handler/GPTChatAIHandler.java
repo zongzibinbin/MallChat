@@ -80,7 +80,6 @@ public class GPTChatAIHandler extends AbstractChatAIHandler {
 
     private String sendRequestToGPT(GPTRequestDTO gptRequestDTO) {
         String content = gptRequestDTO.getContent();
-        Long uid = gptRequestDTO.getUid();
         String text;
         HttpResponse response = null;
         try {
@@ -91,7 +90,6 @@ public class GPTChatAIHandler extends AbstractChatAIHandler {
                     .prompt(content)
                     .send();
             text = ChatGPTUtils.parseText(response);
-            userChatNumInrc(uid);
         } catch (Exception e) {
             log.warn("gpt doChat warn:", e);
             text=  "我累了，明天再聊吧";
@@ -99,15 +97,7 @@ public class GPTChatAIHandler extends AbstractChatAIHandler {
         return text;
     }
 
-    private Long userChatNumInrc(Long uid) {
-        return RedisUtils.inc(RedisKey.getKey(RedisKey.USER_CHAT_NUM, uid), DateUtils.getEndTimeByToday().intValue(), TimeUnit.MILLISECONDS);
-    }
 
-    private Long getUserChatNum(Long uid) {
-        Long num = RedisUtils.get(RedisKey.getKey(RedisKey.USER_CHAT_NUM, uid), Long.class);
-        return num == null ? 0 : num;
-
-    }
 
 
     @Override

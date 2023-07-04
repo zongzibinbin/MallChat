@@ -107,7 +107,6 @@ public class ChatGLM2Handler extends AbstractChatAIHandler {
     @Nullable
     private String sendRequestToGPT(GPTRequestDTO gptRequestDTO) {
         String content = gptRequestDTO.getContent();
-        Long uid = gptRequestDTO.getUid();
         String text;
         HttpResponse response = null;
         try {
@@ -121,9 +120,6 @@ public class ChatGLM2Handler extends AbstractChatAIHandler {
         } catch (Exception e) {
             log.warn("glm2 doChat warn:", e);
             return getErrorText();
-        }
-        if (StringUtils.isNotBlank(text)) {
-            RedisUtils.set(RedisKey.getKey(USER_GLM2_TIME_LAST, uid), new Date(), glm2Properties.getMinute(), TimeUnit.MINUTES);
         }
         return text;
     }

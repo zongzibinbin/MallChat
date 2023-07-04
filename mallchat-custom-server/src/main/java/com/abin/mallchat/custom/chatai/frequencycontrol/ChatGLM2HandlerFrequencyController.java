@@ -53,6 +53,9 @@ public class ChatGLM2HandlerFrequencyController extends AbstractFrequencyControl
 
     @Override
     protected void addFrequencyControlStatisticsCount(Map<String, FrequencyControlWithUidDTO> frequencyControlMap) {
-
+        // 理论上只会有一个
+        FrequencyControlWithUidDTO frequencyControlWithUidDTO = new ArrayList<>(frequencyControlMap.values()).get(0);
+        Long uid = frequencyControlWithUidDTO.getUid();
+        RedisUtils.set(RedisKey.getKey(USER_GLM2_TIME_LAST, uid), new Date(), glm2Properties.getMinute(), TimeUnit.MINUTES);
     }
 }
