@@ -1,6 +1,6 @@
 package com.abin.mallchat.common.user.mapper;
 
-import com.abin.mallchat.common.chat.domain.entity.McEmojis;
+import com.abin.mallchat.common.chat.domain.entity.UserEmojis;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -9,5 +9,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author: WuShiJie
  * @createTime: 2023/7/3 14:24
  */
-public interface EmojisMapper extends BaseMapper<McEmojis> {
+public interface UserEmojisMapper extends BaseMapper<UserEmojis> {
 }

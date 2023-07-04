@@ -1,12 +1,11 @@
 package com.abin.mallchat.custom.user.controller;
 
-import cn.hutool.core.util.StrUtil;
-import com.abin.mallchat.common.chat.domain.entity.McEmojis;
+import com.abin.mallchat.common.chat.domain.entity.UserEmojis;
 import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
 import com.abin.mallchat.common.common.domain.vo.response.ApiResult;
 import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
 import com.abin.mallchat.common.common.utils.RequestHolder;
-import com.abin.mallchat.custom.user.service.EmojisService;
+import com.abin.mallchat.custom.user.service.UserEmojisService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -22,15 +21,15 @@ import javax.validation.Valid;
  * @createTime: 2023/7/3 14:21
  */
 @RestController
-@RequestMapping("/capi/emojis")
+@RequestMapping("/capi/userEmojis")
 @Api(tags = "用户表情包管理相关接口")
-public class EmojisController {
+public class UserEmojisController {
 
     /**
      * 用户表情包 Service
      */
     @Resource
-    private EmojisService emojisService;
+    private UserEmojisService emojisService;
 
 
     /**
@@ -43,7 +42,7 @@ public class EmojisController {
      **/
     @GetMapping("/getEmojisPage")
     @ApiOperation("表情包列表")
-    public ApiResult<CursorPageBaseResp<McEmojis>> getEmojisPage(@Valid CursorPageBaseReq request) {
+    public ApiResult<CursorPageBaseResp<UserEmojis>> getEmojisPage(@Valid CursorPageBaseReq request) {
         return ApiResult.success(emojisService.getEmojisPage(request, RequestHolder.get().getUid()));
     }
 
@@ -57,14 +56,9 @@ public class EmojisController {
      * @createTime 2023/7/3 14:46
      **/
     @PostMapping("/insertEmojis")
-    @ApiOperation("表情包列表")
-    public ApiResult<McEmojis> insertEmojis(@Valid @RequestBody McEmojis emojis) {
-        emojis.setUserId(RequestHolder.get().getUid());
-        LambdaQueryWrapper<McEmojis> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(McEmojis::getUserId,emojis.getUserId());
-        queryWrapper.eq(McEmojis::getExpressionUrl,emojis.getExpressionUrl());
-        emojisService.saveOrUpdate(emojis, queryWrapper);
-        return ApiResult.success(emojis);
+    @ApiOperation("新增表情包")
+    public ApiResult<UserEmojis> insertEmojis(@Valid @RequestBody UserEmojis emojis) {
+        return emojisService.insertEmojis(emojis,RequestHolder.get().getUid());
     }
 
     /**
@@ -76,7 +70,7 @@ public class EmojisController {
      * @createTime 2023/7/3 14:46
      **/
     @GetMapping("/deleteEmojis")
-    @ApiOperation("表情包列表")
+    @ApiOperation("删除表情包")
     public ApiResult<Void> deleteEmojis(@RequestParam("id") String id) {
         emojisService.removeById(id);
         return ApiResult.success();

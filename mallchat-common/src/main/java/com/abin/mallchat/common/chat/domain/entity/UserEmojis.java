@@ -14,8 +14,8 @@ import java.util.Date;
  * @createTime: 2023/7/2 22:00
  */
 @Data
-@TableName(value = "mc_emojis")
-public class McEmojis implements Serializable {
+@TableName(value = "user_emojis")
+public class UserEmojis implements Serializable {
     private static final long serialVersionUID = -7690290707154737263L;
 
     /**
@@ -27,8 +27,8 @@ public class McEmojis implements Serializable {
     /**
      * 用户表ID
      */
-    @TableField(value = "user_id")
-    private Long userId;
+    @TableField(value = "uid")
+    private Long uid;
 
 
     /**
@@ -50,9 +50,9 @@ public class McEmojis implements Serializable {
     @TableField("update_time")
     private Date updateTime;
 
-    @TableField(value = "del_flg")
+    @TableField(value = "delete_status")
     @TableLogic(value = "0",delval = "1")
-    private Integer delFlg;
+    private Integer deleteStatus;
 
 
 }
