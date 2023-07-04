@@ -4,8 +4,12 @@ import cn.hutool.http.HttpResponse;
 import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.chat.domain.entity.msg.MessageExtra;
 import com.abin.mallchat.common.common.constant.RedisKey;
+import com.abin.mallchat.common.common.exception.FrequencyControlException;
 import com.abin.mallchat.common.common.utils.DateUtils;
 import com.abin.mallchat.common.common.utils.RedisUtils;
+import com.abin.mallchat.custom.chatai.dto.FrequencyControlWithUidDTO;
+import com.abin.mallchat.custom.chatai.dto.GPTRequestDTO;
+import com.abin.mallchat.custom.chatai.frequencycontrol.GPTChatAIHandlerFrequencyController;
 import com.abin.mallchat.custom.chatai.properties.ChatGPTProperties;
 import com.abin.mallchat.custom.chatai.utils.ChatGPTUtils;
 import com.abin.mallchat.custom.user.domain.vo.response.user.UserInfoResp;
@@ -20,6 +24,10 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Component
 public class GPTChatAIHandler extends AbstractChatAIHandler {
+    /**
+     * GPTChatAIHandler限流前缀
+     */
+    private static final String CHAT_FREQUENCY_PREFIX = "GPTChatAIHandler";
 
     @Autowired
     private ChatGPTProperties chatGPTProperties;
@@ -51,30 +59,42 @@ public class GPTChatAIHandler extends AbstractChatAIHandler {
         return chatGPTProperties.getAIUserId();
     }
 
+    @Autowired
+    private GPTChatAIHandlerFrequencyController  chatAIHandlerFrequencyController;
 
     @Override
     protected String doChat(Message message) {
         String content = message.getContent().replace("@" + AI_NAME, "").trim();
         Long uid = message.getFromUid();
-        Long chatNum;
+        FrequencyControlWithUidDTO frequencyControlWithUidDTO = new FrequencyControlWithUidDTO();
+        try {
+            frequencyControlWithUidDTO.setKey(CHAT_FREQUENCY_PREFIX + uid);
+            frequencyControlWithUidDTO.setUid(uid);
+            return chatAIHandlerFrequencyController.executeWithFrequencyControl(frequencyControlWithUidDTO, this::sendRequestToGPT, new GPTRequestDTO(content, uid));
+        } catch (FrequencyControlException e) {
+            return  "你今天已经和我聊了" + frequencyControlWithUidDTO.getChatNum() + "次了，我累了，明天再聊吧";
+        } catch (Throwable e) {
+            return "系统开小差啦~~";
+        }
+    }
+
+    private String sendRequestToGPT(GPTRequestDTO gptRequestDTO) {
+        String content = gptRequestDTO.getContent();
+        Long uid = gptRequestDTO.getUid();
         String text;
-        if ((chatNum = getUserChatNum(uid)) > chatGPTProperties.getLimit()) {
-            text = "你今天已经和我聊了" + chatNum + "次了，我累了，明天再聊吧";
-        } else {
-            HttpResponse response = null;
-            try {
-                response = ChatGPTUtils.create(chatGPTProperties.getKey())
-                        .proxyUrl(chatGPTProperties.getProxyUrl())
-                        .model(chatGPTProperties.getModelName())
-                        .timeout(chatGPTProperties.getTimeout())
-                        .prompt(content)
-                        .send();
-                text = ChatGPTUtils.parseText(response);
-                userChatNumInrc(uid);
-            } catch (Exception e) {
-                log.warn("gpt doChat warn:", e);
-                text = "我累了，明天再聊吧";
-            }
+        HttpResponse response = null;
+        try {
+            response = ChatGPTUtils.create(chatGPTProperties.getKey())
+                    .proxyUrl(chatGPTProperties.getProxyUrl())
+                    .model(chatGPTProperties.getModelName())
+                    .timeout(chatGPTProperties.getTimeout())
+                    .prompt(content)
+                    .send();
+            text = ChatGPTUtils.parseText(response);
+            userChatNumInrc(uid);
+        } catch (Exception e) {
+            log.warn("gpt doChat warn:", e);
+            text=  "我累了，明天再聊吧";
         }
         return text;
     }

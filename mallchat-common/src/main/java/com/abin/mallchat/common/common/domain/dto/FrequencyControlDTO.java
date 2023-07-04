@@ -39,8 +39,4 @@ public class FrequencyControlDTO {
      * @return 次数
      */
     private Integer count;
-    /**
-     * 代表频控的序号
-     */
-    private Integer order;
 }
