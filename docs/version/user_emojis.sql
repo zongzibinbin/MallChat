@@ -6,5 +6,5 @@ CREATE TABLE `user_emojis` (
                                `update_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '修改时间',
                                `delete_status` int(1) NOT NULL DEFAULT '0' COMMENT '逻辑删除(0-正常,1-删除)',
                                PRIMARY KEY (`id`),
-                               KEY `IDX_MC_EMOJIS_USER_ID` (`uid`)
+                               KEY `IDX_USER_EMOJIS_UID` (`uid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COMMENT='用户表情包';
