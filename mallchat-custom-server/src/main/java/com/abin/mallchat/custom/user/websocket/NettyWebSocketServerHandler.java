@@ -71,7 +71,7 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
             this.webSocketService.connect(ctx.channel());
             String token = NettyUtil.getAttr(ctx.channel(), NettyUtil.TOKEN);
             if (StrUtil.isNotBlank(token)) {
-                this.webSocketService.authorize(ctx.channel(), new WSAuthorize());
+                this.webSocketService.authorize(ctx.channel(), new WSAuthorize(token));
             }
         }
         super.userEventTriggered(ctx, evt);

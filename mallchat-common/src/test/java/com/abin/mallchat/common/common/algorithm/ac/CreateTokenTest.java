@@ -31,5 +31,4 @@ public class CreateTokenTest {
             log.info("decode error,token:{}", token, e);
         }
     }
-
 }
