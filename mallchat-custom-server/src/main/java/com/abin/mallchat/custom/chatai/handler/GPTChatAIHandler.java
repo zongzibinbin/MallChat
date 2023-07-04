@@ -71,7 +71,7 @@ public class GPTChatAIHandler extends AbstractChatAIHandler {
             frequencyControlDTO.setTime(24);
             return totalCountWithInFixTimeFrequencyController.executeWithFrequencyControl(frequencyControlDTO, this::sendRequestToGPT, new GPTRequestDTO(content, uid));
         } catch (FrequencyControlException e) {
-            return "亲爱的你今天找我聊了5次了~人家累了~明天见";
+            return "亲爱的,你今天找我聊了" + chatGPTProperties.getLimit() + "次了~人家累了~明天见";
         } catch (Throwable e) {
             return "系统开小差啦~~";
         }
