@@ -4,11 +4,11 @@ import cn.hutool.http.HttpResponse;
 import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.chat.domain.entity.msg.MessageExtra;
 import com.abin.mallchat.common.common.constant.RedisKey;
+import com.abin.mallchat.common.common.domain.dto.FrequencyControlDTO;
 import com.abin.mallchat.common.common.exception.FrequencyControlException;
+import com.abin.mallchat.common.common.service.frequecycontrol.TotalCountWithInFixTimeFrequencyController;
 import com.abin.mallchat.common.common.utils.RedisUtils;
-import com.abin.mallchat.custom.chatai.dto.FrequencyControlWithUidDTO;
 import com.abin.mallchat.custom.chatai.dto.GPTRequestDTO;
-import com.abin.mallchat.custom.chatai.frequencycontrol.ChatGLM2HandlerFrequencyController;
 import com.abin.mallchat.custom.chatai.properties.ChatGLM2Properties;
 import com.abin.mallchat.custom.chatai.utils.ChatGLM2Utils;
 import com.abin.mallchat.custom.user.domain.vo.response.user.UserInfoResp;
@@ -33,7 +33,7 @@ public class ChatGLM2Handler extends AbstractChatAIHandler {
     /**
      * ChatGLM2Handler限流前缀
      */
-    private static final String CHAT_FREQUENCY_PREFIX = "ChatGLM2Handler";
+    private static final String CHAT_GLM2_FREQUENCY_PREFIX = "ChatGLM2Handler";
 
     private static final List<String> ERROR_MSG = Arrays.asList(
             "还摸鱼呢？你不下班我还要下班呢。。。。",
@@ -79,20 +79,21 @@ public class ChatGLM2Handler extends AbstractChatAIHandler {
     }
 
     @Autowired
-    private ChatGLM2HandlerFrequencyController chatGLM2HandlerFrequencyControl;
-
+    private TotalCountWithInFixTimeFrequencyController totalCountWithInFixTimeFrequencyController;
 
     @Override
     protected String doChat(Message message) {
         String content = message.getContent().replace("@" + AI_NAME, "").trim();
         Long uid = message.getFromUid();
-        FrequencyControlWithUidDTO frequencyControlWithUidDTO = new FrequencyControlWithUidDTO();
         try {
-            frequencyControlWithUidDTO.setKey(CHAT_FREQUENCY_PREFIX + uid);
-            frequencyControlWithUidDTO.setUid(uid);
-            return chatGLM2HandlerFrequencyControl.executeWithFrequencyControl(frequencyControlWithUidDTO, this::sendRequestToGPT, new GPTRequestDTO(content, uid));
+            FrequencyControlDTO frequencyControlDTO = new FrequencyControlDTO();
+            frequencyControlDTO.setKey(CHAT_GLM2_FREQUENCY_PREFIX + ":" + uid);
+            frequencyControlDTO.setUnit(TimeUnit.MINUTES);
+            frequencyControlDTO.setCount(1);
+            frequencyControlDTO.setTime(glm2Properties.getMinute().intValue());
+            return totalCountWithInFixTimeFrequencyController.executeWithFrequencyControl(frequencyControlDTO, this::sendRequestToGPT, new GPTRequestDTO(content, uid));
         } catch (FrequencyControlException e) {
-            return "你太快了" + frequencyControlWithUidDTO.getRemainingMinutes() + "分钟后重试";
+            return "你太快了亲爱的~过一会再来找人家~";
         } catch (Throwable e) {
             return "系统开小差啦~~";
         }
