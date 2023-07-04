@@ -1,5 +1,6 @@
 package com.abin.mallchat.custom.user.websocket;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONUtil;
 import com.abin.mallchat.custom.user.domain.enums.WSReqTypeEnum;
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
 
     private WebSocketService webSocketService;
+
     // 当web客户端连接后，触发该方法
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
@@ -67,9 +69,10 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
             }
         } else if (evt == WebSocketServerProtocolHandler.ServerHandshakeStateEvent.HANDSHAKE_COMPLETE) {
             this.webSocketService.connect(ctx.channel());
-            // 这里不用判断token是否为空 交给authorize方法中去判断
-            // 在为空或者验证不通过的时候给前端返回相应的状态码
-            this.webSocketService.authorize(ctx.channel(), new WSAuthorize(NettyUtil.getAttr(ctx.channel(), NettyUtil.TOKEN)));
+            String token = NettyUtil.getAttr(ctx.channel(), NettyUtil.TOKEN);
+            if (StrUtil.isNotBlank(token)) {
+                this.webSocketService.authorize(ctx.channel(), new WSAuthorize());
+            }
         }
         super.userEventTriggered(ctx, evt);
     }
