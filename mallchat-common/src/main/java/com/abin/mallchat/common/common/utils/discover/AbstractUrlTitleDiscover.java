@@ -35,7 +35,8 @@ public abstract class AbstractUrlTitleDiscover implements UrlTitleDiscover {
         if (StrUtil.isBlank(content)) {
             return new HashMap<>();
         }
-        List<String> matchList = ReUtil.findAll(PATTERN, content, 0);
+        List<String> matchList = ReUtil.findAll(PATTERN, content, 0)
+                .stream().filter(url -> url.startsWith("http://") || url.startsWith("https://")).collect(Collectors.toList());
         //并行请求
         List<CompletableFuture<Pair<String, String>>> futures = matchList.stream().map(match -> CompletableFuture.supplyAsync(() -> {
             String title = getUrlTitle(match);
