@@ -1,5 +1,6 @@
 package com.abin.mallchat.custom.chat.domain.vo.response;
 
+import com.abin.mallchat.common.common.utils.discover.domain.UrlInfo;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -50,7 +51,7 @@ public class ChatMessageResp {
         private String content;
         @ApiModelProperty("消息链接映射-废弃")
         @Deprecated
-        private Map<String, String> urlTitleMap;
+        private Map<String, UrlInfo> urlContentMap;
         @ApiModelProperty("消息类型 1正常文本 2.撤回消息")
         private Integer type;
         @ApiModelProperty("消息内容不同的消息类型，内容体不同，见https://www.yuque.com/snab/mallcaht/rkb2uz5k1qqdmcmd")

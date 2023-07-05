@@ -56,7 +56,7 @@ public class MessageAdapter {
         messageVO.setSendTime(message.getCreateTime());
         AbstractMsgHandler msgHandler = MsgHandlerFactory.getStrategyNoNull(message.getType());
         messageVO.setBody(msgHandler.showMsg(message));
-        messageVO.setUrlTitleMap(Optional.ofNullable(message.getExtra()).map(MessageExtra::getUrlTitleMap).orElse(null));
+        messageVO.setUrlContentMap(Optional.ofNullable(message.getExtra()).map(MessageExtra::getUrlContentMap).orElse(null));
         Message replyMessage = replyMap.get(message.getReplyMsgId());
 
         //回复消息

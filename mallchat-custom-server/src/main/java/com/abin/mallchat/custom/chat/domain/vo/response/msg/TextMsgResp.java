@@ -1,5 +1,6 @@
 package com.abin.mallchat.custom.chat.domain.vo.response.msg;
 
+import com.abin.mallchat.common.common.utils.discover.domain.UrlInfo;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,7 +23,7 @@ public class TextMsgResp {
     @ApiModelProperty("消息内容")
     private String content;
     @ApiModelProperty("消息链接映射")
-    private Map<String, String> urlTitleMap;
+    private Map<String, UrlInfo> urlContentMap;
     @ApiModelProperty("艾特的uid")
     private List<Long> atUidList;
     @ApiModelProperty("父消息，如果没有父消息，返回的是null")

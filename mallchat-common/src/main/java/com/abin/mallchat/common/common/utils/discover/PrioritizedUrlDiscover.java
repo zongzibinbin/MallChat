@@ -14,18 +14,18 @@ import java.util.List;
  */
 public class PrioritizedUrlDiscover extends AbstractUrlDiscover {
 
-    private final List<UrlDiscover> urlTitleDiscovers = new ArrayList<>(2);
+    private final List<UrlDiscover> urlDiscovers = new ArrayList<>(2);
 
     public PrioritizedUrlDiscover() {
-        urlTitleDiscovers.add(new CommonUrlDiscover());
-        urlTitleDiscovers.add(new WxUrlDiscover());
+        urlDiscovers.add(new CommonUrlDiscover());
+        urlDiscovers.add(new WxUrlDiscover());
     }
 
 
     @Nullable
     @Override
     public String getTitle(Document document) {
-        for (UrlDiscover urlDiscover : urlTitleDiscovers) {
+        for (UrlDiscover urlDiscover : urlDiscovers) {
             String urlTitle = urlDiscover.getTitle(document);
             if (StrUtil.isNotBlank(urlTitle)) {
                 return urlTitle;
@@ -37,7 +37,7 @@ public class PrioritizedUrlDiscover extends AbstractUrlDiscover {
     @Nullable
     @Override
     public String getDescription(Document document) {
-        for (UrlDiscover urlDiscover : urlTitleDiscovers) {
+        for (UrlDiscover urlDiscover : urlDiscovers) {
             String urlDescription = urlDiscover.getDescription(document);
             if (StrUtil.isNotBlank(urlDescription)) {
                 return urlDescription;
@@ -49,7 +49,7 @@ public class PrioritizedUrlDiscover extends AbstractUrlDiscover {
     @Nullable
     @Override
     public String getImage(String url, Document document) {
-        for (UrlDiscover urlDiscover : urlTitleDiscovers) {
+        for (UrlDiscover urlDiscover : urlDiscovers) {
             String urlImage = urlDiscover.getImage(url,document);
             if (StrUtil.isNotBlank(urlImage)) {
                 return urlImage;

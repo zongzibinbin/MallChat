@@ -5,7 +5,6 @@ import cn.hutool.core.util.StrUtil;
 import com.abin.mallchat.common.common.utils.FutureUtils;
 import com.abin.mallchat.common.common.utils.discover.domain.UrlInfo;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -30,7 +29,7 @@ public abstract class AbstractUrlDiscover implements UrlDiscover {
     private static final Pattern PATTERN = Pattern.compile("((http|https)://)?(www.)?([\\w_-]+(?:(?:\\.[\\w_-]+)+))([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])?");
 
 
-    @javax.annotation.Nullable
+    @Nullable
     @Override
     public Map<String, UrlInfo> getUrlContentMap(String content) {
 
@@ -83,4 +82,5 @@ public abstract class AbstractUrlDiscover implements UrlDiscover {
         }
         return null;
     }
+
 }
