@@ -101,6 +101,7 @@ CREATE TABLE `user`  (
   `avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '用户头像',
   `sex` int(11) NULL DEFAULT NULL COMMENT '性别 1为男性，2为女性',
   `open_id` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '微信openid用户标识',
+  `publish_chat_to_wechat_switch` bool DEFAULT 0 COMMENT '群聊消息推送开关',
   `last_opt_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '最后上下线时间',
   `ip_info` json NULL COMMENT 'ip信息',
   `item_id` bigint(20) NULL DEFAULT NULL COMMENT '佩戴的徽章id',

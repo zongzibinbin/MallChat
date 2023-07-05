@@ -59,6 +59,12 @@ public class User implements Serializable {
     private String openId;
 
     /**
+     * 是否开启微信消息推送
+     */
+    @TableField("publish_chat_to_wechat_switch")
+    private boolean publishChatToWechatSwitch;
+
+    /**
      * 最后上下线时间
      */
     @TableField("last_opt_time")
