@@ -11,7 +11,7 @@ import com.abin.mallchat.common.chat.service.cache.MsgCache;
 import com.abin.mallchat.common.common.domain.enums.YesOrNoEnum;
 import com.abin.mallchat.common.common.utils.AssertUtil;
 import com.abin.mallchat.common.common.utils.SensitiveWordUtils;
-import com.abin.mallchat.common.common.utils.discover.PrioritizedUrlTitleDiscover;
+import com.abin.mallchat.common.common.utils.discover.PrioritizedUrlDiscover;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.domain.enums.RoleEnum;
 import com.abin.mallchat.common.user.service.IRoleService;
@@ -47,7 +47,7 @@ public class TextMsgHandler extends AbstractMsgHandler {
     @Autowired
     private IRoleService iRoleService;
     
-    private static final PrioritizedUrlTitleDiscover URL_TITLE_DISCOVER = new PrioritizedUrlTitleDiscover();
+    private static final PrioritizedUrlDiscover URL_TITLE_DISCOVER = new PrioritizedUrlDiscover();
 
     @Override
     MessageTypeEnum getMsgTypeEnum() {
