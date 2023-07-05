@@ -24,7 +24,7 @@ public class CreateTokenTest {
 
 
         try {
-            JWTVerifier verifier = JWT.require(Algorithm.HMAC256("dsfsdfsdfsdfsd")).build();
+            JWTVerifier verifier = JWT.require(Algorithm.HMAC256("dsfsdfsdfsdfsc")).build();
             DecodedJWT jwt = verifier.verify(token);
             log.info(jwt.getClaims().toString());
         } catch (Exception e) {
