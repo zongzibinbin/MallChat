@@ -31,10 +31,6 @@ public class CommonUrlDiscover extends AbstractUrlDiscover {
     @Nullable
     @Override
     public String getImage(String url, Document document) {
-        //如果包含og则是微信链接
-        if(StrUtil.isNotBlank(document.getElementsByAttributeValue("property", "og:title").attr("content"))){
-            return null;
-        }
         String image = document.select("link[type=image/x-icon]").attr("href");
         //如果没有去匹配含有icon属性的logo
         String href = StrUtil.isEmpty(image) ? document.select("link[rel$=icon]").attr("href") : image;

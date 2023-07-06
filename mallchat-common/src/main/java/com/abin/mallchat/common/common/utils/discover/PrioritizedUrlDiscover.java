@@ -17,8 +17,8 @@ public class PrioritizedUrlDiscover extends AbstractUrlDiscover {
     private final List<UrlDiscover> urlDiscovers = new ArrayList<>(2);
 
     public PrioritizedUrlDiscover() {
-        urlDiscovers.add(new CommonUrlDiscover());
         urlDiscovers.add(new WxUrlDiscover());
+        urlDiscovers.add(new CommonUrlDiscover());
     }
 
 
