@@ -5,14 +5,11 @@ import com.abin.mallchat.common.common.domain.dto.FrequencyControlDTO;
 import com.abin.mallchat.common.common.exception.FrequencyControlException;
 import com.abin.mallchat.common.common.handler.GlobalUncaughtExceptionHandler;
 import com.abin.mallchat.common.common.service.frequencycontrol.FrequencyControlUtil;
-import com.abin.mallchat.common.common.utils.JsonUtils;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.service.cache.UserCache;
 import com.abin.mallchat.custom.chat.service.WeChatMsgOperationService;
 import lombok.extern.slf4j.Slf4j;
-import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
-import me.chanjar.weixin.mp.api.WxMpTemplateMsgService;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateData;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +34,7 @@ public class WeChatMsgOperationServiceImpl implements WeChatMsgOperationService 
                     new GlobalUncaughtExceptionHandler()));
 
     // at消息的微信推送模板id
-    private final String atMsgPublishTemplateId = "";
+    private final String atMsgPublishTemplateId = "Xd7sWPZsuWa0UmpvLaZPvaJVjNj1KjEa0zLOm5_Z7IU";
 
     private final String WE_CHAT_MSG_COLOR = "#A349A4";
 
@@ -96,8 +93,8 @@ public class WeChatMsgOperationServiceImpl implements WeChatMsgOperationService 
     private List<WxMpTemplateData> generateAtMsgData(User sender, String msg) {
         List dataList = new ArrayList<WxMpTemplateData>();
 //        todo: 没有消息模板，暂不实现
-//        dataList.add(new WxMpTemplateData("senderName", sender.getName() , WE_CHAT_MSG_COLOR));
-//        dataList.add(new WxMpTemplateData("content", msg , WE_CHAT_MSG_COLOR));
+        dataList.add(new WxMpTemplateData("name", sender.getName(), WE_CHAT_MSG_COLOR));
+        dataList.add(new WxMpTemplateData("content", msg, WE_CHAT_MSG_COLOR));
         return dataList;
     }
 
@@ -107,12 +104,12 @@ public class WeChatMsgOperationServiceImpl implements WeChatMsgOperationService 
      * @param templateMsg 微信模板消息
      */
     protected void publishTemplateMsg(WxMpTemplateMessage templateMsg) {
-        WxMpTemplateMsgService wxMpTemplateMsgService = wxMpService.getTemplateMsgService();
-        try {
-            wxMpTemplateMsgService.sendTemplateMsg(templateMsg);
-        } catch (WxErrorException e) {
-            log.error("publish we chat msg failed! open id is {}, msg is {}.",
-                    templateMsg.getToUser(), JsonUtils.toStr(templateMsg.getData()));
-        }
+//        WxMpTemplateMsgService wxMpTemplateMsgService = wxMpService.getTemplateMsgService();todo 等审核通过
+//        try {
+//            wxMpTemplateMsgService.sendTemplateMsg(templateMsg);
+//        } catch (WxErrorException e) {
+//            log.error("publish we chat msg failed! open id is {}, msg is {}.",
+//                    templateMsg.getToUser(), JsonUtils.toStr(templateMsg.getData()));
+//        }
     }
 }
