@@ -4,7 +4,6 @@ import cn.hutool.core.util.StrUtil;
 import com.abin.mallchat.common.common.annotation.FrequencyControl;
 import com.abin.mallchat.common.common.domain.dto.FrequencyControlDTO;
 import com.abin.mallchat.common.common.service.frequecycontrol.FrequencyControlUtil;
-import com.abin.mallchat.common.common.service.frequecycontrol.TotalCountWithInFixTimeFrequencyController;
 import com.abin.mallchat.common.common.utils.RequestHolder;
 import com.abin.mallchat.common.common.utils.SpElUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +11,6 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
@@ -32,10 +30,6 @@ import static com.abin.mallchat.common.common.service.frequecycontrol.FrequencyC
 @Aspect
 @Component
 public class FrequencyControlAspect {
-
-    @Autowired
-    private TotalCountWithInFixTimeFrequencyController totalCountWithInFixTimeFrequencyController;
-
 
     @Around("@annotation(com.abin.mallchat.common.common.annotation.FrequencyControl)||@annotation(com.abin.mallchat.common.common.annotation.FrequencyControlContainer)")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
