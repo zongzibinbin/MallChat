@@ -1,7 +1,10 @@
 package com.abin.mallchat.custom.chat.service.impl;
 
 import cn.hutool.core.thread.NamedThreadFactory;
+import com.abin.mallchat.common.common.domain.dto.FrequencyControlDTO;
+import com.abin.mallchat.common.common.exception.FrequencyControlException;
 import com.abin.mallchat.common.common.handler.GlobalUncaughtExceptionHandler;
+import com.abin.mallchat.common.common.service.frequencycontrol.FrequencyControlUtil;
 import com.abin.mallchat.common.common.utils.JsonUtils;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.service.cache.UserCache;
@@ -15,20 +18,17 @@ import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import static com.abin.mallchat.common.common.service.frequencycontrol.FrequencyControlStrategyFactory.TOTAL_COUNT_WITH_IN_FIX_TIME_FREQUENCY_CONTROLLER;
+
 @Slf4j
 @Component
-public class WeChatMsgOperationServiceImpl  implements WeChatMsgOperationService {
+public class WeChatMsgOperationServiceImpl implements WeChatMsgOperationService {
 
     private static final ExecutorService executor = new ThreadPoolExecutor(1, 10, 3000L,
             TimeUnit.MILLISECONDS,
@@ -54,13 +54,29 @@ public class WeChatMsgOperationServiceImpl  implements WeChatMsgOperationService
         uidSet.addAll(receiverUidList);
         Map<Long, User> userMap = userCache.getUserInfoBatch(uidSet);
         userMap.values().forEach(user -> {
-            if (Objects.nonNull(user.getOpenId()) && user.isPublishChatToWechatSwitch()) {
+            if (Objects.nonNull(user.getOpenId())) {
                 executor.execute(() -> {
                     WxMpTemplateMessage msgTemplate = getAtMsgTemplate(sender, user.getOpenId(), msg);
-                    publishTemplateMsg(msgTemplate);
+                    publishTemplateMsgCheckLimit(msgTemplate);
                 });
             }
         });
+    }
+
+    private void publishTemplateMsgCheckLimit(WxMpTemplateMessage msgTemplate) {
+        try {
+            FrequencyControlDTO frequencyControlDTO = new FrequencyControlDTO();
+            frequencyControlDTO.setKey("TemplateMsg:" + msgTemplate.getToUser());
+            frequencyControlDTO.setUnit(TimeUnit.HOURS);
+            frequencyControlDTO.setCount(1);
+            frequencyControlDTO.setTime(1);
+            FrequencyControlUtil.executeWithFrequencyControl(TOTAL_COUNT_WITH_IN_FIX_TIME_FREQUENCY_CONTROLLER, frequencyControlDTO,
+                    () -> publishTemplateMsg(msgTemplate));
+        } catch (FrequencyControlException e) {
+            log.info("wx push limit openid:{}", msgTemplate.getToUser());
+        } catch (Throwable e) {
+            log.error("wx push error openid:{}", msgTemplate.getToUser());
+        }
     }
 
     /*
