@@ -38,4 +38,5 @@ public interface LoginService {
      * @return
      */
     Long getValidUid(String token);
+
 }
