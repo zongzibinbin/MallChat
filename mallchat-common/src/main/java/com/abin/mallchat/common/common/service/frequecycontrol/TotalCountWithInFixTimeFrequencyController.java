@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static com.abin.mallchat.common.common.service.frequecycontrol.FrequencyControlStrategyFactory.TOTAL_COUNT_WITH_IN_FIX_TIME_FREQUENCY_CONTROLLER;
+
 /**
  * 抽象类频控服务 -使用redis实现 固定时间内不超过固定次数的限流类
  *
@@ -53,5 +55,10 @@ public class TotalCountWithInFixTimeFrequencyController extends AbstractFrequenc
     @Override
     protected void addFrequencyControlStatisticsCount(Map<String, FrequencyControlDTO> frequencyControlMap) {
         frequencyControlMap.forEach((k, v) -> RedisUtils.inc(k, v.getTime(), v.getUnit()));
+    }
+
+    @Override
+    protected String getStrategyName() {
+        return TOTAL_COUNT_WITH_IN_FIX_TIME_FREQUENCY_CONTROLLER;
     }
 }

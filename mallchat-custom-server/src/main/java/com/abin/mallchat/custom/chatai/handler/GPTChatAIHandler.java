@@ -5,6 +5,7 @@ import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.chat.domain.entity.msg.MessageExtra;
 import com.abin.mallchat.common.common.domain.dto.FrequencyControlDTO;
 import com.abin.mallchat.common.common.exception.FrequencyControlException;
+import com.abin.mallchat.common.common.service.frequecycontrol.FrequencyControlUtil;
 import com.abin.mallchat.common.common.service.frequecycontrol.TotalCountWithInFixTimeFrequencyController;
 import com.abin.mallchat.custom.chatai.dto.GPTRequestDTO;
 import com.abin.mallchat.custom.chatai.properties.ChatGPTProperties;
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.concurrent.TimeUnit;
+
+import static com.abin.mallchat.common.common.service.frequecycontrol.FrequencyControlStrategyFactory.TOTAL_COUNT_WITH_IN_FIX_TIME_FREQUENCY_CONTROLLER;
 
 @Slf4j
 @Component
@@ -56,9 +59,6 @@ public class GPTChatAIHandler extends AbstractChatAIHandler {
         return chatGPTProperties.getAIUserId();
     }
 
-    @Autowired
-    private TotalCountWithInFixTimeFrequencyController totalCountWithInFixTimeFrequencyController;
-
     @Override
     protected String doChat(Message message) {
         String content = message.getContent().replace("@" + AI_NAME, "").trim();
@@ -69,7 +69,7 @@ public class GPTChatAIHandler extends AbstractChatAIHandler {
             frequencyControlDTO.setUnit(TimeUnit.HOURS);
             frequencyControlDTO.setCount(chatGPTProperties.getLimit());
             frequencyControlDTO.setTime(24);
-            return totalCountWithInFixTimeFrequencyController.executeWithFrequencyControl(frequencyControlDTO, this::sendRequestToGPT, new GPTRequestDTO(content, uid));
+            return FrequencyControlUtil.executeWithFrequencyControl(TOTAL_COUNT_WITH_IN_FIX_TIME_FREQUENCY_CONTROLLER, frequencyControlDTO, () -> sendRequestToGPT(new GPTRequestDTO(content, uid)));
         } catch (FrequencyControlException e) {
             return "亲爱的,你今天找我聊了" + chatGPTProperties.getLimit() + "次了~人家累了~明天见";
         } catch (Throwable e) {

@@ -8,6 +8,7 @@ import io.netty.handler.codec.http.HttpHeaders;
 import org.apache.commons.lang3.StringUtils;
 
 import java.net.InetSocketAddress;
+import java.util.Optional;
 
 public class HttpHeadersHandler extends ChannelInboundHandlerAdapter {
 
@@ -18,7 +19,7 @@ public class HttpHeadersHandler extends ChannelInboundHandlerAdapter {
             UrlBuilder urlBuilder = UrlBuilder.ofHttp(request.uri());
 
             // 获取token参数
-            String token = urlBuilder.getQuery().get("token").toString();
+            String token = Optional.ofNullable(urlBuilder.getQuery()).map(k->k.get("token")).map(CharSequence::toString).orElse("");
             NettyUtil.setAttr(ctx.channel(), NettyUtil.TOKEN, token);
 
             // 获取请求路径

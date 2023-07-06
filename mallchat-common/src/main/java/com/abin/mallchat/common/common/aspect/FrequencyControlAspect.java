@@ -3,6 +3,7 @@ package com.abin.mallchat.common.common.aspect;
 import cn.hutool.core.util.StrUtil;
 import com.abin.mallchat.common.common.annotation.FrequencyControl;
 import com.abin.mallchat.common.common.domain.dto.FrequencyControlDTO;
+import com.abin.mallchat.common.common.service.frequecycontrol.FrequencyControlUtil;
 import com.abin.mallchat.common.common.service.frequecycontrol.TotalCountWithInFixTimeFrequencyController;
 import com.abin.mallchat.common.common.utils.RequestHolder;
 import com.abin.mallchat.common.common.utils.SpElUtils;
@@ -19,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.abin.mallchat.common.common.service.frequecycontrol.FrequencyControlStrategyFactory.TOTAL_COUNT_WITH_IN_FIX_TIME_FREQUENCY_CONTROLLER;
 
 /**
  * Description: 频控实现
@@ -58,7 +61,7 @@ public class FrequencyControlAspect {
         // 将注解的参数转换为编程式调用需要的参数
         List<FrequencyControlDTO> frequencyControlDTOS = keyMap.entrySet().stream().map(entrySet -> buildFrequencyControlDTO(entrySet.getKey(), entrySet.getValue())).collect(Collectors.toList());
         // 调用编程式注解
-        return totalCountWithInFixTimeFrequencyController.executeWithFrequencyControlList(frequencyControlDTOS, joinPoint::proceed);
+        return FrequencyControlUtil.executeWithFrequencyControlList(TOTAL_COUNT_WITH_IN_FIX_TIME_FREQUENCY_CONTROLLER, frequencyControlDTOS, joinPoint::proceed);
     }
 
     /**

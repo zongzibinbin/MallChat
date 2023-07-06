@@ -6,6 +6,7 @@ import com.abin.mallchat.common.chat.domain.entity.msg.MessageExtra;
 import com.abin.mallchat.common.common.constant.RedisKey;
 import com.abin.mallchat.common.common.domain.dto.FrequencyControlDTO;
 import com.abin.mallchat.common.common.exception.FrequencyControlException;
+import com.abin.mallchat.common.common.service.frequecycontrol.FrequencyControlUtil;
 import com.abin.mallchat.common.common.service.frequecycontrol.TotalCountWithInFixTimeFrequencyController;
 import com.abin.mallchat.common.common.utils.RedisUtils;
 import com.abin.mallchat.custom.chatai.dto.GPTRequestDTO;
@@ -26,6 +27,7 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import static com.abin.mallchat.common.common.constant.RedisKey.USER_GLM2_TIME_LAST;
+import static com.abin.mallchat.common.common.service.frequecycontrol.FrequencyControlStrategyFactory.TOTAL_COUNT_WITH_IN_FIX_TIME_FREQUENCY_CONTROLLER;
 
 @Slf4j
 @Component
@@ -78,8 +80,6 @@ public class ChatGLM2Handler extends AbstractChatAIHandler {
         return glm2Properties.getAIUserId();
     }
 
-    @Autowired
-    private TotalCountWithInFixTimeFrequencyController totalCountWithInFixTimeFrequencyController;
 
     @Override
     protected String doChat(Message message) {
@@ -91,7 +91,7 @@ public class ChatGLM2Handler extends AbstractChatAIHandler {
             frequencyControlDTO.setUnit(TimeUnit.MINUTES);
             frequencyControlDTO.setCount(1);
             frequencyControlDTO.setTime(glm2Properties.getMinute().intValue());
-            return totalCountWithInFixTimeFrequencyController.executeWithFrequencyControl(frequencyControlDTO, this::sendRequestToGPT, new GPTRequestDTO(content, uid));
+            return FrequencyControlUtil.executeWithFrequencyControl(TOTAL_COUNT_WITH_IN_FIX_TIME_FREQUENCY_CONTROLLER, frequencyControlDTO, () -> sendRequestToGPT(new GPTRequestDTO(content, uid)));
         } catch (FrequencyControlException e) {
             return "你太快了亲爱的~过一会再来找人家~";
         } catch (Throwable e) {
