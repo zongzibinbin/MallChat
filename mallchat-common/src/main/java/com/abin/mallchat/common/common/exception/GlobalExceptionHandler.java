@@ -73,4 +73,12 @@ public class GlobalExceptionHandler {
         return ApiResult.fail(-1, String.format("不支持'%s'请求", e.getMethod()));
     }
 
+    /**
+     * 限流异常
+     */
+    @ExceptionHandler(value = FrequencyControlException.class)
+    public ApiResult frequencyControlExceptionHandler(FrequencyControlException e) {
+        log.info("frequencyControl exception！The reason is：{}", e.getMessage(), e);
+        return ApiResult.fail(e.getErrorCode(), e.getMessage());
+    }
 }
