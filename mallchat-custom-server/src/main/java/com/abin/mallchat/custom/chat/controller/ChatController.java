@@ -94,7 +94,6 @@ public class ChatController {
     private void filterBlackMsg(CursorPageBaseResp<ChatMessageResp> memberPage) {
         Set<String> blackMembers = getBlackUidSet();
         memberPage.getList().removeIf(a -> blackMembers.contains(a.getFromUser().getUid().toString()));
-        System.out.println(1);
     }
 
     @PostMapping("/msg")

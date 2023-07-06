@@ -18,11 +18,6 @@ public class ChatGPTProperties {
      * 机器人 id
      */
     private Long AIUserId;
-
-    /**
-     * 机器人名称
-     */
-    private String AIUserName;
     /**
      * 模型名称
      */
@@ -35,6 +30,11 @@ public class ChatGPTProperties {
      * 代理地址
      */
     private String proxyUrl;
+
+    /**
+     * 超时
+     */
+    private Integer timeout = 60*1000;
 
     /**
      * 用户每天条数限制
