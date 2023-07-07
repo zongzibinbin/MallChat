@@ -13,12 +13,22 @@
     <a href="https://github.com/zongzibinbin/MallChat"><img src="https://img.shields.io/badge/github-项目地址-yellow.svg?style=plasticr"></a>
     <a href="https://gitee.com/zhongzhibinbin/MallChat"><img src="https://img.shields.io/badge/码云-项目地址-orange.svg?style=plasticr"></a>
     <a href="https://github.com/Evansy/MallChatWeb"><img src="https://img.shields.io/badge/前端-项目地址-blueviolet.svg?style=plasticr"></a>
-  [![MallChat](https://github.com/Evansy/MallChatWeb/actions/workflows/deploy.yml/badge.svg?branch=main)](https://github.com/Evansy/MallChatWeb/actions/workflows/deploy.yml)
+    <a href="https://github.com/zongzibinbin/MallChat/commits" target="_blank"><br>
+    <a href="https://github.com/Evansy/MallChatWeb/actions/workflows/deploy.yml" target="_blank">
+        <img alt="Commit" src="https://github.com/Evansy/MallChatWeb/actions/workflows/deploy.yml/badge.svg?branch=main">
+    </a>
     <a href="https://github.com/zongzibinbin/MallChat/commits" target="_blank">
-    <img alt="Commit" src="https://img.shields.io/github/commit-activity/m/zongzibinbin/MallChat"></a>
+        <img alt="Commit" src="https://img.shields.io/github/commit-activity/m/zongzibinbin/MallChat"></a>
     <a href="https://github.com/zongzibinbin/MallChat/issues" target="_blank">
-    <img alt="Issues" src="https://img.shields.io/github/issues/zongzibinbin/MallChat"></a> [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/zongzibinbin/MallChat/blob/master/LICENSE)
-    [![GitHub stars](https://img.shields.io/github/stars/zongzibinbin/MallChat.svg?style=social)](https://github.com/zongzibinbin/MallChat/stargazers)
+        <img alt="Issues" src="https://img.shields.io/github/issues/zongzibinbin/MallChat">
+    </a> 
+    <a href="https://github.com/zongzibinbin/MallChat/blob/master/LICENSE" target="_blank">
+        <img alt="License: Apache-2.0" src="https://img.shields.io/badge/License-Apache--2.0-blue.svg">
+    </a> 
+    <a href="https://github.com/zongzibinbin/MallChat/stargazers" target="_blank">
+        <img alt="License" src="https://img.shields.io/github/stars/zongzibinbin/MallChat.svg?style=social">
+    </a> 
+    
 </div>
 
 ## 项目导航
