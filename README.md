@@ -23,7 +23,7 @@
         <img alt="Issues" src="https://img.shields.io/github/issues/zongzibinbin/MallChat">
     </a> 
     <a href="https://github.com/zongzibinbin/MallChat/blob/master/LICENSE" target="_blank">
-        <img alt="License" src="https://img.shields.io/badge/License-MIT-blue.svg">
+        <img alt="License: Apache-2.0" src="https://img.shields.io/badge/License-Apache--2.0-blue.svg">
     </a> 
     <a href="https://github.com/zongzibinbin/MallChat/stargazers" target="_blank">
         <img alt="License" src="https://img.shields.io/github/stars/zongzibinbin/MallChat.svg?style=social">
