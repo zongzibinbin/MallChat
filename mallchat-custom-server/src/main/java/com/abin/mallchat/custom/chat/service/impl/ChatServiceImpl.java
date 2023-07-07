@@ -160,7 +160,7 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public ChatMemberStatisticResp getMemberStatistic() {
-        System.out.println(Thread.currentThread().getName());
+        log.info(Thread.currentThread().getName());
         Long onlineNum = userCache.getOnlineNum();
 //        Long offlineNum = userCache.getOfflineNum();不展示总人数
         ChatMemberStatisticResp resp = new ChatMemberStatisticResp();

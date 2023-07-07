@@ -54,7 +54,7 @@ public class WeChatMsgOperationServiceImpl  implements WeChatMsgOperationService
         uidSet.addAll(receiverUidList);
         Map<Long, User> userMap = userCache.getUserInfoBatch(uidSet);
         userMap.values().forEach(user -> {
-            if (Objects.nonNull(user.getOpenId()) && user.isPublishChatToWechatSwitch()) {
+            if (Objects.nonNull(user.getOpenId())) {
                 executor.execute(() -> {
                     WxMpTemplateMessage msgTemplate = getAtMsgTemplate(sender, user.getOpenId(), msg);
                     publishTemplateMsg(msgTemplate);
