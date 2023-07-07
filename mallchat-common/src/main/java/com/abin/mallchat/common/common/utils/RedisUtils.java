@@ -32,11 +32,28 @@ public class RedisUtils {
                     "  return tonumber(redis.call('INCR',key)) \n" +
                     "end ";
 
+    private static final String ZERO_STRING = "0";
     public static Long inc(String key, int time, TimeUnit unit) {
         RedisScript<Long> redisScript = new DefaultRedisScript<>(LUA_INCR_EXPIRE, Long.class);
         return stringRedisTemplate.execute(redisScript, Collections.singletonList(key), String.valueOf(unit.toSeconds(time)));
     }
 
+    /**
+     * key自增
+     * @param key
+     * @return
+     */
+    public static Long inc(String key) {
+        return stringRedisTemplate.opsForValue().increment(key);
+    }
+
+    /**
+     * 重置key为0
+     * @param key
+     */
+    public static void reset(String key) {
+        stringRedisTemplate.opsForValue().set(key, ZERO_STRING);
+    }
     /**
      * 指定缓存失效时间
      *
@@ -277,6 +294,66 @@ public class RedisUtils {
             } else {
                 set(key, value);
             }
+            return true;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return false;
+        }
+    }
+
+    /**
+     * 带if exist缓存放入并设置过期时间
+     *
+     * @param key      键
+     * @param value    值
+     * @param time     时间
+     * @param timeUnit 类型
+     * @return true成功 false 失败
+     */
+    public static Boolean setnx(String key, Object value, long time, TimeUnit timeUnit) {
+        try {
+            if (time > 0) {
+                stringRedisTemplate.opsForValue().setIfAbsent(key, objToStr(value), time, timeUnit);
+            } else {
+                set(key, value);
+            }
+            return true;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return false;
+        }
+    }
+
+    /**
+     * 带if exist缓存放入并设置过期时间
+     *
+     * @param key   键
+     * @param value 值
+     * @return true成功 false失败
+     */
+    public static Boolean setnx(String key, Object value, long time) {
+        try {
+            if (time > 0) {
+                stringRedisTemplate.opsForValue().setIfAbsent(key, objToStr(value), time, TimeUnit.SECONDS);
+            } else {
+                set(key, value);
+            }
+            return true;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return false;
+        }
+    }
+    /**
+     * 带if exist缓存放入
+     *
+     * @param key   键
+     * @param value 值
+     * @return true成功 false失败
+     */
+    public static Boolean setnx(String key, Object value) {
+        try {
+            stringRedisTemplate.opsForValue().setIfAbsent(key, objToStr(value));
             return true;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
