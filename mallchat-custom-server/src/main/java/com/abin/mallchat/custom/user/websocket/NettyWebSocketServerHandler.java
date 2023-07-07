@@ -67,7 +67,7 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
                 // 关闭用户的连接
                 userOffLine(ctx);
             }
-        } else if (evt == WebSocketServerProtocolHandler.ServerHandshakeStateEvent.HANDSHAKE_COMPLETE) {
+        } else if (evt instanceof WebSocketServerProtocolHandler.HandshakeComplete) {
             this.webSocketService.connect(ctx.channel());
             String token = NettyUtil.getAttr(ctx.channel(), NettyUtil.TOKEN);
             if (StrUtil.isNotBlank(token)) {
