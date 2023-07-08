@@ -48,7 +48,7 @@ public class EmojisMsgHandler extends AbstractMsgHandler {
 
     @Override
     public Object showMsg(Message msg) {
-        return msg.getExtra().getImgMsgDTO();
+        return msg.getExtra().getEmojisMsgDTO();
     }
 
     @Override
