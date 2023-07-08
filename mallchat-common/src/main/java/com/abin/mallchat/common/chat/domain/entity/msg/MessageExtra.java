@@ -36,4 +36,9 @@ public class MessageExtra implements Serializable {
     private SoundMsgDTO soundMsgDTO;
     //文件消息
     private VideoMsgDTO videoMsgDTO;
+
+    /**
+     * 表情图片信息
+     */
+    private EmojisMsgDTO emojisMsgDTO;
 }
