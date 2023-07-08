@@ -5,6 +5,7 @@ import com.abin.mallchat.common.common.annotation.RedissonLock;
 import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
 import com.abin.mallchat.common.common.domain.vo.response.ApiResult;
 import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
+import com.abin.mallchat.common.common.utils.AssertUtil;
 import com.abin.mallchat.common.common.utils.CursorUtils;
 import com.abin.mallchat.common.common.utils.RequestHolder;
 import com.abin.mallchat.common.user.mapper.UserEmojisMapper;
@@ -66,15 +67,11 @@ public class UserEmojisServiceImpl extends ServiceImpl<UserEmojisMapper, UserEmo
         LambdaQueryWrapper<UserEmojis> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(UserEmojis::getUid,uid);
         int count = this.count(queryWrapper);
-        if (count>30){
-            return ApiResult.fail(-1,"最多只能添加30个表情");
-        }
+        AssertUtil.isFalse(count>30, "最多只能添加30个表情哦~~");
         //校验表情是否存在
         queryWrapper.eq(UserEmojis::getExpressionUrl,emojis.getExpressionUrl());
         count = this.count(queryWrapper);
-        if (count >0){
-            return ApiResult.fail(-1,"当前表情已存在");
-        }
+        AssertUtil.isFalse(count >0, "当前表情已存在哦~~");
         emojis.setUid(RequestHolder.get().getUid());
         this.saveOrUpdate(emojis, queryWrapper);
         return ApiResult.success(emojis);
