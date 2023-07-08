@@ -34,11 +34,15 @@ public class ChatGPTProperties {
     /**
      * 超时
      */
-    private Integer timeout = 60*1000;
+    private Integer timeout = 60 * 1000;
 
     /**
      * 用户每天条数限制
      */
     private Integer limit = 5;
 
+    /**
+     * 最大令牌
+     */
+    private Integer maxTokens = 2048;
 }

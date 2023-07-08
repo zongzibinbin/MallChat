@@ -16,6 +16,12 @@
             <groupId>com.abin.mallchat</groupId>
             <artifactId>mallchat-common</artifactId>
         </dependency>
+        <!--   token计算     -->
+        <dependency>
+            <groupId>com.knuddels</groupId>
+            <artifactId>jtokkit</artifactId>
+            <version>0.6.1</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -1,21 +1,28 @@
 package com.abin.mallchat.custom.chatai.handler;
 
-import cn.hutool.http.HttpResponse;
 import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.chat.domain.entity.msg.MessageExtra;
 import com.abin.mallchat.common.common.constant.RedisKey;
 import com.abin.mallchat.common.common.utils.DateUtils;
 import com.abin.mallchat.common.common.utils.RedisUtils;
+import com.abin.mallchat.custom.chatai.domain.ChatGPTContext;
+import com.abin.mallchat.custom.chatai.domain.ChatGPTMsg;
+import com.abin.mallchat.custom.chatai.domain.builder.ChatGPTContextBuilder;
+import com.abin.mallchat.custom.chatai.domain.builder.ChatGPTMsgBuilder;
 import com.abin.mallchat.custom.chatai.properties.ChatGPTProperties;
 import com.abin.mallchat.custom.chatai.utils.ChatGPTUtils;
 import com.abin.mallchat.custom.user.domain.vo.response.user.UserInfoResp;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import static com.abin.mallchat.common.common.constant.RedisKey.USER_CHAT_CONTEXT;
 
 @Slf4j
 @Component
@@ -54,22 +61,29 @@ public class GPTChatAIHandler extends AbstractChatAIHandler {
 
     @Override
     protected String doChat(Message message) {
-        String content = message.getContent().replace("@" + AI_NAME, "").trim();
+        String prompt = message.getContent().replace("@" + AI_NAME, "").trim();
         Long uid = message.getFromUid();
+        Long roomId = message.getRoomId();
         Long chatNum;
         String text;
         if ((chatNum = getUserChatNum(uid)) > chatGPTProperties.getLimit()) {
             text = "你今天已经和我聊了" + chatNum + "次了，我累了，明天再聊吧";
         } else {
-            HttpResponse response = null;
             try {
-                response = ChatGPTUtils.create(chatGPTProperties.getKey())
+                ChatGPTContext context = buildContext(message, prompt);// 构建上下文
+                context = tailorContext(context);// 裁剪上下文
+                log.info("prompt = {}" , prompt);
+                Response response = ChatGPTUtils.create(chatGPTProperties.getKey())
                         .proxyUrl(chatGPTProperties.getProxyUrl())
                         .model(chatGPTProperties.getModelName())
                         .timeout(chatGPTProperties.getTimeout())
-                        .prompt(content)
+                        .maxTokens(chatGPTProperties.getMaxTokens())
+                        .message(context.getMsg())
                         .send();
                 text = ChatGPTUtils.parseText(response);
+                ChatGPTMsg chatGPTMsg = ChatGPTMsgBuilder.assistantMsg(text);
+                context.addMsg(chatGPTMsg);
+                RedisUtils.set(RedisKey.getKey(USER_CHAT_CONTEXT, uid, roomId), context, 1L, TimeUnit.HOURS);
                 userChatNumInrc(uid);
             } catch (Exception e) {
                 log.warn("gpt doChat warn:", e);
@@ -78,6 +92,28 @@ public class GPTChatAIHandler extends AbstractChatAIHandler {
         }
         return text;
     }
+
+    private ChatGPTContext tailorContext(ChatGPTContext context) {
+        List<ChatGPTMsg> msg = context.getMsg();
+        Integer integer = ChatGPTUtils.countTokens(msg);
+        if (integer < (chatGPTProperties.getMaxTokens() - 500)) { // 用户的输入+ChatGPT的回答内容都会计算token 留500个token给ChatGPT回答
+            return context;
+        }
+        msg.remove(1);
+        return tailorContext(context);
+    }
+
+    private ChatGPTContext buildContext(Message message, String prompt) {
+        Long uid = message.getFromUid();
+        Long roomId = message.getRoomId();
+        ChatGPTContext chatGPTContext = RedisUtils.get(RedisKey.getKey(USER_CHAT_CONTEXT, uid, roomId), ChatGPTContext.class);
+        if (chatGPTContext == null) {
+            chatGPTContext = ChatGPTContextBuilder.initContext(uid, roomId);
+        }
+        chatGPTContext.addMsg(ChatGPTMsgBuilder.userMsg(prompt));
+        return chatGPTContext;
+    }
+
 
     private Long userChatNumInrc(Long uid) {
         return RedisUtils.inc(RedisKey.getKey(RedisKey.USER_CHAT_NUM, uid), DateUtils.getEndTimeByToday().intValue(), TimeUnit.MILLISECONDS);
