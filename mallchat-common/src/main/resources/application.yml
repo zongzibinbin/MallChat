@@ -39,16 +39,6 @@ spring:
     timeout: 1800000
     # 设置密码
     password: ${mallchat.redis.password}
-    lettuce:
-      pool:
-        # 最大阻塞等待时间，负数表示没有限制
-        max-wait: -1
-        # 连接池中的最大空闲连接
-        max-idle: 5
-        # 连接池中的最小空闲连接
-        min-idle: 0
-        # 连接池中最大连接数，负数表示没有限制
-        max-active: 20
   jackson:
     serialization:
       write-dates-as-timestamps: true
