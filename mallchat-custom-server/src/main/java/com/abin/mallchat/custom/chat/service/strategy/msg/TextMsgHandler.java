@@ -11,7 +11,8 @@ import com.abin.mallchat.common.chat.service.cache.MsgCache;
 import com.abin.mallchat.common.common.domain.enums.YesOrNoEnum;
 import com.abin.mallchat.common.common.utils.AssertUtil;
 import com.abin.mallchat.common.common.utils.SensitiveWordUtils;
-import com.abin.mallchat.common.common.utils.discover.PrioritizedUrlTitleDiscover;
+import com.abin.mallchat.common.common.utils.discover.PrioritizedUrlDiscover;
+import com.abin.mallchat.common.common.utils.discover.domain.UrlInfo;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.domain.enums.RoleEnum;
 import com.abin.mallchat.common.user.service.IRoleService;
@@ -47,7 +48,7 @@ public class TextMsgHandler extends AbstractMsgHandler {
     @Autowired
     private IRoleService iRoleService;
     
-    private static final PrioritizedUrlTitleDiscover URL_TITLE_DISCOVER = new PrioritizedUrlTitleDiscover();
+    private static final PrioritizedUrlDiscover URL_TITLE_DISCOVER = new PrioritizedUrlDiscover();
 
     @Override
     MessageTypeEnum getMsgTypeEnum() {
@@ -91,8 +92,8 @@ public class TextMsgHandler extends AbstractMsgHandler {
 
         }
         //判断消息url跳转
-        Map<String, String> urlTitleMap = URL_TITLE_DISCOVER.getContentTitleMap(body.getContent());
-        extra.setUrlTitleMap(urlTitleMap);
+        Map<String, UrlInfo> urlContentMap = URL_TITLE_DISCOVER.getUrlContentMap(body.getContent());
+        extra.setUrlContentMap(urlContentMap);
         //艾特功能
         if (CollectionUtil.isNotEmpty(body.getAtUidList())) {
             extra.setAtUidList(body.getAtUidList());
@@ -106,7 +107,7 @@ public class TextMsgHandler extends AbstractMsgHandler {
     public Object showMsg(Message msg) {
         TextMsgResp resp = new TextMsgResp();
         resp.setContent(msg.getContent());
-        resp.setUrlTitleMap(Optional.ofNullable(msg.getExtra()).map(MessageExtra::getUrlTitleMap).orElse(null));
+        resp.setUrlContentMap(Optional.ofNullable(msg.getExtra()).map(MessageExtra::getUrlContentMap).orElse(null));
         resp.setAtUidList(Optional.ofNullable(msg.getExtra()).map(MessageExtra::getAtUidList).orElse(null));
         //回复消息
         Optional<Message> reply = Optional.ofNullable(msg.getReplyMsgId())
