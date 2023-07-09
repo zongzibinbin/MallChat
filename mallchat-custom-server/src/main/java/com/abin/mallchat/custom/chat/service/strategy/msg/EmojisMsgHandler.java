@@ -4,7 +4,6 @@ import cn.hutool.core.bean.BeanUtil;
 import com.abin.mallchat.common.chat.dao.MessageDao;
 import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.chat.domain.entity.msg.EmojisMsgDTO;
-import com.abin.mallchat.common.chat.domain.entity.msg.ImgMsgDTO;
 import com.abin.mallchat.common.chat.domain.entity.msg.MessageExtra;
 import com.abin.mallchat.common.chat.domain.enums.MessageTypeEnum;
 import com.abin.mallchat.common.common.utils.AssertUtil;
@@ -26,7 +25,7 @@ public class EmojisMsgHandler extends AbstractMsgHandler {
 
     @Override
     MessageTypeEnum getMsgTypeEnum() {
-        return MessageTypeEnum.EMOJIS;
+        return MessageTypeEnum.EMOJI;
     }
 
     @Override

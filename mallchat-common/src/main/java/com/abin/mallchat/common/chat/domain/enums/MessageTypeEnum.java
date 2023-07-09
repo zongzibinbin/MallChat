@@ -22,7 +22,7 @@ public enum MessageTypeEnum {
     FILE(4, "文件"),
     SOUND(5, "语音"),
     VIDEO(6, "视频"),
-    EMOJIS(7, "表情"),
+    EMOJI(7, "表情"),
     ;
 
     private final Integer type;
