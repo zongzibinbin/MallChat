@@ -2,7 +2,6 @@ package com.abin.mallchat.custom.chatai.utils;
 
 import com.abin.mallchat.common.common.exception.BusinessException;
 import com.abin.mallchat.custom.chatai.domain.ChatGPTMsg;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.knuddels.jtokkit.Encodings;
 import com.knuddels.jtokkit.api.Encoding;
@@ -13,10 +12,9 @@ import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class ChatGPTUtils {
@@ -85,17 +83,23 @@ public class ChatGPTUtils {
         return parseText(response.body().string());
     }
 
+
     public static String parseText(String body) {
-        log.info("body >>> " + body);
-        JSONObject jsonObject = JSONObject.parseObject(body);
-        JSONObject error = jsonObject.getJSONObject("error");
-        if (error != null) {
-            log.error("error >>> " + error);
+//        log.info("body >>> " + body);
+        try {
+            return Arrays.stream(body.split("data:"))
+                    .map(String::trim)
+                    .filter(x -> StringUtils.isNotBlank(x) && !"[DONE]".endsWith(x))
+                    .map(x -> JSONObject.parseObject(x)
+                            .getJSONArray("choices")
+                            .getJSONObject(0)
+                            .getJSONObject("delta")
+                            .getString("content")
+                    ).filter(Objects::nonNull).collect(Collectors.joining());
+        } catch (Exception e) {
+            log.error("parseText error e:", e);
             return "闹脾气了，等会再试试吧~";
         }
-        JSONArray choices = JSONObject.parseArray(jsonObject.getString("choices"));
-        JSONObject choice = choices.getJSONObject(0);
-        return choice.getJSONObject("message").getString("content");
     }
 
     public ChatGPTUtils model(String model) {
@@ -144,15 +148,6 @@ public class ChatGPTUtils {
     }
 
     public Response send() throws IOException {
-//        cn.hutool.json.JSONObject param = new cn.hutool.json.JSONObject();
-//        param.set("model", model);
-//        param.set("messages", messages);
-//        param.set("max_tokens", maxTokens);
-//        param.set("temperature", temperature);
-//        param.set("top_p", topP);
-//        param.set("frequency_penalty", frequencyPenalty);
-//        param.set("presence_penalty", presencePenalty);
-//        log.info("headers >>> " + headers);
         OkHttpClient okHttpClient = new OkHttpClient()
                 .newBuilder()
                 .connectTimeout(10, TimeUnit.SECONDS)
@@ -167,7 +162,9 @@ public class ChatGPTUtils {
         paramMap.put("top_p", topP);
         paramMap.put("frequency_penalty", frequencyPenalty);
         paramMap.put("presence_penalty", presencePenalty);
+        paramMap.put("stream", true);
 
+        log.info("paramMap >>> " + JSONObject.toJSONString(paramMap));
         Request request = new Request.Builder()
                 .url(StringUtils.isNotBlank(proxyUrl) ? proxyUrl : URL)
                 .addHeader("Content-Type", "application/json")
