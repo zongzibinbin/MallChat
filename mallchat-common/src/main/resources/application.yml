@@ -12,7 +12,7 @@ mybatis-plus:
 spring:
   profiles:
     #运行的环境
-    active: test
+    active: my-prod
   application:
     name: mallchat
   datasource:
@@ -38,7 +38,7 @@ spring:
     # 连接超时时间
     timeout: 1800000
     # 设置密码
-#    password: ${mallchat.redis.password}
+    password: ${mallchat.redis.password}
     lettuce:
       pool:
         # 最大阻塞等待时间，负数表示没有限制
@@ -68,12 +68,9 @@ chatai:
     use: ${mallchat.chatgpt.use}
     AIUserId: ${mallchat.chatgpt.uid}
     key: ${mallchat.chatgpt.key}
-#    proxyUrl: ${mallchat.chatgpt.proxyUrl}
-    context: ${mallchat.chatgpt.context}
-    modelName: ${mallchat.chatgpt.modelName}
+    proxyUrl: ${mallchat.chatgpt.proxyUrl}
   chatglm2:
     use: ${mallchat.chatglm2.use}
     url: ${mallchat.chatglm2.url}
     minute: 3 # 每个用户每3分钟可以请求一次
     AIUserId: ${mallchat.chatglm2.uid}
-    context: ${mallchat.chatglm2.context}

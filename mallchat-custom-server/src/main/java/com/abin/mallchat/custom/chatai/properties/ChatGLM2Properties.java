@@ -18,7 +18,7 @@ public class ChatGLM2Properties {
     /**
      * 使用
      */
-    private boolean use;
+    private boolean use = false;
 
     /**
      * url

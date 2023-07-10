@@ -13,7 +13,7 @@ public class ChatGPTProperties {
     /**
      * 是否使用openAI
      */
-    private boolean use;
+    private boolean use = false;
     /**
      * 机器人 id
      */
