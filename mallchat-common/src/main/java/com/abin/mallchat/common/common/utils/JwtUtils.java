@@ -67,7 +67,7 @@ public class JwtUtils {
             DecodedJWT jwt = verifier.verify(token);
             return jwt.getClaims();
         } catch (Exception e) {
-            log.info("decode error,token:{}", token, e);
+            log.error("decode error,token:{}", token, e);
         }
         return null;
     }

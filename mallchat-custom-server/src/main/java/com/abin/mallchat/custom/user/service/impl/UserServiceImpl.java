@@ -4,7 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.abin.mallchat.common.common.event.UserBlackEvent;
 import com.abin.mallchat.common.common.event.UserRegisterEvent;
 import com.abin.mallchat.common.common.utils.AssertUtil;
-import com.abin.mallchat.common.common.utils.SensitiveWordUtils;
+import com.abin.mallchat.common.common.utils.sensitiveWord.SensitiveWordBs;
 import com.abin.mallchat.common.user.dao.BlackDao;
 import com.abin.mallchat.common.user.dao.ItemConfigDao;
 import com.abin.mallchat.common.user.dao.UserBackpackDao;
@@ -63,6 +63,8 @@ public class UserServiceImpl implements UserService {
     private BlackDao blackDao;
     @Autowired
     private UserSummaryCache userSummaryCache;
+    @Autowired
+    private SensitiveWordBs sensitiveWordBs;
 
     @Override
     public UserInfoResp getUserInfo(Long uid) {
@@ -76,7 +78,7 @@ public class UserServiceImpl implements UserService {
     public void modifyName(Long uid, ModifyNameReq req) {
         //判断名字是不是重复
         String newName = req.getName();
-        AssertUtil.isFalse(SensitiveWordUtils.hasSensitiveWord(newName), "名字中包含敏感词，请重新输入"); // 判断名字中有没有敏感词
+        AssertUtil.isFalse(sensitiveWordBs.hasSensitiveWord(newName), "名字中包含敏感词，请重新输入"); // 判断名字中有没有敏感词
         User oldUser = userDao.getByName(newName);
         AssertUtil.isEmpty(oldUser, "名字已经被抢占了，请换一个哦~~");
         //判断改名卡够不够

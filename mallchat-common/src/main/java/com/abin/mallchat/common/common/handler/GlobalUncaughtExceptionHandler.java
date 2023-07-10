@@ -9,7 +9,6 @@ public class GlobalUncaughtExceptionHandler  implements Thread.UncaughtException
     @Override
     public void uncaughtException(Thread t, Throwable e) {
         log.error("Exception in thread {} ", t.getName(), e);
-        e.printStackTrace();
     }
 
 }

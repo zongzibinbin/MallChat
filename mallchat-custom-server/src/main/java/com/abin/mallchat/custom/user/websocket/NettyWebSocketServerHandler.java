@@ -19,10 +19,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
 
+    private WebSocketService webSocketService;
+
     // 当web客户端连接后，触发该方法
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-//        getService().connect(ctx.channel());
+        this.webSocketService = getService();
     }
 
     // 客户端离线
@@ -45,7 +47,7 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
     }
 
     private void userOffLine(ChannelHandlerContext ctx) {
-        getService().removed(ctx.channel());
+        this.webSocketService.removed(ctx.channel());
         ctx.channel().close();
     }
 
@@ -65,11 +67,11 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
                 // 关闭用户的连接
                 userOffLine(ctx);
             }
-        } else if (evt == WebSocketServerProtocolHandler.ServerHandshakeStateEvent.HANDSHAKE_COMPLETE) {
-            getService().connect(ctx.channel());
+        } else if (evt instanceof WebSocketServerProtocolHandler.HandshakeComplete) {
+            this.webSocketService.connect(ctx.channel());
             String token = NettyUtil.getAttr(ctx.channel(), NettyUtil.TOKEN);
             if (StrUtil.isNotBlank(token)) {
-                getService().authorize(ctx.channel(), new WSAuthorize(token));
+                this.webSocketService.authorize(ctx.channel(), new WSAuthorize(token));
             }
         }
         super.userEventTriggered(ctx, evt);
@@ -93,13 +95,13 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
         WSReqTypeEnum wsReqTypeEnum = WSReqTypeEnum.of(wsBaseReq.getType());
         switch (wsReqTypeEnum) {
             case LOGIN:
-                getService().handleLoginReq(ctx.channel());
+                this.webSocketService.handleLoginReq(ctx.channel());
                 log.info("请求二维码 = " + msg.text());
                 break;
             case HEARTBEAT:
                 break;
             case AUTHORIZE:
-                getService().authorize(ctx.channel(), JSONUtil.toBean(wsBaseReq.getData(), WSAuthorize.class));
+                this.webSocketService.authorize(ctx.channel(), JSONUtil.toBean(wsBaseReq.getData(), WSAuthorize.class));
                 log.info("主动认证 = " + msg.text());
                 break;
             default:

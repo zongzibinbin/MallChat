@@ -2,9 +2,8 @@ package com.abin.mallchat.common.common.aspect;
 
 import cn.hutool.core.util.StrUtil;
 import com.abin.mallchat.common.common.annotation.FrequencyControl;
-import com.abin.mallchat.common.common.exception.BusinessException;
-import com.abin.mallchat.common.common.exception.CommonErrorEnum;
-import com.abin.mallchat.common.common.utils.RedisUtils;
+import com.abin.mallchat.common.common.domain.dto.FrequencyControlDTO;
+import com.abin.mallchat.common.common.service.frequencycontrol.FrequencyControlUtil;
 import com.abin.mallchat.common.common.utils.RequestHolder;
 import com.abin.mallchat.common.common.utils.SpElUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +14,12 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static com.abin.mallchat.common.common.service.frequencycontrol.FrequencyControlStrategyFactory.TOTAL_COUNT_WITH_IN_FIX_TIME_FREQUENCY_CONTROLLER;
 
 /**
  * Description: 频控实现
@@ -48,25 +52,25 @@ public class FrequencyControlAspect {
             }
             keyMap.put(prefix + ":" + key, frequencyControl);
         }
-        //批量获取redis统计的值
-        ArrayList<String> keyList = new ArrayList<>(keyMap.keySet());
-        List<Integer> countList = RedisUtils.mget(keyList, Integer.class);
-        for (int i = 0; i < keyList.size(); i++) {
-            String key = keyList.get(i);
-            Integer count = countList.get(i);
-            FrequencyControl frequencyControl = keyMap.get(key);
-            if (Objects.nonNull(count) && count >= frequencyControl.count()) {//频率超过了
-                log.warn("frequencyControl limit key:{},count:{}", key, count);
-                throw new BusinessException(CommonErrorEnum.FREQUENCY_LIMIT);
-            }
-        }
-        try {
-            return joinPoint.proceed();
-        } finally {
-            //不管成功还是失败，都增加次数
-            keyMap.forEach((k, v) -> {
-                RedisUtils.inc(k, v.time(), v.unit());
-            });
-        }
+        // 将注解的参数转换为编程式调用需要的参数
+        List<FrequencyControlDTO> frequencyControlDTOS = keyMap.entrySet().stream().map(entrySet -> buildFrequencyControlDTO(entrySet.getKey(), entrySet.getValue())).collect(Collectors.toList());
+        // 调用编程式注解
+        return FrequencyControlUtil.executeWithFrequencyControlList(TOTAL_COUNT_WITH_IN_FIX_TIME_FREQUENCY_CONTROLLER, frequencyControlDTOS, joinPoint::proceed);
+    }
+
+    /**
+     * 将注解参数转换为编程式调用所需要的参数
+     *
+     * @param key              频率控制Key
+     * @param frequencyControl 注解
+     * @return 编程式调用所需要的参数-FrequencyControlDTO
+     */
+    private FrequencyControlDTO buildFrequencyControlDTO(String key, FrequencyControl frequencyControl) {
+        FrequencyControlDTO frequencyControlDTO = new FrequencyControlDTO();
+        frequencyControlDTO.setCount(frequencyControl.count());
+        frequencyControlDTO.setTime(frequencyControl.time());
+        frequencyControlDTO.setUnit(frequencyControl.unit());
+        frequencyControlDTO.setKey(key);
+        return frequencyControlDTO;
     }
 }

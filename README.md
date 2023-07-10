@@ -13,13 +13,22 @@
     <a href="https://github.com/zongzibinbin/MallChat"><img src="https://img.shields.io/badge/github-项目地址-yellow.svg?style=plasticr"></a>
     <a href="https://gitee.com/zhongzhibinbin/MallChat"><img src="https://img.shields.io/badge/码云-项目地址-orange.svg?style=plasticr"></a>
     <a href="https://github.com/Evansy/MallChatWeb"><img src="https://img.shields.io/badge/前端-项目地址-blueviolet.svg?style=plasticr"></a>
-    
-  [![MallChat](https://github.com/Evansy/MallChatWeb/actions/workflows/deploy.yml/badge.svg?branch=main)](https://github.com/Evansy/MallChatWeb/actions/workflows/deploy.yml)
+    <a href="https://github.com/zongzibinbin/MallChat/commits" target="_blank"><br>
+    <a href="https://github.com/Evansy/MallChatWeb/actions/workflows/deploy.yml" target="_blank">
+        <img alt="Commit" src="https://github.com/Evansy/MallChatWeb/actions/workflows/deploy.yml/badge.svg?branch=main">
+    </a>
     <a href="https://github.com/zongzibinbin/MallChat/commits" target="_blank">
-    <img alt="Commit" src="https://img.shields.io/github/commit-activity/m/zongzibinbin/MallChat"></a>
+        <img alt="Commit" src="https://img.shields.io/github/commit-activity/m/zongzibinbin/MallChat"></a>
     <a href="https://github.com/zongzibinbin/MallChat/issues" target="_blank">
-    <img alt="Issues" src="https://img.shields.io/github/issues/zongzibinbin/MallChat"></a> [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/zongzibinbin/MallChat/blob/master/LICENSE)
-    [![GitHub stars](https://img.shields.io/github/stars/zongzibinbin/MallChat.svg?style=social)](https://github.com/zongzibinbin/MallChat/stargazers)
+        <img alt="Issues" src="https://img.shields.io/github/issues/zongzibinbin/MallChat">
+    </a> 
+    <a href="https://github.com/zongzibinbin/MallChat/blob/master/LICENSE" target="_blank">
+        <img alt="License: Apache-2.0" src="https://img.shields.io/badge/License-Apache--2.0-blue.svg">
+    </a> 
+    <a href="https://github.com/zongzibinbin/MallChat/stargazers" target="_blank">
+        <img alt="License" src="https://img.shields.io/github/stars/zongzibinbin/MallChat.svg?style=social">
+    </a> 
+    
 </div>
 
 ## 项目导航
@@ -130,7 +139,7 @@
     <td><a href="https://github.com/Evansy/MallChatWeb/pull/17">虚拟列表</a></td>
   </tr>
   <tr>
-    <td rowspan="3">后端</td>
+    <td rowspan="5">后端</td>
     <td rowspan="2">
       <a href="https://github.com/1045078399"><img src="https://avatars.githubusercontent.com/u/82020261?v=4" style=" width: 80px; height: 80px;"></a>
     </td>
@@ -144,6 +153,18 @@
       <a href="https://github.com/xiaocairush"><img src="https://avatars.githubusercontent.com/u/6416523?v=4" style=" width: 80px; height: 80px;"></a>
     </td>
     <td><a href="https://github.com/zongzibinbin/MallChat/pull/99">Ac自动机敏感词检测</a></td>
+  </tr>
+    <tr>
+    <td rowspan="1">
+      <a href="https://github.com/linzhihan"><img src="https://avatars.githubusercontent.com/u/58815955?v=4" style=" width: 80px; height: 80px;"></a>
+    </td>
+    <td><a href="https://github.com/zongzibinbin/MallChat/pull/95">限流编程式</a></td>
+  </tr>
+    <tr>
+    <td rowspan="1">
+      <a href="https://github.com/zbzbzzz"><img src="https://avatars.githubusercontent.com/u/42697182?v=4" style=" width: 80px; height: 80px;"></a>
+    </td>
+    <td><a href="https://github.com/zongzibinbin/MallChat/pull/82">握手认证</a></td>
   </tr>
 </table>
 

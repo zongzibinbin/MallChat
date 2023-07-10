@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class OssServiceImpl implements OssService {
-    private static final String BUCKET_NAME = "mallchat";
     @Autowired
     private MinIOTemplate minIOTemplate;
 

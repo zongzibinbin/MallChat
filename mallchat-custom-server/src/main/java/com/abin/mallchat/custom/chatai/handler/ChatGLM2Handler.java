@@ -4,12 +4,17 @@ import cn.hutool.http.HttpResponse;
 import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.chat.domain.entity.msg.MessageExtra;
 import com.abin.mallchat.common.common.constant.RedisKey;
+import com.abin.mallchat.common.common.domain.dto.FrequencyControlDTO;
+import com.abin.mallchat.common.common.exception.FrequencyControlException;
+import com.abin.mallchat.common.common.service.frequencycontrol.FrequencyControlUtil;
 import com.abin.mallchat.common.common.utils.RedisUtils;
+import com.abin.mallchat.custom.chatai.dto.GPTRequestDTO;
 import com.abin.mallchat.custom.chatai.properties.ChatGLM2Properties;
 import com.abin.mallchat.custom.chatai.utils.ChatGLM2Utils;
 import com.abin.mallchat.custom.user.domain.vo.response.user.UserInfoResp;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -21,10 +26,15 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import static com.abin.mallchat.common.common.constant.RedisKey.USER_GLM2_TIME_LAST;
+import static com.abin.mallchat.common.common.service.frequencycontrol.FrequencyControlStrategyFactory.TOTAL_COUNT_WITH_IN_FIX_TIME_FREQUENCY_CONTROLLER;
 
 @Slf4j
 @Component
 public class ChatGLM2Handler extends AbstractChatAIHandler {
+    /**
+     * ChatGLM2Handler限流前缀
+     */
+    private static final String CHAT_GLM2_FREQUENCY_PREFIX = "ChatGLM2Handler";
 
     private static final List<String> ERROR_MSG = Arrays.asList(
             "还摸鱼呢？你不下班我还要下班呢。。。。",
@@ -74,27 +84,42 @@ public class ChatGLM2Handler extends AbstractChatAIHandler {
     protected String doChat(Message message) {
         String content = message.getContent().replace("@" + AI_NAME, "").trim();
         Long uid = message.getFromUid();
-        Long minute;
+        try {
+            FrequencyControlDTO frequencyControlDTO = new FrequencyControlDTO();
+            frequencyControlDTO.setKey(CHAT_GLM2_FREQUENCY_PREFIX + ":" + uid);
+            frequencyControlDTO.setUnit(TimeUnit.MINUTES);
+            frequencyControlDTO.setCount(1);
+            frequencyControlDTO.setTime(glm2Properties.getMinute().intValue());
+            return FrequencyControlUtil.executeWithFrequencyControl(TOTAL_COUNT_WITH_IN_FIX_TIME_FREQUENCY_CONTROLLER, frequencyControlDTO, () -> sendRequestToGPT(new GPTRequestDTO(content, uid)));
+        } catch (FrequencyControlException e) {
+            return "你太快了亲爱的~过一会再来找人家~";
+        } catch (Throwable e) {
+            return "系统开小差啦~~";
+        }
+    }
+
+    /**
+     * TODO
+     *
+     * @param gptRequestDTO
+     * @return
+     */
+    @Nullable
+    private String sendRequestToGPT(GPTRequestDTO gptRequestDTO) {
+        String content = gptRequestDTO.getContent();
         String text;
-        if ((minute = userMinutesLater(uid)) > 0) {
-            text = "你太快了 " + minute + "分钟后重试";
-        } else {
-            HttpResponse response = null;
-            try {
-                response = ChatGLM2Utils
-                        .create()
-                        .url(glm2Properties.getUrl())
-                        .prompt(content)
-                        .timeout(glm2Properties.getTimeout())
-                        .send();
-                text = ChatGLM2Utils.parseText(response);
-            } catch (Exception e) {
-                log.warn("glm2 doChat warn:", e);
-                return getErrorText();
-            }
-            if (StringUtils.isNotBlank(text)) {
-                RedisUtils.set(RedisKey.getKey(USER_GLM2_TIME_LAST, uid), new Date(), glm2Properties.getMinute(), TimeUnit.MINUTES);
-            }
+        HttpResponse response = null;
+        try {
+            response = ChatGLM2Utils
+                    .create()
+                    .url(glm2Properties.getUrl())
+                    .prompt(content)
+                    .timeout(glm2Properties.getTimeout())
+                    .send();
+            text = ChatGLM2Utils.parseText(response);
+        } catch (Exception e) {
+            log.warn("glm2 doChat warn:", e);
+            return getErrorText();
         }
         return text;
     }
