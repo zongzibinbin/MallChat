@@ -64,4 +64,15 @@ public abstract class AbstractRedisStringCache<IN, OUT> implements BatchCache<IN
         }
         return resultMap;
     }
+
+    @Override
+    public void delete(IN req) {
+        deleteBatch(Collections.singletonList(req));
+    }
+
+    @Override
+    public void deleteBatch(List<IN> req) {
+        List<String> keys = req.stream().map(this::getKey).collect(Collectors.toList());
+        RedisUtils.del(keys);
+    }
 }
