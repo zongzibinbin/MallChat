@@ -1,4 +1,4 @@
-package com.abin.mallchat.common.common.algorithm.ac;
+package com.abin.mallchat.custom.ac;
 
 
 import com.auth0.jwt.JWT;

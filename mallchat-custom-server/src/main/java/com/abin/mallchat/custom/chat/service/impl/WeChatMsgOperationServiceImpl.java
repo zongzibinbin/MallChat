@@ -1,34 +1,31 @@
 package com.abin.mallchat.custom.chat.service.impl;
 
 import cn.hutool.core.thread.NamedThreadFactory;
+import com.abin.mallchat.common.common.domain.dto.FrequencyControlDTO;
+import com.abin.mallchat.common.common.exception.FrequencyControlException;
 import com.abin.mallchat.common.common.handler.GlobalUncaughtExceptionHandler;
-import com.abin.mallchat.common.common.utils.JsonUtils;
+import com.abin.mallchat.common.common.service.frequencycontrol.FrequencyControlUtil;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.service.cache.UserCache;
 import com.abin.mallchat.custom.chat.service.WeChatMsgOperationService;
 import lombok.extern.slf4j.Slf4j;
-import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
-import me.chanjar.weixin.mp.api.WxMpTemplateMsgService;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateData;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import static com.abin.mallchat.common.common.service.frequencycontrol.FrequencyControlStrategyFactory.TOTAL_COUNT_WITH_IN_FIX_TIME_FREQUENCY_CONTROLLER;
+
 @Slf4j
 @Component
-public class WeChatMsgOperationServiceImpl  implements WeChatMsgOperationService {
+public class WeChatMsgOperationServiceImpl implements WeChatMsgOperationService {
 
     private static final ExecutorService executor = new ThreadPoolExecutor(1, 10, 3000L,
             TimeUnit.MILLISECONDS,
@@ -37,7 +34,7 @@ public class WeChatMsgOperationServiceImpl  implements WeChatMsgOperationService
                     new GlobalUncaughtExceptionHandler()));
 
     // at消息的微信推送模板id
-    private final String atMsgPublishTemplateId = "";
+    private final String atMsgPublishTemplateId = "Xd7sWPZsuWa0UmpvLaZPvaJVjNj1KjEa0zLOm5_Z7IU";
 
     private final String WE_CHAT_MSG_COLOR = "#A349A4";
 
@@ -54,13 +51,29 @@ public class WeChatMsgOperationServiceImpl  implements WeChatMsgOperationService
         uidSet.addAll(receiverUidList);
         Map<Long, User> userMap = userCache.getUserInfoBatch(uidSet);
         userMap.values().forEach(user -> {
-            if (Objects.nonNull(user.getOpenId()) && user.isPublishChatToWechatSwitch()) {
+            if (Objects.nonNull(user.getOpenId())) {
                 executor.execute(() -> {
                     WxMpTemplateMessage msgTemplate = getAtMsgTemplate(sender, user.getOpenId(), msg);
-                    publishTemplateMsg(msgTemplate);
+                    publishTemplateMsgCheckLimit(msgTemplate);
                 });
             }
         });
+    }
+
+    private void publishTemplateMsgCheckLimit(WxMpTemplateMessage msgTemplate) {
+        try {
+            FrequencyControlDTO frequencyControlDTO = new FrequencyControlDTO();
+            frequencyControlDTO.setKey("TemplateMsg:" + msgTemplate.getToUser());
+            frequencyControlDTO.setUnit(TimeUnit.HOURS);
+            frequencyControlDTO.setCount(1);
+            frequencyControlDTO.setTime(1);
+            FrequencyControlUtil.executeWithFrequencyControl(TOTAL_COUNT_WITH_IN_FIX_TIME_FREQUENCY_CONTROLLER, frequencyControlDTO,
+                    () -> publishTemplateMsg(msgTemplate));
+        } catch (FrequencyControlException e) {
+            log.info("wx push limit openid:{}", msgTemplate.getToUser());
+        } catch (Throwable e) {
+            log.error("wx push error openid:{}", msgTemplate.getToUser());
+        }
     }
 
     /*
@@ -80,8 +93,8 @@ public class WeChatMsgOperationServiceImpl  implements WeChatMsgOperationService
     private List<WxMpTemplateData> generateAtMsgData(User sender, String msg) {
         List dataList = new ArrayList<WxMpTemplateData>();
 //        todo: 没有消息模板，暂不实现
-//        dataList.add(new WxMpTemplateData("senderName", sender.getName() , WE_CHAT_MSG_COLOR));
-//        dataList.add(new WxMpTemplateData("content", msg , WE_CHAT_MSG_COLOR));
+        dataList.add(new WxMpTemplateData("name", sender.getName(), WE_CHAT_MSG_COLOR));
+        dataList.add(new WxMpTemplateData("content", msg, WE_CHAT_MSG_COLOR));
         return dataList;
     }
 
@@ -91,12 +104,12 @@ public class WeChatMsgOperationServiceImpl  implements WeChatMsgOperationService
      * @param templateMsg 微信模板消息
      */
     protected void publishTemplateMsg(WxMpTemplateMessage templateMsg) {
-        WxMpTemplateMsgService wxMpTemplateMsgService = wxMpService.getTemplateMsgService();
-        try {
-            wxMpTemplateMsgService.sendTemplateMsg(templateMsg);
-        } catch (WxErrorException e) {
-            log.error("publish we chat msg failed! open id is {}, msg is {}.",
-                    templateMsg.getToUser(), JsonUtils.toStr(templateMsg.getData()));
-        }
+//        WxMpTemplateMsgService wxMpTemplateMsgService = wxMpService.getTemplateMsgService();todo 等审核通过
+//        try {
+//            wxMpTemplateMsgService.sendTemplateMsg(templateMsg);
+//        } catch (WxErrorException e) {
+//            log.error("publish we chat msg failed! open id is {}, msg is {}.",
+//                    templateMsg.getToUser(), JsonUtils.toStr(templateMsg.getData()));
+//        }
     }
 }

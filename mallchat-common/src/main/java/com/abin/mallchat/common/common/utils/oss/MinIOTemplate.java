@@ -136,8 +136,8 @@ public class MinIOTemplate {
         String uid = Optional.ofNullable(req.getUid()).map(String::valueOf).orElse("000000");
         cn.hutool.core.lang.UUID uuid = cn.hutool.core.lang.UUID.fastUUID();
         String suffix = FileNameUtil.getSuffix(req.getFileName());
-        String year = DateUtil.format(new Date(), DatePattern.NORM_YEAR_PATTERN);
-        return req.getFilePath() + StrUtil.SLASH + year + StrUtil.SLASH + uid + StrUtil.SLASH + uuid + StrUtil.DOT + suffix;
+        String yearAndMonth = DateUtil.format(new Date(), DatePattern.NORM_MONTH_PATTERN);
+        return req.getFilePath() + StrUtil.SLASH + yearAndMonth + StrUtil.SLASH + uid + StrUtil.SLASH + uuid + StrUtil.DOT + suffix;
     }
 
     /**

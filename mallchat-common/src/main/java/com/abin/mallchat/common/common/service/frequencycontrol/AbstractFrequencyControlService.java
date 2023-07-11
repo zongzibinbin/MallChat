@@ -88,6 +88,17 @@ public abstract class AbstractFrequencyControlService<K extends FrequencyControl
         T get() throws Throwable;
     }
 
+    @FunctionalInterface
+    public interface Executor {
+
+        /**
+         * Gets a result.
+         *
+         * @return a result
+         */
+        void execute() throws Throwable;
+    }
+
     /**
      * 是否达到限流阈值 子类实现 每个子类都可以自定义自己的限流逻辑判断
      *
