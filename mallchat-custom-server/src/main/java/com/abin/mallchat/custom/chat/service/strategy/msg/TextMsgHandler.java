@@ -10,9 +10,9 @@ import com.abin.mallchat.common.chat.domain.enums.MessageTypeEnum;
 import com.abin.mallchat.common.chat.service.cache.MsgCache;
 import com.abin.mallchat.common.common.domain.enums.YesOrNoEnum;
 import com.abin.mallchat.common.common.utils.AssertUtil;
-import com.abin.mallchat.common.common.utils.SensitiveWordUtils;
 import com.abin.mallchat.common.common.utils.discover.PrioritizedUrlDiscover;
 import com.abin.mallchat.common.common.utils.discover.domain.UrlInfo;
+import com.abin.mallchat.common.common.utils.sensitiveWord.SensitiveWordBs;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.domain.enums.RoleEnum;
 import com.abin.mallchat.common.user.service.IRoleService;
@@ -47,7 +47,9 @@ public class TextMsgHandler extends AbstractMsgHandler {
     private UserInfoCache userInfoCache;
     @Autowired
     private IRoleService iRoleService;
-    
+    @Autowired
+    private SensitiveWordBs sensitiveWordBs;
+
     private static final PrioritizedUrlDiscover URL_TITLE_DISCOVER = new PrioritizedUrlDiscover();
 
     @Override
@@ -82,7 +84,7 @@ public class TextMsgHandler extends AbstractMsgHandler {
         MessageExtra extra = Optional.ofNullable(msg.getExtra()).orElse(new MessageExtra());
         Message update = new Message();
         update.setId(msg.getId());
-        update.setContent(SensitiveWordUtils.filter(body.getContent()));
+        update.setContent(sensitiveWordBs.filter(body.getContent()));
         update.setExtra(extra);
         //如果有回复消息
         if (Objects.nonNull(body.getReplyMsgId())) {

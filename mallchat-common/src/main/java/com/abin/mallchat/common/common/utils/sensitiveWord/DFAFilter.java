@@ -1,4 +1,4 @@
-package com.abin.mallchat.common.common.utils;
+package com.abin.mallchat.common.common.utils.sensitiveWord;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
@@ -18,7 +18,10 @@ import java.util.*;
  * @author zhaoyuhang
  * @date 2023/06/19
  */
-public final class SensitiveWordUtils {
+public final class DFAFilter implements SensitiveWordFilter {
+
+    private DFAFilter() {
+    }
     private static Word root = new Word(' '); // 敏感词字典的根节点
     private final static char replace = '*'; // 替代字符
     private final static String skipChars = " !*-+_=,，.@;:；：。、？?（）()【】[]《》<>“”\"‘’"; // 遇到这些字符就会跳过
@@ -30,6 +33,10 @@ public final class SensitiveWordUtils {
         }
     }
 
+    public static DFAFilter getInstance() {
+        return new DFAFilter();
+    }
+
 
     /**
      * 判断文本中是否存在敏感词
@@ -37,7 +44,7 @@ public final class SensitiveWordUtils {
      * @param text 文本
      * @return true: 存在敏感词, false: 不存在敏感词
      */
-    public static boolean hasSensitiveWord(String text) {
+    public boolean hasSensitiveWord(String text) {
         if (StringUtils.isBlank(text)) return false;
         return !Objects.equals(filter(text), text);
     }
@@ -48,7 +55,7 @@ public final class SensitiveWordUtils {
      * @param text 待替换文本
      * @return 替换后的文本
      */
-    public static String filter(String text) {
+    public String filter(String text) {
         StringBuilder result = new StringBuilder(text);
         int index = 0;
         while (index < result.length()) {
@@ -93,7 +100,7 @@ public final class SensitiveWordUtils {
      *
      * @param words 敏感词数组
      */
-    public static void loadWord(List<String> words) {
+    public void loadWord(List<String> words) {
         if (!CollectionUtils.isEmpty(words)) {
             Word newRoot = new Word(' ');
             words.forEach(word -> loadWord(word, newRoot));
@@ -106,7 +113,7 @@ public final class SensitiveWordUtils {
      *
      * @param word 词
      */
-    public static void loadWord(String word, Word root) {
+    public void loadWord(String word, Word root) {
         if (StringUtils.isBlank(word)) {
             return;
         }
@@ -136,7 +143,7 @@ public final class SensitiveWordUtils {
      *
      * @param path 文本文件的绝对路径
      */
-    public static void loadWordFromFile(String path) {
+    public void loadWordFromFile(String path) {
         try (InputStream inputStream = Files.newInputStream(Paths.get(path))) {
             loadWord(inputStream);
         } catch (IOException e) {
@@ -150,7 +157,7 @@ public final class SensitiveWordUtils {
      * @param inputStream 文本文件输入流
      * @throws IOException IO异常
      */
-    public static void loadWord(InputStream inputStream) throws IOException {
+    public void loadWord(InputStream inputStream) throws IOException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
             String line;
             ArrayList<String> list = new ArrayList<>();
@@ -167,7 +174,7 @@ public final class SensitiveWordUtils {
      * @param c 待检测字符
      * @return true: 需要跳过, false: 不需要跳过
      */
-    private static boolean skip(char c) {
+    private boolean skip(char c) {
         return skipSet.contains(c);
     }
 
@@ -186,17 +193,7 @@ public final class SensitiveWordUtils {
 
         public Word(char c) {
             this.c = c;
-            this.end = false;
             this.next = new HashMap<>();
         }
     }
-
-    public static void main(String[] args) {
-        String text = "白日,梦";
-        String filter = filter(text);
-        System.out.println(filter);
-
-
-    }
-
 }
