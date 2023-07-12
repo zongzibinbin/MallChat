@@ -45,6 +45,9 @@ public class ThreadPoolConfig implements AsyncConfigurer {
         executor.setThreadNamePrefix("mallchat-executor-");
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());//满了调用线程执行，认为重要任务
         executor.setThreadFactory(new MyThreadFactory(executor));
+        executor.setPrestartAllCoreThreads(true);
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(10);
         executor.initialize();
         return executor;
     }
@@ -58,6 +61,7 @@ public class ThreadPoolConfig implements AsyncConfigurer {
         executor.setThreadNamePrefix("websocket-executor-");
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());//满了直接丢弃，默认为不重要消息推送
         executor.setThreadFactory(new MyThreadFactory(executor));
+        executor.setPrestartAllCoreThreads(true);
         executor.initialize();
         return executor;
     }
