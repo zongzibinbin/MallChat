@@ -1,4 +1,4 @@
-package com.abin.mallchat.common.common.utils;
+package com.abin.mallchat.common.common.utils.sensitiveWord;
 
 import com.abin.mallchat.common.common.algorithm.ac.ACTrie;
 import com.abin.mallchat.common.common.algorithm.ac.MatchResult;
@@ -15,7 +15,7 @@ import java.util.Objects;
  *
  * Created by berg on 2023/6/18.
  */
-public class SensitiveWordUtils0 {
+public class ACFilter implements SensitiveWordFilter {
 
     private final static char mask_char = '*'; // 替代字符
 
@@ -27,7 +27,7 @@ public class SensitiveWordUtils0 {
      * @param text 文本
      * @return boolean
      */
-    public static boolean hasSensitiveWord(String text) {
+    public boolean hasSensitiveWord(String text) {
         if (StringUtils.isBlank(text)) return false;
         return !Objects.equals(filter(text), text);
     }
@@ -38,7 +38,7 @@ public class SensitiveWordUtils0 {
      * @param text 待替换文本
      * @return 替换后的文本
      */
-    public static String filter(String text) {
+    public String filter(String text) {
         if (StringUtils.isBlank(text)) return text;
         List<MatchResult> matchResults = ac_trie.matches(text);
         StringBuffer result = new StringBuffer(text);
@@ -62,7 +62,7 @@ public class SensitiveWordUtils0 {
      *
      * @param words 敏感词数组
      */
-    public static void loadWord(List<String> words) {
+    public void loadWord(List<String> words) {
         if (words == null) return;
         ac_trie = new ACTrie(words);
     }
