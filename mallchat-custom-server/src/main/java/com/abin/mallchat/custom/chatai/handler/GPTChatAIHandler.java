@@ -36,16 +36,18 @@ public class GPTChatAIHandler extends AbstractChatAIHandler {
     @Override
     protected void init() {
         super.init();
-        UserInfoResp userInfo = userService.getUserInfo(chatGPTProperties.getAIUserId());
-        if (userInfo == null) {
-            log.error("根据AIUserId:{} 找不到用户信息", chatGPTProperties.getAIUserId());
-            throw new RuntimeException("根据AIUserId: " + chatGPTProperties.getAIUserId() + " 找不到用户信息");
+        if (isUse()) {
+            UserInfoResp userInfo = userService.getUserInfo(chatGPTProperties.getAIUserId());
+            if (userInfo == null) {
+                log.error("根据AIUserId:{} 找不到用户信息", chatGPTProperties.getAIUserId());
+                throw new RuntimeException("根据AIUserId: " + chatGPTProperties.getAIUserId() + " 找不到用户信息");
+            }
+            if (StringUtils.isBlank(userInfo.getName())) {
+                log.warn("根据AIUserId:{} 找到的用户信息没有name", chatGPTProperties.getAIUserId());
+                throw new RuntimeException("根据AIUserId: " + chatGPTProperties.getAIUserId() + " 找到的用户没有名字");
+            }
+            AI_NAME = userInfo.getName();
         }
-        if (StringUtils.isBlank(userInfo.getName())) {
-            log.warn("根据AIUserId:{} 找到的用户信息没有name", chatGPTProperties.getAIUserId());
-            throw new RuntimeException("根据AIUserId: " + chatGPTProperties.getAIUserId() + " 找到的用户没有名字");
-        }
-        AI_NAME = userInfo.getName();
     }
 
     @Override
@@ -90,12 +92,10 @@ public class GPTChatAIHandler extends AbstractChatAIHandler {
             text = ChatGPTUtils.parseText(response);
         } catch (Exception e) {
             log.warn("gpt doChat warn:", e);
-            text=  "我累了，明天再聊吧";
+            text = "我累了，明天再聊吧";
         }
         return text;
     }
-
-
 
 
     @Override
