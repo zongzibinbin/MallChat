@@ -11,6 +11,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.data.util.Pair;
 
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +62,7 @@ public abstract class AbstractUrlDiscover implements UrlDiscover {
         return UrlInfo.builder()
                 .title(getTitle(document))
                 .description(getDescription(document))
-                .image(getImage(assemble(url),document)).build();
+                .image(getImage(assemble(url), document)).build();
     }
 
 
@@ -81,6 +84,34 @@ public abstract class AbstractUrlDiscover implements UrlDiscover {
             log.error("find error:url:{}", matchUrl, e);
         }
         return null;
+    }
+
+    /**
+     * 判断链接是否有效
+     * 输入链接
+     * 返回true或者false
+     */
+    public static boolean isConnect(String href) {
+        //请求地址
+        URL url;
+        //请求状态码
+        int state;
+        //下载链接类型
+        String fileType;
+        try {
+            url = new URL(href);
+            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+            state = httpURLConnection.getResponseCode();
+            fileType = httpURLConnection.getHeaderField("Content-Disposition");
+            //如果成功200，缓存304，移动302都算有效链接，并且不是下载链接
+            if ((state == 200 || state == 302 || state == 304) && fileType == null) {
+                return true;
+            }
+            httpURLConnection.disconnect();
+        } catch (Exception e) {
+            return false;
+        }
+        return false;
     }
 
 }
