@@ -47,6 +47,7 @@
         <jsoup.version>1.15.3</jsoup.version>
         <okhttp.version>4.8.1</okhttp.version>
         <redisson-spring-boot-starter.version>3.17.1</redisson-spring-boot-starter.version>
+        <fastjosn.version>1.2.83</fastjosn.version>
     </properties>
 
     <dependencyManagement>
@@ -130,6 +131,11 @@
                 <groupId>org.redisson</groupId>
                 <artifactId>redisson-spring-boot-starter</artifactId>
                 <version>${redisson-spring-boot-starter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjosn.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
