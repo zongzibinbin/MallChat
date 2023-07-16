@@ -1,7 +1,6 @@
 package com.abin.mallchat.custom.chat.service.adapter;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.abin.mallchat.common.chat.domain.entity.Room;
 import com.abin.mallchat.custom.chat.domain.vo.response.ChatRoomResp;
 
 import java.util.List;

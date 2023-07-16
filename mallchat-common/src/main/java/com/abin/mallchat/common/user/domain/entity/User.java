@@ -59,6 +59,12 @@ public class User implements Serializable {
     private String openId;
 
     /**
+     * 上下线状态 1在线 2离线
+     */
+    @TableField("active_status")
+    private Integer activeStatus;
+
+    /**
      * 最后上下线时间
      */
     @TableField("last_opt_time")

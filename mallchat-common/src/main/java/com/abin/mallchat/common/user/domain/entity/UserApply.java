@@ -1,4 +1,4 @@
-package com.abin.mallchat.common.chat.domain.entity;
+package com.abin.mallchat.common.user.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 房间表
+ * 用户申请表
  * </p>
  *
  * @author <a href="https://github.com/zongzibinbin">abin</a>
@@ -20,8 +20,8 @@ import java.time.LocalDateTime;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("room")
-public class Room implements Serializable {
+@TableName("user_apply")
+public class UserApply implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -32,40 +32,40 @@ public class Room implements Serializable {
     private Long id;
 
     /**
-     * 群名称
+     * 申请人uid
      */
-    @TableField("name")
-    private String name;
+    @TableField("uid")
+    private Long uid;
 
     /**
-     * 群头像
-     */
-    @TableField("avatar")
-    private String avatar;
-
-    /**
-     * 房间类型 1群聊
+     * 申请类型 1加好友
      */
     @TableField("type")
     private Integer type;
 
     /**
-     * 是否全员展示 0否 1是
+     * 接收人uid
      */
-    @TableField("hot_flag")
-    private Integer hotFlag;
+    @TableField("target_id")
+    private Long targetId;
 
     /**
-     * 群最后消息的更新时间（热点群不需要写扩散，更新这里就行）
+     * 申请信息
      */
-    @TableField("active_time")
-    private LocalDateTime activeTime;
+    @TableField("msg")
+    private String msg;
 
     /**
-     * 额外信息（根据不同类型房间有不同存储的东西）
+     * 申请状态 1待审批 2同意
      */
-    @TableField("ext_json")
-    private String extJson;
+    @TableField("status")
+    private Integer status;
+
+    /**
+     * 阅读状态 1未读 2已读
+     */
+    @TableField("read_status")
+    private Integer readStatus;
 
     /**
      * 创建时间

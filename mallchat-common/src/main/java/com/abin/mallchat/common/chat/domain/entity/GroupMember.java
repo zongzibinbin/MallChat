@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 房间表
+ * 群成员表
  * </p>
  *
  * @author <a href="https://github.com/zongzibinbin">abin</a>
@@ -20,8 +20,8 @@ import java.time.LocalDateTime;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("room")
-public class Room implements Serializable {
+@TableName("group_member")
+public class GroupMember implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -32,40 +32,22 @@ public class Room implements Serializable {
     private Long id;
 
     /**
-     * 群名称
+     * 房间id
      */
-    @TableField("name")
-    private String name;
+    @TableField("room_id")
+    private Long roomId;
 
     /**
-     * 群头像
+     * 成员uid
      */
-    @TableField("avatar")
-    private String avatar;
+    @TableField("uid")
+    private Long uid;
 
     /**
-     * 房间类型 1群聊
+     * 成员类型 1群主 2管理员 3普通成员
      */
     @TableField("type")
     private Integer type;
-
-    /**
-     * 是否全员展示 0否 1是
-     */
-    @TableField("hot_flag")
-    private Integer hotFlag;
-
-    /**
-     * 群最后消息的更新时间（热点群不需要写扩散，更新这里就行）
-     */
-    @TableField("active_time")
-    private LocalDateTime activeTime;
-
-    /**
-     * 额外信息（根据不同类型房间有不同存储的东西）
-     */
-    @TableField("ext_json")
-    private String extJson;
 
     /**
      * 创建时间
