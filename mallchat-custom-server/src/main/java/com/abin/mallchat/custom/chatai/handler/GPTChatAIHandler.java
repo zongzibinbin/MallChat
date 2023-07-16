@@ -76,7 +76,7 @@ public class GPTChatAIHandler extends AbstractChatAIHandler {
             frequencyControlDTO.setKey(RedisKey.getKey(CHAT_FREQUENCY_PREFIX) + ":" + uid);
             frequencyControlDTO.setUnit(TimeUnit.HOURS);
             frequencyControlDTO.setCount(chatGPTProperties.getLimit());
-            frequencyControlDTO.setTime(24);
+            frequencyControlDTO.setTime(1);
             return FrequencyControlUtil.executeWithFrequencyControl(TOTAL_COUNT_WITH_IN_FIX_TIME_FREQUENCY_CONTROLLER,
                     frequencyControlDTO, // 限流参数
                     () -> sendRequestToGPT(message));
@@ -104,7 +104,7 @@ public class GPTChatAIHandler extends AbstractChatAIHandler {
             text = ChatGPTUtils.parseText(response);
             ChatGPTMsg chatGPTMsg = ChatGPTMsgBuilder.assistantMsg(text);
             context.addMsg(chatGPTMsg);
-            RedisUtils.set(RedisKey.getKey(USER_CHAT_CONTEXT, message.getFromUid(), message.getRoomId()), context, 1L, TimeUnit.HOURS);
+            saveContext(context);
         } catch (Exception e) {
             log.warn("gpt doChat warn:", e);
             text = "我累了，明天再聊吧";
@@ -130,9 +130,13 @@ public class GPTChatAIHandler extends AbstractChatAIHandler {
         if (chatGPTContext == null) {
             chatGPTContext = ChatGPTContextBuilder.initContext(uid, roomId);
         }
-        RedisUtils.set(RedisKey.getKey(USER_CHAT_CONTEXT, uid, roomId), chatGPTContext, 1L, TimeUnit.HOURS);
+        saveContext(chatGPTContext);
         chatGPTContext.addMsg(ChatGPTMsgBuilder.userMsg(prompt));
         return chatGPTContext;
+    }
+
+    private void saveContext(ChatGPTContext chatGPTContext) {
+        RedisUtils.set(RedisKey.getKey(USER_CHAT_CONTEXT, chatGPTContext.getUid(), chatGPTContext.getRoomId()), chatGPTContext, 5L, TimeUnit.MINUTES);
     }
 
 

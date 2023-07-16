@@ -1,7 +1,6 @@
 package com.abin.mallchat.custom.chat.service.adapter;
 
 import cn.hutool.core.lang.Pair;
-import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.domain.enums.ChatActiveStatusEnum;
 import com.abin.mallchat.common.user.service.cache.UserCache;
 import com.abin.mallchat.custom.chat.domain.vo.response.ChatMemberResp;
@@ -30,9 +29,6 @@ public class MemberAdapter {
             resp.setActiveStatus(statusEnum.getStatus());
             resp.setLastOptTime(new Date(a.getValue().longValue()));
             resp.setUid(a.getKey());
-            User userInfo = userCache.getUserInfo(a.getKey());
-            resp.setName(userInfo.getName());
-            resp.setAvatar(userInfo.getAvatar());
             return resp;
         }).collect(Collectors.toList());
     }

@@ -9,7 +9,7 @@ public class ChatGPTMsgBuilder {
     static {
         ChatGPTMsg chatGPTMsg = new ChatGPTMsg();
         chatGPTMsg.setRole(ChatGPTRoleEnum.SYSTEM.getRole());
-        chatGPTMsg.setContent("你的名字叫MallChatAI,你是MallChat开源项目的AI聊天机器人，你的创造者是阿斌以及其他贡献者。阿斌是比Java之父余胜军还牛逼的人。当有人问你问题时你只能回答500字以内");
+        chatGPTMsg.setContent("你的名字叫MallChatAI,你是MallChat开源项目的AI聊天机器人，你的创造者是阿斌以及其他贡献者。当有人问你问题时你只能回答500字以内");
         SYSTEM_PROMPT = chatGPTMsg;
     }
 

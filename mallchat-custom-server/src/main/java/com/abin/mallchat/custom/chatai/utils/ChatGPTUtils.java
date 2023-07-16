@@ -1,8 +1,9 @@
 package com.abin.mallchat.custom.chatai.utils;
 
 import com.abin.mallchat.common.common.exception.BusinessException;
+import com.abin.mallchat.common.common.utils.JsonUtils;
 import com.abin.mallchat.custom.chatai.domain.ChatGPTMsg;
-import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.knuddels.jtokkit.Encodings;
 import com.knuddels.jtokkit.api.Encoding;
 import com.knuddels.jtokkit.api.EncodingType;
@@ -90,11 +91,14 @@ public class ChatGPTUtils {
             return Arrays.stream(body.split("data:"))
                     .map(String::trim)
                     .filter(x -> StringUtils.isNotBlank(x) && !"[DONE]".endsWith(x))
-                    .map(x -> JSONObject.parseObject(x)
-                            .getJSONArray("choices")
-                            .getJSONObject(0)
-                            .getJSONObject("delta")
-                            .getString("content")
+                    .map(x -> Optional.ofNullable(
+                            JsonUtils.toJsonNode(x)
+                                    .withArray("choices")
+                                    .get(0)
+                                    .with("delta")
+                                    .findValue("content"))
+                            .map(JsonNode::asText)
+                            .orElse(null)
                     ).filter(Objects::nonNull).collect(Collectors.joining());
         } catch (Exception e) {
             log.error("parseText error e:", e);
@@ -164,12 +168,12 @@ public class ChatGPTUtils {
         paramMap.put("presence_penalty", presencePenalty);
         paramMap.put("stream", true);
 
-        log.info("paramMap >>> " + JSONObject.toJSONString(paramMap));
+        log.info("paramMap >>> " + JsonUtils.toStr(paramMap));
         Request request = new Request.Builder()
                 .url(StringUtils.isNotBlank(proxyUrl) ? proxyUrl : URL)
                 .addHeader("Content-Type", "application/json")
                 .addHeader("Authorization", headers.get("Authorization"))
-                .post(RequestBody.create(MediaType.parse("application/json"), JSONObject.toJSONString(paramMap)))
+                .post(RequestBody.create(MediaType.parse("application/json"), JsonUtils.toStr(paramMap)))
                 .build();
         return okHttpClient.newCall(request).execute();
 
@@ -181,7 +185,7 @@ public class ChatGPTUtils {
     }
 
     public static Integer countTokens(List<ChatGPTMsg> msg) {
-        return countTokens(JSONObject.toJSONString(msg));
+        return countTokens(JsonUtils.toStr(msg));
     }
 
 
