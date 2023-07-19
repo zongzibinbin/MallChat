@@ -25,6 +25,7 @@ public class WxUrlDiscover extends AbstractUrlDiscover {
     @Nullable
     @Override
     public String getImage(String url, Document document) {
-        return document.getElementsByAttributeValue("property", "og:image").attr("content");
+        String href = document.getElementsByAttributeValue("property", "og:image").attr("content");
+        return isConnect(href) ? href: null;
     }
 }

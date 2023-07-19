@@ -1,28 +1,36 @@
 package com.abin.mallchat.custom.chatai.utils;
 
-import cn.hutool.http.HttpResponse;
-import cn.hutool.http.HttpUtil;
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONObject;
 import com.abin.mallchat.common.common.exception.BusinessException;
+import com.abin.mallchat.common.common.utils.JsonUtils;
+import com.abin.mallchat.custom.chatai.domain.ChatGPTMsg;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.knuddels.jtokkit.Encodings;
+import com.knuddels.jtokkit.api.Encoding;
+import com.knuddels.jtokkit.api.EncodingType;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class ChatGPTUtils {
 
-    private static final String URL = "https://api.openai.com/v1/completions";
+    private static final Encoding encoding = Encodings.newDefaultEncodingRegistry().getEncoding(EncodingType.CL100K_BASE);
 
-    private String model = "text-davinci-003";
+    private static final String URL = "https://api.openai.com/v1/chat/completions";
+
+    private String model = "gpt-3.5-turbo";
 
     private final Map<String, String> headers;
     /**
      * 超时30秒
      */
-    private Integer timeout = 30 * 1000;
+    private Integer timeout = -1;
     /**
      * 参数用于指定生成文本的最大长度。
      * 它表示生成的文本中最多包含多少个 token。一个 token 可以是一个单词、一个标点符号或一个空格。
@@ -52,7 +60,8 @@ public class ChatGPTUtils {
     /**
      * 提示词
      */
-    private String prompt;
+    private List<ChatGPTMsg> messages;
+//    private List<ChatGPTMsg> prompt;
 
     private String proxyUrl;
 
@@ -70,21 +79,31 @@ public class ChatGPTUtils {
         return new ChatGPTUtils(key);
     }
 
-    public static String parseText(HttpResponse response) {
-        return parseText(response.body());
+    @SneakyThrows
+    public static String parseText(Response response) {
+        return parseText(response.body().string());
     }
 
+
     public static String parseText(String body) {
-        log.info("body >>> " + body);
-        JSONObject jsonObj = new JSONObject(body);
-        JSONObject error = jsonObj.getJSONObject("error");
-        if (error != null) {
-            log.error("error >>> " + error);
-           return "闹脾气了，等会再试试吧~";
+//        log.info("body >>> " + body);
+        try {
+            return Arrays.stream(body.split("data:"))
+                    .map(String::trim)
+                    .filter(x -> StringUtils.isNotBlank(x) && !"[DONE]".endsWith(x))
+                    .map(x -> Optional.ofNullable(
+                            JsonUtils.toJsonNode(x)
+                                    .withArray("choices")
+                                    .get(0)
+                                    .with("delta")
+                                    .findValue("content"))
+                            .map(JsonNode::asText)
+                            .orElse(null)
+                    ).filter(Objects::nonNull).collect(Collectors.joining());
+        } catch (Exception e) {
+            log.error("parseText error e:", e);
+            return "闹脾气了，等会再试试吧~";
         }
-        JSONArray choicesArr = jsonObj.getJSONArray("choices");
-        JSONObject choiceObj = choicesArr.getJSONObject(0);
-        return choiceObj.getStr("text");
     }
 
     public ChatGPTUtils model(String model) {
@@ -122,8 +141,8 @@ public class ChatGPTUtils {
         return this;
     }
 
-    public ChatGPTUtils prompt(String prompt) {
-        this.prompt = prompt;
+    public ChatGPTUtils message(List<ChatGPTMsg> messages) {
+        this.messages = messages;
         return this;
     }
 
@@ -132,37 +151,42 @@ public class ChatGPTUtils {
         return this;
     }
 
-    public HttpResponse send() {
-        JSONObject param = new JSONObject();
-        param.set("model", model);
-        param.set("prompt", prompt);
-        param.set("max_tokens", maxTokens);
-        param.set("temperature", temperature);
-        param.set("top_p", topP);
-        param.set("frequency_penalty", frequencyPenalty);
-        param.set("presence_penalty", presencePenalty);
-        log.info("headers >>> " + headers);
-        log.info("param >>> " + param);
-        return HttpUtil.createPost(StringUtils.isNotBlank(proxyUrl) ? proxyUrl : URL)
-                .addHeaders(headers)
-                .body(param.toString())
-                .timeout(timeout)
-                .execute();
-    }
+    public Response send() throws IOException {
+        OkHttpClient okHttpClient = new OkHttpClient()
+                .newBuilder()
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .writeTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .build();
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("model", model);
+        paramMap.put("messages", messages);
+        paramMap.put("max_tokens", maxTokens);
+        paramMap.put("temperature", temperature);
+        paramMap.put("top_p", topP);
+        paramMap.put("frequency_penalty", frequencyPenalty);
+        paramMap.put("presence_penalty", presencePenalty);
+        paramMap.put("stream", true);
 
-    public static void main(String[] args) {
-        HttpResponse send = ChatGPTUtils.create("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")
-                .timeout(30 * 1000)
-                .prompt("Spring的启动流程是什么")
-                .send();
-        System.out.println("send = " + send);
-        // JSON 数据
-        // JSON 数据
-        JSONObject jsonObj = new JSONObject(send.body());
-        JSONArray choicesArr = jsonObj.getJSONArray("choices");
-        JSONObject choiceObj = choicesArr.getJSONObject(0);
-        String text = choiceObj.getStr("text");
-        System.out.println("text = " + text);
+        log.info("paramMap >>> " + JsonUtils.toStr(paramMap));
+        Request request = new Request.Builder()
+                .url(StringUtils.isNotBlank(proxyUrl) ? proxyUrl : URL)
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Authorization", headers.get("Authorization"))
+                .post(RequestBody.create(MediaType.parse("application/json"), JsonUtils.toStr(paramMap)))
+                .build();
+        return okHttpClient.newCall(request).execute();
+
 
     }
+
+    public static Integer countTokens(String messages) {
+        return encoding.countTokens(messages);
+    }
+
+    public static Integer countTokens(List<ChatGPTMsg> msg) {
+        return countTokens(JsonUtils.toStr(msg));
+    }
+
+
 }

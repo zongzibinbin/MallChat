@@ -1,6 +1,7 @@
 package com.abin.mallchat.common.common.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -19,6 +20,14 @@ public class JsonUtils {
         }
     }
 
+    public static JsonNode toJsonNode(String str) {
+        try {
+            return jsonMapper.readTree(str);
+        } catch (JsonProcessingException e) {
+            throw new UnsupportedOperationException(e);
+        }
+    }
+
     public static String toStr(Object t) {
         try {
             return jsonMapper.writeValueAsString(t);
@@ -26,4 +35,5 @@ public class JsonUtils {
             throw new UnsupportedOperationException(e);
         }
     }
+
 }
