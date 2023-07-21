@@ -257,6 +257,16 @@ public class WebSocketServiceImpl implements WebSocketService {
         sendToAllOnline(wsBaseResp, null);
     }
 
+    @Override
+    public void sendToFriend(WSBaseResp<?> wsBaseResp, Long friendUid) {
+        CopyOnWriteArrayList<Channel> channels = ONLINE_UID_MAP.get(friendUid);
+        if (CollectionUtil.isEmpty(channels)) {
+            log.info("用户：{}不在线", friendUid);
+            return;
+        }
+        threadPoolTaskExecutor.execute(() -> sendMsg(channels.get(0), wsBaseResp));
+    }
+
     private void sendMsg(Channel channel, WSBaseResp<?> wsBaseResp) {
         channel.writeAndFlush(new TextWebSocketFrame(JSONUtil.toJsonStr(wsBaseResp)));
     }
