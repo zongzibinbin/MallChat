@@ -21,7 +21,7 @@ import javax.validation.constraints.NotNull;
 public class FriendApproveReq {
 
     @NotNull
-    @ApiModelProperty("审批动作 2同意")
-    private Integer approveStatus;
+    @ApiModelProperty("申请id")
+    private Long applyId;
 
 }

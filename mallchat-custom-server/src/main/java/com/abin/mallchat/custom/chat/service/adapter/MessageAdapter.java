@@ -6,12 +6,19 @@ import com.abin.mallchat.common.chat.domain.entity.MessageMark;
 import com.abin.mallchat.common.chat.domain.enums.MessageMarkTypeEnum;
 import com.abin.mallchat.common.chat.domain.enums.MessageStatusEnum;
 import com.abin.mallchat.common.common.domain.enums.YesOrNoEnum;
+import com.abin.mallchat.common.user.domain.entity.UserApply;
 import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessageReq;
 import com.abin.mallchat.custom.chat.domain.vo.response.ChatMessageResp;
 import com.abin.mallchat.custom.chat.service.strategy.msg.AbstractMsgHandler;
 import com.abin.mallchat.custom.chat.service.strategy.msg.MsgHandlerFactory;
+import com.abin.mallchat.custom.user.domain.vo.response.ws.WSApplyMessage;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -74,6 +81,21 @@ public class MessageAdapter {
         ChatMessageResp.UserInfo userInfo = new ChatMessageResp.UserInfo();
         userInfo.setUid(fromUid);
         return userInfo;
+    }
+
+    public static WSApplyMessage buildApplyResp(UserApply userApply) {
+        WSApplyMessage wsApplyMessage = new WSApplyMessage();
+        wsApplyMessage.setApplyMessage(buildApplyMessage(userApply));
+        wsApplyMessage.setFromUser(buildFromUser(userApply.getUid()));
+        return wsApplyMessage;
+    }
+
+    private static ChatMessageResp.ApplyMessage buildApplyMessage(UserApply userApply) {
+        ChatMessageResp.ApplyMessage applyMessage = new ChatMessageResp.ApplyMessage();
+        applyMessage.setApplyId(userApply.getId());
+        applyMessage.setApplyMsg(userApply.getMsg());
+        applyMessage.setSendTime(userApply.getCreateTime());
+        return applyMessage;
     }
 
 

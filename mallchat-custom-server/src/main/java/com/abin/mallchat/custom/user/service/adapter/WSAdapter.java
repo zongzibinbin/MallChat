@@ -132,4 +132,11 @@ public class WSAdapter {
         wsBaseResp.setData(mark);
         return wsBaseResp;
     }
+
+    public static WSBaseResp<WSApplyMessage> buildApplySend(WSApplyMessage resp) {
+        WSBaseResp<WSApplyMessage> wsBaseResp = new WSBaseResp<>();
+        wsBaseResp.setType(WSRespTypeEnum.APPLY.getType());
+        wsBaseResp.setData(resp);
+        return wsBaseResp;
+    }
 }

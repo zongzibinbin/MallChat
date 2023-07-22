@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -23,6 +25,9 @@ public class ChatMessageResp {
     private UserInfo fromUser;
     @ApiModelProperty("消息详情")
     private Message message;
+
+    @ApiModelProperty("申请消息")
+    private ApplyMessage applyMessage;
 
     @Data
     public static class UserInfo {
@@ -54,5 +59,19 @@ public class ChatMessageResp {
         private Integer dislikeCount;
         @ApiModelProperty("该用户是否已经举报 0否 1是")
         private Integer userDislike;
+    }
+
+    @Data
+    public static class ApplyMessage {
+        @ApiModelProperty("申请id")
+        private Long applyId;
+
+        @ApiModelProperty("申请信息")
+        private String applyMsg;
+
+        @ApiModelProperty("申请发送时间")
+        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
+        private LocalDateTime sendTime;
+
     }
 }

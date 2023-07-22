@@ -26,6 +26,7 @@ public enum WSRespTypeEnum {
     BLACK(7, "拉黑用户", WSBlack.class),
     MARK(8, "消息标记", WSMsgMark.class),
     RECALL(9, "消息撤回", WSMsgRecall.class),
+    APPLY(10,"好友申请", WSApplyMessage.class),
     ;
 
     private final Integer type;

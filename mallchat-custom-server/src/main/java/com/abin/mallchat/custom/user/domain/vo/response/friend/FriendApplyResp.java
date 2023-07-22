@@ -27,6 +27,6 @@ public class FriendApplyResp {
     @ApiModelProperty("申请信息")
     private String msg;
 
-    @ApiModelProperty("申请状态 1待审批 2同意")//todo 自己去加枚举
+    @ApiModelProperty("申请状态 1待审批 2同意")
     private Integer status;
 }

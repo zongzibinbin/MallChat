@@ -66,5 +66,7 @@ public interface WebSocketService {
      */
     void sendToAllOnline(WSBaseResp<?> wsBaseResp);
 
+    void sendToFriend(WSBaseResp<?> wsBaseResp, Long friendUid);
+
 
 }
