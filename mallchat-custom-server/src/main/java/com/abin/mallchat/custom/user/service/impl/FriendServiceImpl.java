@@ -2,10 +2,10 @@ package com.abin.mallchat.custom.user.service.impl;
 
 import com.abin.mallchat.common.common.domain.vo.request.PageBaseReq;
 import com.abin.mallchat.common.common.domain.vo.response.PageBaseResp;
+import com.abin.mallchat.common.user.dao.UserApplyDao;
+import com.abin.mallchat.common.user.dao.UserFriendDao;
 import com.abin.mallchat.common.user.domain.entity.UserApply;
 import com.abin.mallchat.common.user.domain.entity.UserFriend;
-import com.abin.mallchat.common.user.service.IUserApplyService;
-import com.abin.mallchat.common.user.service.IUserFriendService;
 import com.abin.mallchat.custom.chat.service.adapter.MessageAdapter;
 import com.abin.mallchat.custom.user.domain.vo.request.friend.FriendApplyReq;
 import com.abin.mallchat.custom.user.domain.vo.request.friend.FriendApproveReq;
@@ -17,8 +17,6 @@ import com.abin.mallchat.custom.user.domain.vo.response.ws.WSApplyMessage;
 import com.abin.mallchat.custom.user.service.FriendService;
 import com.abin.mallchat.custom.user.service.WebSocketService;
 import com.abin.mallchat.custom.user.service.adapter.WSAdapter;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
-import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -43,15 +41,14 @@ import static com.abin.mallchat.common.user.domain.enums.ApplyTypeEnum.ADD_FRIEN
 @Slf4j
 @Service
 public class FriendServiceImpl implements FriendService {
-
-    @Resource
-    private IUserFriendService friendService;
-
-    @Resource
-    private IUserApplyService applyService;
-
     @Resource
     private WebSocketService webSocketService;
+
+    @Resource
+    private UserFriendDao userFriendDao;
+
+    @Resource
+    private UserApplyDao userApplyDao;
 
     /**
      * 检查
@@ -63,10 +60,7 @@ public class FriendServiceImpl implements FriendService {
      */
     @Override
     public FriendCheckResp check(Long uid, FriendCheckReq request) {
-        LambdaQueryChainWrapper<UserFriend> wrapper = friendService.lambdaQuery();
-        wrapper.eq(UserFriend::getUid, uid)
-                .in(UserFriend::getFriendUid, request.getUidList());
-        List<UserFriend> friendList = friendService.list(wrapper);
+        List<UserFriend> friendList = userFriendDao.queryUserFriend(uid, request.getUidList());
         Map<Long, UserFriend> friendMap = friendList.stream().collect(Collectors.toMap(UserFriend::getFriendUid, friend -> friend));
         List<FriendCheckResp.FriendCheck> friendCheckList = request.getUidList().stream().map(friendUid -> {
             FriendCheckResp.FriendCheck friendCheck = new FriendCheckResp.FriendCheck();
@@ -84,10 +78,7 @@ public class FriendServiceImpl implements FriendService {
      */
     @Override
     public void apply(Long uid, FriendApplyReq request) {
-        LambdaQueryChainWrapper<UserApply> wrapper = applyService.lambdaQuery();
-        wrapper.eq(UserApply::getUid, uid)
-                .eq(UserApply::getTargetId, request.getTargetUid());
-        UserApply userApply = applyService.getOne(wrapper);
+        UserApply userApply = userApplyDao.queryUserApply(uid, request.getTargetUid());
         if (Objects.nonNull(userApply)) {
             log.info("已有好友申请记录,uid:{}, targetId:{}", uid, request.getTargetUid());
             return;
@@ -99,7 +90,7 @@ public class FriendServiceImpl implements FriendService {
         userApplyNew.setTargetId(request.getTargetUid());
         userApplyNew.setStatus(WAIT_APPROVAL.getCode());
         userApplyNew.setReadStatus(UNREAD.getCode());
-        applyService.save(userApplyNew);
+        userApplyDao.insert(userApplyNew);
 
         WSApplyMessage applyMessage = MessageAdapter.buildApplyResp(userApplyNew);
         webSocketService.sendToFriend(WSAdapter.buildApplySend(applyMessage), request.getTargetUid());
@@ -114,13 +105,10 @@ public class FriendServiceImpl implements FriendService {
     @Override
     public PageBaseResp<FriendApplyResp> pageApplyFriend(Long uid, PageBaseReq request) {
         // todo 分页
-        LambdaQueryChainWrapper<UserApply> wrapper = applyService.lambdaQuery();
-        wrapper.eq(UserApply::getUid, uid)
-                .or()
-                .eq(UserApply::getTargetId, uid);
-        List<UserApply> userApplyList = applyService.list(wrapper);
+        List<UserApply> userApplyList = userApplyDao.queryUserApplyList(uid);
         List<FriendApplyResp> friendApplyResps = userApplyList.stream().map(userApply -> {
             FriendApplyResp friendApplyResp = new FriendApplyResp();
+            friendApplyResp.setApplyId(userApply.getId());
             friendApplyResp.setUid(userApply.getUid());
             friendApplyResp.setType(userApply.getType());
             friendApplyResp.setMsg(userApply.getMsg());
@@ -139,16 +127,13 @@ public class FriendServiceImpl implements FriendService {
      */
     @Override
     public FriendUnreadResp unread(Long uid) {
-        LambdaQueryChainWrapper<UserApply> wrapper = applyService.lambdaQuery();
-        wrapper.eq(UserApply::getTargetId, uid)
-                .eq(UserApply::getReadStatus, UNREAD.getCode());
-        return new FriendUnreadResp(applyService.count(wrapper));
+        return new FriendUnreadResp(userApplyDao.unreadCount(uid));
     }
 
     @Override
     @Transactional
     public void applyApprove(FriendApproveReq request) {
-        UserApply userApply = applyService.getById(request.getApplyId());
+        UserApply userApply = userApplyDao.queryUserApplyById(request.getApplyId());
         if (Objects.isNull(userApply)) {
             log.error("不存在申请记录：{}", request.getApplyId());
             return;
@@ -157,16 +142,13 @@ public class FriendServiceImpl implements FriendService {
             log.error("已同意好友申请：{}", request.getApplyId());
             return;
         }
-        LambdaUpdateChainWrapper<UserApply> updateWrapper = applyService.lambdaUpdate();
-        updateWrapper.set(UserApply::getStatus, AGREE.getCode())
-                .eq(UserApply::getId, request.getApplyId());
-        applyService.update(updateWrapper);
+        userApplyDao.agreeUserApply(request.getApplyId());
         UserFriend userFriend1 = new UserFriend();
         userFriend1.setUid(userApply.getUid());
         userFriend1.setFriendUid(userApply.getTargetId());
         UserFriend userFriend2 = new UserFriend();
         userFriend2.setUid(userApply.getTargetId());
         userFriend2.setFriendUid(userApply.getUid());
-        friendService.saveBatch(Lists.newArrayList(userFriend1, userFriend2));
+        userFriendDao.insertBatch(Lists.newArrayList(userFriend1, userFriend2));
     }
 }

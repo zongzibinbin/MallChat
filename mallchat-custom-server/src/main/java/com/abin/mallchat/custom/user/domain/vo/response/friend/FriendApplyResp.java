@@ -17,6 +17,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FriendApplyResp {
+    @ApiModelProperty("申请id")
+    private Long applyId;
 
     @ApiModelProperty("申请人uid")
     private Long uid;
