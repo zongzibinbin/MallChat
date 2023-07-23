@@ -66,8 +66,8 @@ public class FriendController {
     @DeleteMapping()
     @ApiOperation("删除好友")
     public ApiResult<Void> delete(@Valid @RequestBody FriendDeleteReq request) {
-        //todo
         Long uid = RequestHolder.get().getUid();
+        friendService.deleteFriend(uid, request.getTargetUid());
         return ApiResult.success();
     }
 
@@ -94,10 +94,9 @@ public class FriendController {
 
     @PutMapping("/page")
     @ApiOperation("联系人列表")
-    public ApiResult<CursorPageBaseResp<ChatMemberResp>> applyApprove(@Valid CursorPageBaseReq request) {
-        //todo
+    public ApiResult<CursorPageBaseResp<ChatMemberResp>> friendList(@Valid CursorPageBaseReq request) {
         Long uid = RequestHolder.get().getUid();
-        return ApiResult.success();
+        return ApiResult.success(friendService.friendList(uid, request));
     }
 }
 

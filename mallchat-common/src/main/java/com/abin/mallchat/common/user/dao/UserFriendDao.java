@@ -1,5 +1,8 @@
 package com.abin.mallchat.common.user.dao;
 
+import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
+import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
+import com.abin.mallchat.common.common.utils.CursorUtils;
 import com.abin.mallchat.common.user.domain.entity.UserFriend;
 import com.abin.mallchat.common.user.mapper.UserFriendMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -29,4 +32,21 @@ public class UserFriendDao extends ServiceImpl<UserFriendMapper, UserFriend> {
                 .eq(UserFriend::getFriendUid, targetUid)
                 .one();
     }
+
+    public CursorPageBaseResp<UserFriend> getFriendPage(Long uid, CursorPageBaseReq cursorPageBaseReq) {
+        return CursorUtils.getCursorPageByMysql(this, cursorPageBaseReq,
+                wrapper -> wrapper.eq(UserFriend::getUid, uid), UserFriend::getId);
+    }
+
+    public List<UserFriend> getUserFriend(Long uid, Long friendUid) {
+        return lambdaQuery()
+                .eq(UserFriend::getUid, uid)
+                .eq(UserFriend::getFriendUid, friendUid)
+                .or()
+                .eq(UserFriend::getFriendUid, uid)
+                .eq(UserFriend::getUid, friendUid)
+                .select(UserFriend::getId)
+                .list();
+    }
+
 }

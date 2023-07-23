@@ -40,7 +40,7 @@ public class UserApplyDao extends ServiceImpl<UserApplyMapper, UserApply> {
                 .count();
     }
 
-    public IPage<UserApply> FriendApplyPage(Long uid, Page page) {
+    public IPage<UserApply> friendApplyPage(Long uid, Page page) {
         return lambdaQuery()
                 .eq(UserApply::getTargetId, uid)
                 .eq(UserApply::getType, ApplyTypeEnum.ADD_FRIEND.getCode())

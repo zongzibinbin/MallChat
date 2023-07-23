@@ -1,20 +1,25 @@
 package com.abin.mallchat.custom.user.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.abin.mallchat.common.chat.dao.RoomFriendDao;
 import com.abin.mallchat.common.chat.domain.entity.RoomFriend;
 import com.abin.mallchat.common.chat.service.ContactService;
 import com.abin.mallchat.common.chat.service.RoomService;
 import com.abin.mallchat.common.common.annotation.RedissonLock;
+import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
 import com.abin.mallchat.common.common.domain.vo.request.PageBaseReq;
+import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
 import com.abin.mallchat.common.common.domain.vo.response.PageBaseResp;
 import com.abin.mallchat.common.common.event.UserApplyEvent;
 import com.abin.mallchat.common.common.utils.AssertUtil;
 import com.abin.mallchat.common.user.dao.UserApplyDao;
+import com.abin.mallchat.common.user.dao.UserDao;
 import com.abin.mallchat.common.user.dao.UserFriendDao;
+import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.domain.entity.UserApply;
 import com.abin.mallchat.common.user.domain.entity.UserFriend;
+import com.abin.mallchat.custom.chat.domain.vo.response.ChatMemberResp;
 import com.abin.mallchat.custom.chat.service.ChatService;
+import com.abin.mallchat.custom.chat.service.adapter.MemberAdapter;
 import com.abin.mallchat.custom.chat.service.adapter.MessageAdapter;
 import com.abin.mallchat.custom.user.domain.vo.request.friend.FriendApplyReq;
 import com.abin.mallchat.custom.user.domain.vo.request.friend.FriendApproveReq;
@@ -23,7 +28,6 @@ import com.abin.mallchat.custom.user.domain.vo.response.friend.FriendApplyResp;
 import com.abin.mallchat.custom.user.domain.vo.response.friend.FriendCheckResp;
 import com.abin.mallchat.custom.user.domain.vo.response.friend.FriendUnreadResp;
 import com.abin.mallchat.custom.user.service.FriendService;
-import com.abin.mallchat.custom.user.service.WebSocketService;
 import com.abin.mallchat.custom.user.service.adapter.FriendAdapter;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.google.common.collect.Lists;
@@ -51,22 +55,20 @@ import static com.abin.mallchat.common.user.domain.enums.ApplyStatusEnum.AGREE;
 public class FriendServiceImpl implements FriendService {
 
     @Autowired
-    private WebSocketService webSocketService;
-
-    @Autowired
     private UserFriendDao userFriendDao;
     @Autowired
     private UserApplyDao userApplyDao;
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
     @Autowired
-    private RoomFriendDao roomFriendDao;
-    @Autowired
     private RoomService roomService;
     @Autowired
     private ContactService contactService;
     @Autowired
     private ChatService chatService;
+
+    @Autowired
+    private UserDao userDao;
 
     /**
      * 检查
@@ -121,12 +123,14 @@ public class FriendServiceImpl implements FriendService {
      */
     @Override
     public PageBaseResp<FriendApplyResp> pageApplyFriend(Long uid, PageBaseReq request) {
-        IPage<UserApply> userApplyIPage = userApplyDao.FriendApplyPage(uid, request.plusPage());
+        IPage<UserApply> userApplyIPage = userApplyDao.friendApplyPage(uid, request.plusPage());
         if (CollectionUtil.isEmpty(userApplyIPage.getRecords())) {
             return PageBaseResp.empty();
         }
         //将这些申请列表设为已读
-        List<Long> applyIds = userApplyIPage.getRecords().stream().map(UserApply::getId).collect(Collectors.toList());
+        List<Long> applyIds = userApplyIPage.getRecords()
+                .stream().map(UserApply::getId)
+                .collect(Collectors.toList());
         userApplyDao.readApples(uid, applyIds);
         //返回消息
         return PageBaseResp.init(userApplyIPage, FriendAdapter.buildFriendApplyList(userApplyIPage.getRecords()));
@@ -164,6 +168,33 @@ public class FriendServiceImpl implements FriendService {
         chatService.sendMsg(MessageAdapter.buildAgreeMsg(roomFriend.getRoomId()), uid);
     }
 
+    /**
+     * 删除好友
+     *
+     * @param uid       uid
+     * @param friendUid 朋友uid
+     */
+    @Override
+    public void deleteFriend(Long uid, Long friendUid) {
+        List<UserFriend> userFriends = userFriendDao.getUserFriend(uid, friendUid);
+        if (CollectionUtil.isEmpty(userFriends)) {
+            log.info("没有好友关系：{},{}", uid, friendUid);
+            return;
+        }
+        List<Long> friendRecordIds = userFriends.stream().map(UserFriend::getId).collect(Collectors.toList());
+        userFriendDao.removeByIds(friendRecordIds);
+    }
+
+    @Override
+    public CursorPageBaseResp<ChatMemberResp> friendList(Long uid, CursorPageBaseReq request) {
+        CursorPageBaseResp<UserFriend> friendPage = userFriendDao.getFriendPage(uid, request);
+        List<Long> friendUids = friendPage.getList()
+                .stream().map(UserFriend::getFriendUid)
+                .collect(Collectors.toList());
+        List<User> userList = userDao.getUserList(friendUids);
+        return CursorPageBaseResp.init(friendPage, MemberAdapter.buildMember(friendPage.getList(), userList));
+    }
+
     private void createFriend(Long uid, Long targetUid) {
         UserFriend userFriend1 = new UserFriend();
         userFriend1.setUid(uid);
@@ -171,6 +202,7 @@ public class FriendServiceImpl implements FriendService {
         UserFriend userFriend2 = new UserFriend();
         userFriend2.setUid(targetUid);
         userFriend2.setFriendUid(uid);
-        userFriendDao.saveBatch(Lists.newArrayList(userFriend1, userFriend2))
+        userFriendDao.saveBatch(Lists.newArrayList(userFriend1, userFriend2));
     }
+
 }
