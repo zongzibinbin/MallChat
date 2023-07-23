@@ -44,10 +44,10 @@ public class GroupMember implements Serializable {
     private Long uid;
 
     /**
-     * 成员类型 1群主 2管理员 3普通成员
+     * 成员角色1群主 2管理员 3普通成员
      */
-    @TableField("type")
-    private Integer type;
+    @TableField("role")
+    private Integer role;
 
     /**
      * 创建时间

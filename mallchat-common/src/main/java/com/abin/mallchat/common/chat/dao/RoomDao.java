@@ -2,7 +2,7 @@ package com.abin.mallchat.common.chat.dao;
 
 import com.abin.mallchat.common.chat.domain.entity.Room;
 import com.abin.mallchat.common.chat.mapper.RoomMapper;
-import com.abin.mallchat.common.chat.service.IRoomService;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +15,6 @@ import org.springframework.stereotype.Service;
  * @since 2023-07-16
  */
 @Service
-public class RoomDao extends ServiceImpl<RoomMapper, Room> implements IRoomService {
+public class RoomDao extends ServiceImpl<RoomMapper, Room> implements IService<Room> {
 
 }

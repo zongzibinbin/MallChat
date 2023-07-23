@@ -56,5 +56,5 @@ public interface FriendService {
      * @param uid     uid
      * @param request 请求
      */
-    void applyApprove(FriendApproveReq request);
+    void applyApprove(Long uid, FriendApproveReq request);
 }

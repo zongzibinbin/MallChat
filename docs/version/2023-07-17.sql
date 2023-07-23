@@ -28,7 +28,7 @@ CREATE TABLE `user_apply` (
   `create_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
   `update_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE KEY `uniq_target_id_uid` (`target_id`,`uid`) USING BTREE,
+  KEY `idx_target_id_uid_status` (`target_id`,`uid`,`status`) USING BTREE,
   KEY `idx_target_id` (`target_id`) USING BTREE,
   KEY `idx_create_time` (`create_time`) USING BTREE,
   KEY `idx_update_time` (`update_time`) USING BTREE
@@ -38,10 +38,11 @@ CREATE TABLE `user_friend` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
   `uid` bigint(20) NOT NULL COMMENT 'uid',
   `friend_uid` bigint(20) NOT NULL COMMENT '好友uid',
+  `delete_status` int(1) NOT NULL DEFAULT '0' COMMENT '逻辑删除(0-正常,1-删除)',
   `create_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
   `update_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE KEY `uniq_uid_friend_uid` (`uid`,`friend_uid`) USING BTREE,
+  KEY `idx_uid_friend_uid` (`uid`,`friend_uid`) USING BTREE,
   KEY `idx_create_time` (`create_time`) USING BTREE,
   KEY `idx_update_time` (`update_time`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户联系人表';
@@ -50,7 +51,7 @@ CREATE TABLE `group_member` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
   `room_id` bigint(20) NOT NULL COMMENT '房间id',
   `uid` bigint(20) NOT NULL COMMENT '成员uid',
-  `type` int(11) NOT NULL COMMENT '成员类型 1群主 2管理员 3普通成员',
+  `role` int(11) NOT NULL COMMENT '成员角色 1群主 2管理员 3普通成员',
   `create_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
   `update_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE,

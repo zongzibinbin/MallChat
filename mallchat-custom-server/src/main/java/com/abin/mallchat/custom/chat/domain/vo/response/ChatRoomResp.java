@@ -18,12 +18,20 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatRoomResp {
-    @ApiModelProperty("会话id")
-    private Long id;
+    @ApiModelProperty("房间id")
+    private Long roomId;
+    @ApiModelProperty("房间类型 1群聊 2单聊")
+    private Integer type;
+    @ApiModelProperty("是否全员展示的会话 0否 1是")
+    private Integer hot_Flag;
+    @ApiModelProperty("最新消息")
+    private String text;
     @ApiModelProperty("会话名称")
     private String name;
-    @ApiModelProperty("会话类型 1大群聊 2沸点")
-    private Integer type;
-    @ApiModelProperty("房间最后活跃时间")
+    @ApiModelProperty("会话头像")
+    private String avatar;
+    @ApiModelProperty("房间最后活跃时间(用来排序)")
     private Date lastActiveTime;
+    @ApiModelProperty("未读数")
+    private Integer unreadCount;
 }

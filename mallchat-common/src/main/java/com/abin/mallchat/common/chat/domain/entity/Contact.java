@@ -38,22 +38,10 @@ public class Contact implements Serializable {
     private Long uid;
 
     /**
-     * 聊天类型 1单聊 2普通群聊
+     * 房间id
      */
-    @TableField("type")
-    private Integer type;
-
-    /**
-     * 是否全员展示 0否 1是
-     */
-    @TableField("hot_flag")
-    private Integer hotFlag;
-
-    /**
-     * 聊天对象type=1:uid，type=2:房间id
-     */
-    @TableField("target_id")
-    private Long targetId;
+    @TableField("room_id")
+    private Long roomId;
 
     /**
      * 阅读到的时间
@@ -66,6 +54,12 @@ public class Contact implements Serializable {
      */
     @TableField("active_time")
     private LocalDateTime activeTime;
+
+    /**
+     * 最后一条消息id
+     */
+    @TableField("last_msg_id")
+    private Long lastMsgId;
 
     /**
      * 创建时间

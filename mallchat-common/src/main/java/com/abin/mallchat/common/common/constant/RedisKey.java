@@ -22,6 +22,16 @@ public class RedisKey {
     public static final String USER_INFO_STRING = "userInfo:uid_%d";
 
     /**
+     * 房间详情
+     */
+    public static final String ROOM_INFO_STRING = "roomInfo:roomId_%d";
+
+    /**
+     * 群组详情
+     */
+    public static final String GROUP_INFO_STRING = "groupInfo:roomId_%d";
+
+    /**
      * 用户token存放
      */
     public static final String USER_TOKEN_STRING = "userToken:uid_%d";

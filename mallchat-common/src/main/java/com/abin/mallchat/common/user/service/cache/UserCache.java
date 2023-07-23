@@ -32,8 +32,6 @@ import java.util.stream.Collectors;
 public class UserCache {
 
     @Autowired
-    private CursorUtils cursorUtils;
-    @Autowired
     private UserDao userDao;
     @Autowired
     private BlackDao blackDao;
@@ -88,11 +86,11 @@ public class UserCache {
     }
 
     public CursorPageBaseResp<Pair<Long, Double>> getOnlineCursorPage(CursorPageBaseReq pageBaseReq) {
-        return cursorUtils.getCursorPageByRedis(pageBaseReq, RedisKey.getKey(RedisKey.ONLINE_UID_ZET), Long::parseLong);
+        return CursorUtils.getCursorPageByRedis(pageBaseReq, RedisKey.getKey(RedisKey.ONLINE_UID_ZET), Long::parseLong);
     }
 
     public CursorPageBaseResp<Pair<Long, Double>> getOfflineCursorPage(CursorPageBaseReq pageBaseReq) {
-        return cursorUtils.getCursorPageByRedis(pageBaseReq, RedisKey.getKey(RedisKey.OFFLINE_UID_ZET), Long::parseLong);
+        return CursorUtils.getCursorPageByRedis(pageBaseReq, RedisKey.getKey(RedisKey.OFFLINE_UID_ZET), Long::parseLong);
     }
 
     public List<Long> getUserModifyTime(List<Long> uidList) {

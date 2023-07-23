@@ -10,7 +10,6 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.data.redis.core.ZSetOperations;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,10 +23,9 @@ import java.util.stream.Collectors;
  * Author: <a href="https://github.com/zongzibinbin">abin</a>
  * Date: 2023-03-28
  */
-@Component
 public class CursorUtils {
 
-    public <T> CursorPageBaseResp<Pair<T, Double>> getCursorPageByRedis(CursorPageBaseReq cursorPageBaseReq, String redisKey, Function<String, T> typeConvert) {
+    public static <T> CursorPageBaseResp<Pair<T, Double>> getCursorPageByRedis(CursorPageBaseReq cursorPageBaseReq, String redisKey, Function<String, T> typeConvert) {
         Set<ZSetOperations.TypedTuple<String>> typedTuples;
         if (StrUtil.isBlank(cursorPageBaseReq.getCursor())) {//第一次
             typedTuples = RedisUtils.zReverseRangeWithScores(redisKey, cursorPageBaseReq.getPageSize());
@@ -47,7 +45,7 @@ public class CursorUtils {
         return new CursorPageBaseResp<>(cursor, isLast, result);
     }
 
-    public <T> CursorPageBaseResp<T> getCursorPageByMysql(IService<T> mapper, CursorPageBaseReq request, Consumer<LambdaQueryWrapper<T>> initWrapper, SFunction<T, ?> cursorColumn) {
+    public static <T> CursorPageBaseResp<T> getCursorPageByMysql(IService<T> mapper, CursorPageBaseReq request, Consumer<LambdaQueryWrapper<T>> initWrapper, SFunction<T, ?> cursorColumn) {
         LambdaQueryWrapper<T> wrapper = new LambdaQueryWrapper<>();
         initWrapper.accept(wrapper);
         if (StrUtil.isNotBlank(request.getCursor())) {

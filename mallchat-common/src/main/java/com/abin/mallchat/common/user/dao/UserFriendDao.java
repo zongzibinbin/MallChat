@@ -2,9 +2,10 @@ package com.abin.mallchat.common.user.dao;
 
 import com.abin.mallchat.common.user.domain.entity.UserFriend;
 import com.abin.mallchat.common.user.mapper.UserFriendMapper;
-import com.abin.mallchat.common.user.service.IUserFriendService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * <p>
@@ -15,6 +16,17 @@ import org.springframework.stereotype.Service;
  * @since 2023-07-16
  */
 @Service
-public class UserFriendDao extends ServiceImpl<UserFriendMapper, UserFriend> implements IUserFriendService {
+public class UserFriendDao extends ServiceImpl<UserFriendMapper, UserFriend> {
 
+    public List<UserFriend> getByFriends(Long uid, List<Long> uidList) {
+        return lambdaQuery().eq(UserFriend::getUid, uid)
+                .in(UserFriend::getFriendUid, uidList)
+                .list();
+    }
+
+    public UserFriend getByFriend(Long uid, Long targetUid) {
+        return lambdaQuery().eq(UserFriend::getUid, uid)
+                .eq(UserFriend::getFriendUid, targetUid)
+                .one();
+    }
 }

@@ -5,20 +5,16 @@ import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.chat.domain.entity.MessageMark;
 import com.abin.mallchat.common.chat.domain.enums.MessageMarkTypeEnum;
 import com.abin.mallchat.common.chat.domain.enums.MessageStatusEnum;
+import com.abin.mallchat.common.chat.domain.enums.MessageTypeEnum;
 import com.abin.mallchat.common.common.domain.enums.YesOrNoEnum;
 import com.abin.mallchat.common.user.domain.entity.UserApply;
 import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessageReq;
+import com.abin.mallchat.custom.chat.domain.vo.request.msg.TextMsgReq;
 import com.abin.mallchat.custom.chat.domain.vo.response.ChatMessageResp;
 import com.abin.mallchat.custom.chat.service.strategy.msg.AbstractMsgHandler;
 import com.abin.mallchat.custom.chat.service.strategy.msg.MsgHandlerFactory;
-import com.abin.mallchat.custom.user.domain.vo.response.ws.WSApplyMessage;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -99,4 +95,13 @@ public class MessageAdapter {
     }
 
 
+    public static ChatMessageReq buildAgreeMsg(Long roomId) {
+        ChatMessageReq chatMessageReq = new ChatMessageReq();
+        chatMessageReq.setRoomId(roomId);
+        chatMessageReq.setMsgType(MessageTypeEnum.TEXT.getType());
+        TextMsgReq textMsgReq = new TextMsgReq();
+        textMsgReq.setContent("我们已经成为好友了，开始聊天吧");
+        chatMessageReq.setBody(textMsgReq);
+        return chatMessageReq;
+    }
 }
