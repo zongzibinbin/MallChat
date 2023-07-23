@@ -24,7 +24,6 @@ import java.time.LocalDateTime;
 public class Room implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
     /**
      * id
      */
@@ -32,25 +31,15 @@ public class Room implements Serializable {
     private Long id;
 
     /**
-     * 群名称
-     */
-    @TableField("name")
-    private String name;
-
-    /**
-     * 群头像
-     */
-    @TableField("avatar")
-    private String avatar;
-
-    /**
-     * 房间类型 1群聊
+     * 房间类型 1群聊 2单聊
      */
     @TableField("type")
     private Integer type;
 
     /**
      * 是否全员展示 0否 1是
+     *
+     * @see com.abin.mallchat.common.chat.domain.enums.HotFlagEnum
      */
     @TableField("hot_flag")
     private Integer hotFlag;

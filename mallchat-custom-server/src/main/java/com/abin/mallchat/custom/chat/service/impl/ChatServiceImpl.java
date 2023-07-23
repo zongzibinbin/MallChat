@@ -5,14 +5,18 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Pair;
+import com.abin.mallchat.common.chat.dao.ContactDao;
 import com.abin.mallchat.common.chat.dao.MessageDao;
 import com.abin.mallchat.common.chat.dao.MessageMarkDao;
 import com.abin.mallchat.common.chat.dao.RoomDao;
+import com.abin.mallchat.common.chat.domain.dto.MsgReadInfoDTO;
+import com.abin.mallchat.common.chat.domain.entity.Contact;
 import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.chat.domain.entity.MessageMark;
 import com.abin.mallchat.common.chat.domain.entity.Room;
 import com.abin.mallchat.common.chat.domain.enums.MessageMarkActTypeEnum;
 import com.abin.mallchat.common.chat.domain.enums.MessageTypeEnum;
+import com.abin.mallchat.common.chat.service.ContactService;
 import com.abin.mallchat.common.common.annotation.RedissonLock;
 import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
 import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
@@ -44,6 +48,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -77,6 +82,10 @@ public class ChatServiceImpl implements ChatService {
     private IRoleService iRoleService;
     @Autowired
     private RecallMsgHandler recallMsgHandler;
+    @Autowired
+    private ContactService contactService;
+    @Autowired
+    private ContactDao contactDao;
 
     /**
      * 发送消息
@@ -203,6 +212,32 @@ public class ChatServiceImpl implements ChatService {
                     }).collect(Collectors.toList());
         }
         return null;
+    }
+
+    @Override
+    public Collection<MsgReadInfoDTO> getMsgReadInfo(Long uid, ChatMessageReadInfoReq request) {
+        List<Message> messages = messageDao.listByIds(request.getMsgIds());
+        messages.forEach(message -> {
+            AssertUtil.equal(uid, message.getFromUid(), "只能查询自己发送的消息");
+        });
+        return contactService.getMsgReadInfo(messages).values();
+    }
+
+    @Override
+    public CursorPageBaseResp<ChatMessageReadResp> getReadPage(@Nullable Long uid, ChatMessageReadReq request) {
+        Message message = messageDao.getById(request.getMsgId());
+        AssertUtil.isNotEmpty(message, "消息id有误");
+        AssertUtil.equal(uid, message.getFromUid(), "只能查看自己的消息");
+        CursorPageBaseResp<Contact> page;
+        if (request.getSearchType() == 1) {//已读
+            page = contactDao.getReadPage(message, request);
+        } else {
+            page = contactDao.getUnReadPage(message, request);
+        }
+        if (CollectionUtil.isEmpty(page.getList())) {
+            return CursorPageBaseResp.empty();
+        }
+        return CursorPageBaseResp.init(page, RoomAdapter.buildReadResp(page.getList()));
     }
 
     private void checkRecall(Long uid, Message message) {

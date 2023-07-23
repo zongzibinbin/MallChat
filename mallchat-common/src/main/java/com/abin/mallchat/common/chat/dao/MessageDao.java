@@ -7,7 +7,6 @@ import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
 import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
 import com.abin.mallchat.common.common.utils.CursorUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -20,11 +19,9 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class MessageDao extends ServiceImpl<MessageMapper, Message> {
-    @Autowired
-    private CursorUtils cursorUtils;
 
     public CursorPageBaseResp<Message> getCursorPage(Long roomId, CursorPageBaseReq request) {
-        return cursorUtils.getCursorPageByMysql(this, request, wrapper -> {
+        return CursorUtils.getCursorPageByMysql(this, request, wrapper -> {
             wrapper.eq(Message::getRoomId, roomId);
             wrapper.eq(Message::getStatus, MessageStatusEnum.NORMAL.getStatus());
         }, Message::getId);

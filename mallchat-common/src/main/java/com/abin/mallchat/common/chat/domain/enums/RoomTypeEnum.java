@@ -16,17 +16,17 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Getter
 public enum RoomTypeEnum {
-    GROUP(1, "大群聊"),
-    BOILING(2, "沸点"),
+    GROUP(1, "群聊"),
+    FRIEND(2, "单聊"),
     ;
 
-    private final Integer status;
+    private final Integer type;
     private final String desc;
 
     private static Map<Integer, RoomTypeEnum> cache;
 
     static {
-        cache = Arrays.stream(RoomTypeEnum.values()).collect(Collectors.toMap(RoomTypeEnum::getStatus, Function.identity()));
+        cache = Arrays.stream(RoomTypeEnum.values()).collect(Collectors.toMap(RoomTypeEnum::getType, Function.identity()));
     }
 
     public static RoomTypeEnum of(Integer type) {

@@ -1,8 +1,11 @@
 package com.abin.mallchat.common.chat.dao;
 
 import com.abin.mallchat.common.chat.domain.entity.Contact;
+import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.chat.mapper.ContactMapper;
-import com.abin.mallchat.common.chat.service.IContactService;
+import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
+import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
+import com.abin.mallchat.common.common.utils.CursorUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +18,57 @@ import org.springframework.stereotype.Service;
  * @since 2023-07-16
  */
 @Service
-public class ContactDao extends ServiceImpl<ContactMapper, Contact> implements IContactService {
+public class ContactDao extends ServiceImpl<ContactMapper, Contact> {
 
+    public Contact get(Long uid, Long roomId) {
+        return lambdaQuery()
+                .eq(Contact::getUid, uid)
+                .eq(Contact::getRoomId, roomId)
+                .one();
+    }
+
+    public Integer getReadCount(Message message) {
+        return lambdaQuery()
+                .eq(Contact::getRoomId, message.getRoomId())
+                .ge(Contact::getReadTime, message.getCreateTime())
+                .count();
+    }
+
+    public Integer getTotalCount(Long roomId) {
+        return lambdaQuery()
+                .eq(Contact::getRoomId, roomId)
+                .count();
+    }
+
+    public Integer getUnReadCount(Message message) {
+        return lambdaQuery()
+                .eq(Contact::getRoomId, message.getRoomId())
+                .lt(Contact::getReadTime, message.getCreateTime())
+                .count();
+    }
+
+    public CursorPageBaseResp<Contact> getReadPage(Message message, CursorPageBaseReq cursorPageBaseReq) {
+        return CursorUtils.getCursorPageByMysql(this, cursorPageBaseReq, wrapper -> {
+            wrapper.eq(Contact::getRoomId, message.getRoomId());
+            wrapper.ne(Contact::getUid, message.getFromUid());//不需要查询出自己
+            wrapper.ge(Contact::getReadTime, message.getCreateTime());//已读时间大于等于消息发送时间
+        }, Contact::getReadTime);
+    }
+
+    public CursorPageBaseResp<Contact> getUnReadPage(Message message, CursorPageBaseReq cursorPageBaseReq) {
+        return CursorUtils.getCursorPageByMysql(this, cursorPageBaseReq, wrapper -> {
+            wrapper.eq(Contact::getRoomId, message.getRoomId());
+            wrapper.ne(Contact::getUid, message.getFromUid());//不需要查询出自己
+            wrapper.lt(Contact::getReadTime, message.getCreateTime());//已读时间小于消息发送时间
+        }, Contact::getReadTime);
+    }
+
+    /**
+     * 获取用户会话列表
+     */
+    public CursorPageBaseResp<Contact> getContactPage(Long uid, CursorPageBaseReq request) {
+        return CursorUtils.getCursorPageByMysql(this, request, wrapper -> {
+            wrapper.eq(Contact::getUid, uid);
+        }, Contact::getActiveTime);
+    }
 }

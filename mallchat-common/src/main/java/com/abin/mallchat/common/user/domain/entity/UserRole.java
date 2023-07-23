@@ -54,6 +54,4 @@ public class UserRole implements Serializable {
      */
     @TableField("update_time")
     private LocalDateTime updateTime;
-
-
 }

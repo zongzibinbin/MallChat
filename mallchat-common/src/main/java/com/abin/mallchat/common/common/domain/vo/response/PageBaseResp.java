@@ -36,13 +36,13 @@ public class PageBaseResp<T> {
     private List<T> list;
 
 
-    public static PageBaseResp empty() {
-        PageBaseResp r = new PageBaseResp();
+    public static <T> PageBaseResp<T> empty() {
+        PageBaseResp<T> r = new PageBaseResp<>();
         r.setPageNo(1);
         r.setPageSize(0);
         r.setIsLast(true);
         r.setTotalRecords(0L);
-        r.setList(new ArrayList());
+        r.setList(new ArrayList<>());
         return r;
     }
 

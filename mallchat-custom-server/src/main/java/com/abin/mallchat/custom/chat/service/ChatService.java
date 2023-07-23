@@ -1,5 +1,6 @@
 package com.abin.mallchat.custom.chat.service;
 
+import com.abin.mallchat.common.chat.domain.dto.MsgReadInfoDTO;
 import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
 import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
@@ -7,6 +8,7 @@ import com.abin.mallchat.custom.chat.domain.vo.request.*;
 import com.abin.mallchat.custom.chat.domain.vo.response.*;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -73,4 +75,8 @@ public interface ChatService {
     void recallMsg(Long uid, ChatMessageBaseReq request);
 
     List<ChatMemberListResp> getMemberList(ChatMessageMemberReq chatMessageMemberReq);
+
+    Collection<MsgReadInfoDTO> getMsgReadInfo(Long uid, ChatMessageReadInfoReq request);
+
+    CursorPageBaseResp<ChatMessageReadResp> getReadPage(Long uid, ChatMessageReadReq request);
 }

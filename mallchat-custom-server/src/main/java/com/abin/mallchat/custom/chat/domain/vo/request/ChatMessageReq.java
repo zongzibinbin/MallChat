@@ -24,7 +24,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class ChatMessageReq {
     @NotNull
-    @ApiModelProperty("会话id")
+    @ApiModelProperty("房间id")
     private Long roomId;
 
     @ApiModelProperty("消息类型")

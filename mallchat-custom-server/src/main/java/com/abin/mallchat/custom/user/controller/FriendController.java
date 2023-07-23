@@ -88,7 +88,7 @@ public class FriendController {
     @PutMapping("/apply")
     @ApiOperation("申请审批")
     public ApiResult<Void> applyApprove(@Valid @RequestBody FriendApproveReq request) {
-        friendService.applyApprove(request);
+        friendService.applyApprove(RequestHolder.get().getUid(), request);
         return ApiResult.success();
     }
 

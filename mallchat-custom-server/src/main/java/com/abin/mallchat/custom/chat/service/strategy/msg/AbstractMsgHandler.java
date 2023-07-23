@@ -18,14 +18,29 @@ public abstract class AbstractMsgHandler {
         MsgHandlerFactory.register(getMsgTypeEnum().getType(), this);
     }
 
+    /**
+     * 消息类型
+     */
     abstract MessageTypeEnum getMsgTypeEnum();
 
+    /**
+     * 校验消息——保存前校验
+     */
     public abstract void checkMsg(ChatMessageReq req, Long uid);
 
+    /**
+     * 保存消息
+     */
     public abstract void saveMsg(Message msg, ChatMessageReq req);
 
+    /**
+     * 展示消息
+     */
     public abstract Object showMsg(Message msg);
 
+    /**
+     * 被回复时——展示的消息
+     */
     public abstract Object showReplyMsg(Message msg);
 
 }
