@@ -1,7 +1,10 @@
 package com.abin.mallchat.custom.user.service;
 
+import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
 import com.abin.mallchat.common.common.domain.vo.request.PageBaseReq;
+import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
 import com.abin.mallchat.common.common.domain.vo.response.PageBaseResp;
+import com.abin.mallchat.custom.chat.domain.vo.response.ChatMemberResp;
 import com.abin.mallchat.custom.user.domain.vo.request.friend.FriendApplyReq;
 import com.abin.mallchat.custom.user.domain.vo.request.friend.FriendApproveReq;
 import com.abin.mallchat.custom.user.domain.vo.request.friend.FriendCheckReq;
@@ -57,4 +60,14 @@ public interface FriendService {
      * @param request 请求
      */
     void applyApprove(Long uid, FriendApproveReq request);
+
+    /**
+     * 删除好友
+     *
+     * @param uid       uid
+     * @param friendUid 朋友uid
+     */
+    void deleteFriend(Long uid, Long friendUid);
+
+    CursorPageBaseResp<ChatMemberResp> friendList(Long uid, CursorPageBaseReq request);
 }

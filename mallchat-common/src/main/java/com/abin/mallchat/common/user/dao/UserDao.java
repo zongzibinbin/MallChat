@@ -53,4 +53,13 @@ public class UserDao extends ServiceImpl<UserMapper, User> {
                 .list();
 
     }
+
+    public List<User> getUserList(List<Long> uids) {
+        return lambdaQuery()
+                .in(User::getId, uids)
+                .orderByDesc(User::getId)
+                .select(User::getId, User::getActiveStatus, User::getLastOptTime)
+                .list();
+
+    }
 }
