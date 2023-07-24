@@ -19,8 +19,6 @@ import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
 import com.abin.mallchat.common.common.event.MessageSendEvent;
 import com.abin.mallchat.common.common.utils.AssertUtil;
 import com.abin.mallchat.common.user.dao.UserDao;
-import com.abin.mallchat.common.user.domain.entity.ItemConfig;
-import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.domain.enums.ChatActiveStatusEnum;
 import com.abin.mallchat.common.user.domain.enums.RoleEnum;
 import com.abin.mallchat.common.user.service.IRoleService;
@@ -49,7 +47,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Description: 消息处理类
@@ -226,21 +223,14 @@ public class ChatServiceImpl implements ChatService {
             return new ArrayList<>();
         }
         Map<Long, Message> replyMap = new HashMap<>();
-        Map<Long, User> userMap;
-        Map<Long, ItemConfig> itemMap;
         //批量查出回复的消息
         List<Long> replyIds = messages.stream().map(Message::getReplyMsgId).filter(Objects::nonNull).distinct().collect(Collectors.toList());
         if (CollectionUtil.isNotEmpty(replyIds)) {
             replyMap = messageDao.listByIds(replyIds).stream().collect(Collectors.toMap(Message::getId, Function.identity()));
         }
-        //批量查询消息关联用户
-        Set<Long> uidSet = Stream.concat(replyMap.values().stream().map(Message::getFromUid), messages.stream().map(Message::getFromUid)).collect(Collectors.toSet());
-        userMap = userCache.getUserInfoBatch(uidSet);
-        //批量查询item信息
-        itemMap = userMap.values().stream().map(User::getItemId).distinct().filter(Objects::nonNull).map(itemCache::getById).collect(Collectors.toMap(ItemConfig::getId, Function.identity()));
         //查询消息标志
         List<MessageMark> msgMark = messageMarkDao.getValidMarkByMsgIdBatch(messages.stream().map(Message::getId).collect(Collectors.toList()));
-        return MessageAdapter.buildMsgResp(messages, replyMap, userMap, msgMark, receiveUid, itemMap);
+        return MessageAdapter.buildMsgResp(messages, replyMap, msgMark, receiveUid);
     }
 
 }

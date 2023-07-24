@@ -13,7 +13,7 @@ public class ChatGPTProperties {
     /**
      * 是否使用openAI
      */
-    private boolean use;
+    private boolean use = false;
     /**
      * 机器人 id
      */
@@ -21,7 +21,7 @@ public class ChatGPTProperties {
     /**
      * 模型名称
      */
-    private String modelName = "text-davinci-003";
+    private String modelName = "gpt-3.5-turbo";
     /**
      * openAI key
      */
@@ -34,11 +34,15 @@ public class ChatGPTProperties {
     /**
      * 超时
      */
-    private Integer timeout = 60*1000;
+    private Integer timeout = 60 * 1000;
 
     /**
-     * 用户每天条数限制
+     * 用户每小时条数限制
      */
-    private Integer limit = 5;
+    private Integer limit = 20;
 
+    /**
+     * 最大令牌
+     */
+    private Integer maxTokens = 2048;
 }

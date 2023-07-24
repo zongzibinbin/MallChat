@@ -199,6 +199,10 @@ public class RedisUtils {
         }
     }
 
+    public static void del(List<String> keys) {
+        stringRedisTemplate.delete(keys);
+    }
+
     // ============================String=============================
 
     /**

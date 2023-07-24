@@ -28,6 +28,14 @@ public class FrequencyControlUtil {
         return frequencyController.executeWithFrequencyControl(frequencyControl, supplier);
     }
 
+    public static <K extends FrequencyControlDTO> void executeWithFrequencyControl(String strategyName, K frequencyControl, AbstractFrequencyControlService.Executor executor) throws Throwable {
+        AbstractFrequencyControlService<K> frequencyController = FrequencyControlStrategyFactory.getFrequencyControllerByName(strategyName);
+        frequencyController.executeWithFrequencyControl(frequencyControl, () -> {
+            executor.execute();
+            return null;
+        });
+    }
+
 
     /**
      * 多限流策略的编程式调用方法调用方法
