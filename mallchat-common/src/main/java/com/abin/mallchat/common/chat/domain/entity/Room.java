@@ -1,9 +1,12 @@
 package com.abin.mallchat.common.chat.domain.entity;
 
+import com.abin.mallchat.common.chat.domain.enums.HotFlagEnum;
+import com.abin.mallchat.common.chat.domain.enums.RoomTypeEnum;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -77,4 +80,18 @@ public class Room implements Serializable {
     private Date updateTime;
 
 
+    @JsonIgnore
+    public boolean isHotRoom() {
+        return HotFlagEnum.of(this.hotFlag) == HotFlagEnum.YES;
+    }
+
+    @JsonIgnore
+    public boolean isRoomFriend() {
+        return RoomTypeEnum.of(this.type) == RoomTypeEnum.FRIEND;
+    }
+
+    @JsonIgnore
+    public boolean isRoomGroup() {
+        return RoomTypeEnum.of(this.hotFlag) == RoomTypeEnum.GROUP;
+    }
 }

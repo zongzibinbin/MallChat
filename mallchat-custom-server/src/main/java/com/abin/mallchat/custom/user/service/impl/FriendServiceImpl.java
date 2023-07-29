@@ -1,6 +1,7 @@
 package com.abin.mallchat.custom.user.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.abin.mallchat.common.chat.dao.RoomFriendDao;
 import com.abin.mallchat.common.chat.domain.entity.RoomFriend;
 import com.abin.mallchat.common.chat.service.ContactService;
 import com.abin.mallchat.common.chat.service.RoomService;
@@ -67,9 +68,10 @@ public class FriendServiceImpl implements FriendService {
     private ContactService contactService;
     @Autowired
     private ChatService chatService;
-
     @Autowired
     private UserDao userDao;
+    @Autowired
+    private RoomFriendDao roomFriendDao;
 
     /**
      * 检查
@@ -176,6 +178,7 @@ public class FriendServiceImpl implements FriendService {
      * @param friendUid 朋友uid
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteFriend(Long uid, Long friendUid) {
         List<UserFriend> userFriends = userFriendDao.getUserFriend(uid, friendUid);
         if (CollectionUtil.isEmpty(userFriends)) {
@@ -184,6 +187,8 @@ public class FriendServiceImpl implements FriendService {
         }
         List<Long> friendRecordIds = userFriends.stream().map(UserFriend::getId).collect(Collectors.toList());
         userFriendDao.removeByIds(friendRecordIds);
+        //禁用房间
+        roomService.disableFriendRoom(friendRecordIds);
     }
 
     @Override

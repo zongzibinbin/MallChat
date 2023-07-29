@@ -178,6 +178,7 @@ public class RoomAppServiceImpl implements RoomAppService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void delMember(Long uid, MemberDelReq request) {
         Room room = roomCache.get(request.getRoomId());
         AssertUtil.isNotEmpty(room, "房间号有误");

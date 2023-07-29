@@ -5,19 +5,17 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Pair;
-import com.abin.mallchat.common.chat.dao.ContactDao;
-import com.abin.mallchat.common.chat.dao.MessageDao;
-import com.abin.mallchat.common.chat.dao.MessageMarkDao;
-import com.abin.mallchat.common.chat.dao.RoomDao;
+import com.abin.mallchat.common.chat.dao.*;
 import com.abin.mallchat.common.chat.domain.dto.MsgReadInfoDTO;
-import com.abin.mallchat.common.chat.domain.entity.Contact;
-import com.abin.mallchat.common.chat.domain.entity.Message;
-import com.abin.mallchat.common.chat.domain.entity.MessageMark;
+import com.abin.mallchat.common.chat.domain.entity.*;
 import com.abin.mallchat.common.chat.domain.enums.MessageMarkActTypeEnum;
 import com.abin.mallchat.common.chat.domain.enums.MessageTypeEnum;
 import com.abin.mallchat.common.chat.domain.vo.response.ChatMessageResp;
 import com.abin.mallchat.common.chat.service.ContactService;
+import com.abin.mallchat.common.chat.service.cache.RoomCache;
+import com.abin.mallchat.common.chat.service.cache.RoomGroupCache;
 import com.abin.mallchat.common.common.annotation.RedissonLock;
+import com.abin.mallchat.common.common.domain.enums.NormalOrNoEnum;
 import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
 import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
 import com.abin.mallchat.common.common.event.MessageSendEvent;
@@ -28,7 +26,6 @@ import com.abin.mallchat.common.user.domain.enums.ChatActiveStatusEnum;
 import com.abin.mallchat.common.user.domain.enums.RoleEnum;
 import com.abin.mallchat.common.user.domain.vo.response.ws.ChatMemberResp;
 import com.abin.mallchat.common.user.service.IRoleService;
-import com.abin.mallchat.common.user.service.cache.ItemCache;
 import com.abin.mallchat.common.user.service.cache.UserCache;
 import com.abin.mallchat.custom.chat.domain.vo.request.*;
 import com.abin.mallchat.custom.chat.domain.vo.response.ChatMemberListResp;
@@ -81,7 +78,7 @@ public class ChatServiceImpl implements ChatService {
     @Autowired
     private MessageMarkDao messageMarkDao;
     @Autowired
-    private ItemCache itemCache;
+    private RoomFriendDao roomFriendDao;
     @Autowired
     private IRoleService iRoleService;
     @Autowired
@@ -90,6 +87,12 @@ public class ChatServiceImpl implements ChatService {
     private ContactService contactService;
     @Autowired
     private ContactDao contactDao;
+    @Autowired
+    private RoomCache roomCache;
+    @Autowired
+    private GroupMemberDao groupMemberDao;
+    @Autowired
+    private RoomGroupCache roomGroupCache;
 
     /**
      * 发送消息
@@ -97,6 +100,7 @@ public class ChatServiceImpl implements ChatService {
     @Override
     @Transactional
     public Long sendMsg(ChatMessageReq request, Long uid) {
+        check(request, uid);
         AbstractMsgHandler msgHandler = MsgHandlerFactory.getStrategyNoNull(request.getMsgType());//todo 这里先不扩展，后续再改
         msgHandler.checkMsg(request, uid);
         //同步获取消息的跳转链接标题
@@ -106,6 +110,24 @@ public class ChatServiceImpl implements ChatService {
         //发布消息发送事件
         applicationEventPublisher.publishEvent(new MessageSendEvent(this, insert.getId()));
         return insert.getId();
+    }
+
+    private void check(ChatMessageReq request, Long uid) {
+        Room room = roomCache.get(request.getRoomId());
+        if (room.isHotRoom()) {//全员群跳过校验
+            return;
+        }
+        if (room.isRoomFriend()) {
+            RoomFriend roomFriend = roomFriendDao.getByRoomId(request.getRoomId());
+            AssertUtil.equal(NormalOrNoEnum.NORMAL.getStatus(), roomFriend.getStatus(), "您已经被对方拉黑");
+            AssertUtil.isTrue(uid.equals(roomFriend.getUid1()) || uid.equals(roomFriend.getUid2()), "您已经被对方拉黑");
+        }
+        if (room.isRoomGroup()) {
+            RoomGroup roomGroup = roomGroupCache.get(request.getRoomId());
+            GroupMember member = groupMemberDao.getMember(roomGroup.getId(), uid);
+            AssertUtil.isNotEmpty(member, "您已经被移除该群");
+        }
+
     }
 
     @Override

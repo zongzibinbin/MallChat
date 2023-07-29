@@ -18,6 +18,12 @@ public interface RoomService {
     RoomFriend createFriendRoom(List<Long> uidList);
 
     /**
+     * 禁用一个单聊房间
+     */
+    void disableFriendRoom(List<Long> uidList);
+
+
+    /**
      * 创建一个群聊房间
      */
     RoomGroup createGroupRoom(Long uid);

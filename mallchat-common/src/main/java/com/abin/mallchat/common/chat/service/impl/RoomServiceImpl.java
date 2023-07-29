@@ -60,6 +60,14 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    public void disableFriendRoom(List<Long> uidList) {
+        AssertUtil.isNotEmpty(uidList, "房间创建失败，好友数量不对");
+        AssertUtil.equal(uidList.size(), 2, "房间创建失败，好友数量不对");
+        String key = ChatAdapter.generateRoomKey(uidList);
+        roomFriendDao.disableRoom(key);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public RoomGroup createGroupRoom(Long uid) {
         List<GroupMember> selfGroup = groupMemberDao.getSelfGroup(uid);
