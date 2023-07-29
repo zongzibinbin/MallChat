@@ -51,17 +51,23 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public Map<Long, MsgReadInfoDTO> getMsgReadInfo(List<Message> messages) {
+    public Map<Long, MsgReadInfoDTO> getMsgReadInfo(List<Message> messages, boolean needUnread) {
         Map<Long, List<Message>> roomGroup = messages.stream().collect(Collectors.groupingBy(Message::getRoomId));
         AssertUtil.equal(roomGroup.size(), 1, "只能查相同房间下的消息");
         Long roomId = roomGroup.keySet().iterator().next();
-        Integer totalCount = contactDao.getTotalCount(roomId);
+        Integer totalCount = null;
+        if (needUnread) {
+            totalCount = contactDao.getTotalCount(roomId);
+        }
+        Integer finalTotalCount = totalCount;
         return messages.stream().map(message -> {
             MsgReadInfoDTO readInfoDTO = new MsgReadInfoDTO();
             readInfoDTO.setMsgId(message.getId());
             Integer readCount = contactDao.getReadCount(message);
             readInfoDTO.setReadCount(readCount);
-            readInfoDTO.setUnReadCount(totalCount - readCount);
+            if (needUnread) {
+                readInfoDTO.setUnReadCount(finalTotalCount - readCount);
+            }
             return readInfoDTO;
         }).collect(Collectors.toMap(MsgReadInfoDTO::getMsgId, Function.identity()));
     }
