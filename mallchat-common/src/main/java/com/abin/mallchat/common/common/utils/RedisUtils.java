@@ -849,6 +849,10 @@ public class RedisUtils {
         return stringRedisTemplate.opsForZSet().range(key, start, end);
     }
 
+    public static Set<String> zAll(String key) {
+        return stringRedisTemplate.opsForZSet().range(key, 0, -1);
+    }
+
     /**
      * 获取集合元素, 并且把score值也获取
      *
@@ -882,8 +886,14 @@ public class RedisUtils {
      * @param max 最大值
      * @return
      */
-    public Set<TypedTuple<String>> zRangeByScoreWithScores(String key,
-                                                           double min, double max) {
+    public static Set<TypedTuple<String>> zRangeByScoreWithScores(String key,
+                                                                  Double min, Double max) {
+        if (Objects.isNull(min)) {
+            min = Double.MIN_VALUE;
+        }
+        if (Objects.isNull(max)) {
+            max = Double.MAX_VALUE;
+        }
         return stringRedisTemplate.opsForZSet().rangeByScoreWithScores(key, min, max);
     }
 

@@ -9,6 +9,9 @@ import com.abin.mallchat.common.common.utils.CursorUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+import java.util.List;
+
 /**
  * <p>
  * 会话列表 服务实现类
@@ -70,5 +73,19 @@ public class ContactDao extends ServiceImpl<ContactMapper, Contact> {
         return CursorUtils.getCursorPageByMysql(this, request, wrapper -> {
             wrapper.eq(Contact::getUid, uid);
         }, Contact::getActiveTime);
+    }
+
+    public List<Contact> getByRoomIds(List<Long> roomIds, Long uid) {
+        return lambdaQuery()
+                .eq(Contact::getRoomId, roomIds)
+                .eq(Contact::getUid, uid)
+                .list();
+    }
+
+    /**
+     * 更新所有人的会话时间，没有就直接插入
+     */
+    public void refreshOrCreateActiveTime(Long roomId, List<Long> memberUidList, Long msgId, Date activeTime) {
+        baseMapper.refreshOrCreateActiveTime(roomId, memberUidList, msgId, activeTime);
     }
 }

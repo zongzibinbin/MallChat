@@ -7,9 +7,7 @@ import com.abin.mallchat.common.common.domain.vo.response.ApiResult;
 import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
 import com.abin.mallchat.common.common.domain.vo.response.PageBaseResp;
 import com.abin.mallchat.common.common.utils.RequestHolder;
-import com.abin.mallchat.common.user.service.cache.UserCache;
-import com.abin.mallchat.custom.chat.domain.vo.response.ChatMemberResp;
-import com.abin.mallchat.custom.chat.service.ChatService;
+import com.abin.mallchat.common.user.domain.vo.response.ws.ChatMemberResp;
 import com.abin.mallchat.custom.user.domain.vo.request.friend.FriendApplyReq;
 import com.abin.mallchat.custom.user.domain.vo.request.friend.FriendApproveReq;
 import com.abin.mallchat.custom.user.domain.vo.request.friend.FriendCheckReq;
@@ -21,7 +19,6 @@ import com.abin.mallchat.custom.user.service.FriendService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -40,11 +37,6 @@ import javax.validation.Valid;
 @Api(tags = "好友相关接口")
 @Slf4j
 public class FriendController {
-    @Autowired
-    private ChatService chatService;
-    @Autowired
-    private UserCache userCache;
-
     @Resource
     private FriendService friendService;
 
@@ -86,13 +78,13 @@ public class FriendController {
     }
 
     @PutMapping("/apply")
-    @ApiOperation("申请审批")
+    @ApiOperation("审批申请")
     public ApiResult<Void> applyApprove(@Valid @RequestBody FriendApproveReq request) {
         friendService.applyApprove(RequestHolder.get().getUid(), request);
         return ApiResult.success();
     }
 
-    @PutMapping("/page")
+    @GetMapping("/page")
     @ApiOperation("联系人列表")
     public ApiResult<CursorPageBaseResp<ChatMemberResp>> friendList(@Valid CursorPageBaseReq request) {
         Long uid = RequestHolder.get().getUid();

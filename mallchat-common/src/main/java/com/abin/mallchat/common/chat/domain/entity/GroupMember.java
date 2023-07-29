@@ -4,11 +4,10 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * <p>
@@ -21,6 +20,9 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @TableName("group_member")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class GroupMember implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -32,10 +34,10 @@ public class GroupMember implements Serializable {
     private Long id;
 
     /**
-     * 房间id
+     * 群组id
      */
-    @TableField("room_id")
-    private Long roomId;
+    @TableField("group_id")
+    private Long groupId;
 
     /**
      * 成员uid
@@ -44,7 +46,9 @@ public class GroupMember implements Serializable {
     private Long uid;
 
     /**
-     * 成员角色1群主 2管理员 3普通成员
+     * 成员角色1群主(可撤回，可移除，可解散) 2管理员(可撤回，可移除) 3普通成员
+     *
+     * @see com.abin.mallchat.common.chat.domain.enums.GroupRoleEnum
      */
     @TableField("role")
     private Integer role;
@@ -53,13 +57,13 @@ public class GroupMember implements Serializable {
      * 创建时间
      */
     @TableField("create_time")
-    private LocalDateTime createTime;
+    private Date createTime;
 
     /**
      * 修改时间
      */
     @TableField("update_time")
-    private LocalDateTime updateTime;
+    private Date updateTime;
 
 
 }

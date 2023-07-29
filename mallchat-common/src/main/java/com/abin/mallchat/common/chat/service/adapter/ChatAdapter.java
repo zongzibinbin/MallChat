@@ -3,9 +3,11 @@ package com.abin.mallchat.common.chat.service.adapter;
 import com.abin.mallchat.common.chat.domain.entity.Contact;
 import com.abin.mallchat.common.chat.domain.entity.Room;
 import com.abin.mallchat.common.chat.domain.entity.RoomFriend;
+import com.abin.mallchat.common.chat.domain.entity.RoomGroup;
 import com.abin.mallchat.common.chat.domain.enums.HotFlagEnum;
 import com.abin.mallchat.common.chat.domain.enums.RoomTypeEnum;
 import com.abin.mallchat.common.common.domain.enums.NormalOrNoEnum;
+import com.abin.mallchat.common.user.domain.entity.User;
 
 import java.util.Collection;
 import java.util.List;
@@ -41,7 +43,7 @@ public class ChatAdapter {
         roomFriend.setRoomId(roomId);
         roomFriend.setUid1(collect.get(0));
         roomFriend.setUid2(collect.get(1));
-        roomFriend.setKey(generateRoomKey(uidList));
+        roomFriend.setRoomKey(generateRoomKey(uidList));
         roomFriend.setStatus(NormalOrNoEnum.NORMAL.getStatus());
         return roomFriend;
     }
@@ -64,5 +66,13 @@ public class ChatAdapter {
      */
     public static Long getFriendUid(RoomFriend roomFriend, Long uid) {
         return Objects.equals(uid, roomFriend.getUid1()) ? roomFriend.getUid2() : roomFriend.getUid1();
+    }
+
+    public static RoomGroup buildGroupRoom(User user, Long roomId) {
+        RoomGroup roomGroup = new RoomGroup();
+        roomGroup.setName(user.getName() + "的群组");
+        roomGroup.setAvatar(user.getAvatar());
+        roomGroup.setRoomId(roomId);
+        return roomGroup;
     }
 }

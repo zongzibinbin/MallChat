@@ -3,14 +3,14 @@ package com.abin.mallchat.custom.user.service.adapter;
 import cn.hutool.core.bean.BeanUtil;
 import com.abin.mallchat.common.chat.domain.dto.ChatMessageMarkDTO;
 import com.abin.mallchat.common.chat.domain.dto.ChatMsgRecallDTO;
+import com.abin.mallchat.common.chat.domain.vo.response.ChatMessageResp;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.domain.enums.ChatActiveStatusEnum;
-import com.abin.mallchat.custom.chat.domain.vo.response.ChatMemberResp;
+import com.abin.mallchat.common.user.domain.enums.WSBaseResp;
+import com.abin.mallchat.common.user.domain.enums.WSRespTypeEnum;
+import com.abin.mallchat.common.user.domain.vo.response.ws.*;
 import com.abin.mallchat.custom.chat.domain.vo.response.ChatMemberStatisticResp;
-import com.abin.mallchat.custom.chat.domain.vo.response.ChatMessageResp;
 import com.abin.mallchat.custom.chat.service.ChatService;
-import com.abin.mallchat.custom.user.domain.enums.WSRespTypeEnum;
-import com.abin.mallchat.custom.user.domain.vo.response.ws.*;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,7 +87,6 @@ public class WSAdapter {
     private void assembleNum(WSOnlineOfflineNotify onlineOfflineNotify) {
         ChatMemberStatisticResp memberStatistic = chatService.getMemberStatistic();
         onlineOfflineNotify.setOnlineNum(memberStatistic.getOnlineNum());
-        onlineOfflineNotify.setTotalNum(memberStatistic.getTotalNum());
     }
 
     private static ChatMemberResp buildOnlineInfo(User user) {

@@ -13,9 +13,9 @@ import com.abin.mallchat.common.chat.domain.dto.MsgReadInfoDTO;
 import com.abin.mallchat.common.chat.domain.entity.Contact;
 import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.chat.domain.entity.MessageMark;
-import com.abin.mallchat.common.chat.domain.entity.Room;
 import com.abin.mallchat.common.chat.domain.enums.MessageMarkActTypeEnum;
 import com.abin.mallchat.common.chat.domain.enums.MessageTypeEnum;
+import com.abin.mallchat.common.chat.domain.vo.response.ChatMessageResp;
 import com.abin.mallchat.common.chat.service.ContactService;
 import com.abin.mallchat.common.common.annotation.RedissonLock;
 import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
@@ -23,13 +23,17 @@ import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
 import com.abin.mallchat.common.common.event.MessageSendEvent;
 import com.abin.mallchat.common.common.utils.AssertUtil;
 import com.abin.mallchat.common.user.dao.UserDao;
+import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.domain.enums.ChatActiveStatusEnum;
 import com.abin.mallchat.common.user.domain.enums.RoleEnum;
+import com.abin.mallchat.common.user.domain.vo.response.ws.ChatMemberResp;
 import com.abin.mallchat.common.user.service.IRoleService;
 import com.abin.mallchat.common.user.service.cache.ItemCache;
 import com.abin.mallchat.common.user.service.cache.UserCache;
 import com.abin.mallchat.custom.chat.domain.vo.request.*;
-import com.abin.mallchat.custom.chat.domain.vo.response.*;
+import com.abin.mallchat.custom.chat.domain.vo.response.ChatMemberListResp;
+import com.abin.mallchat.custom.chat.domain.vo.response.ChatMemberStatisticResp;
+import com.abin.mallchat.custom.chat.domain.vo.response.ChatMessageReadResp;
 import com.abin.mallchat.custom.chat.service.ChatService;
 import com.abin.mallchat.custom.chat.service.adapter.MemberAdapter;
 import com.abin.mallchat.custom.chat.service.adapter.MessageAdapter;
@@ -116,26 +120,26 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public CursorPageBaseResp<ChatMemberResp> getMemberPage(CursorPageBaseReq request) {
+    public CursorPageBaseResp<ChatMemberResp> getMemberPage(List<Long> memberUidList, CursorPageBaseReq request) {
         Pair<ChatActiveStatusEnum, String> pair = ChatMemberHelper.getCursorPair(request.getCursor());
         ChatActiveStatusEnum activeStatusEnum = pair.getKey();
         String timeCursor = pair.getValue();
         List<ChatMemberResp> resultList = new ArrayList<>();//最终列表
         Boolean isLast = Boolean.FALSE;
         if (activeStatusEnum == ChatActiveStatusEnum.ONLINE) {//在线列表
-            CursorPageBaseResp<Pair<Long, Double>> cursorPage = userCache.getOnlineCursorPage(new CursorPageBaseReq(request.getPageSize(), timeCursor));
-            resultList.addAll(memberAdapter.buildMember(cursorPage.getList(), ChatActiveStatusEnum.ONLINE));//添加在线列表
+            CursorPageBaseResp<User> cursorPage = userDao.getCursorPage(memberUidList, request, ChatActiveStatusEnum.ONLINE);
+            resultList.addAll(MemberAdapter.buildMember(cursorPage.getList()));//添加在线列表
             if (cursorPage.getIsLast()) {//如果是最后一页,从离线列表再补点数据
-                Integer leftSize = request.getPageSize() - cursorPage.getList().size();
-                cursorPage = userCache.getOfflineCursorPage(new CursorPageBaseReq(leftSize, null));
-                resultList.addAll(memberAdapter.buildMember(cursorPage.getList(), ChatActiveStatusEnum.OFFLINE));//添加离线线列表
                 activeStatusEnum = ChatActiveStatusEnum.OFFLINE;
+                Integer leftSize = request.getPageSize() - cursorPage.getList().size();
+                cursorPage = userDao.getCursorPage(memberUidList, new CursorPageBaseReq(leftSize, null), ChatActiveStatusEnum.OFFLINE);
+                resultList.addAll(MemberAdapter.buildMember(cursorPage.getList()));//添加离线线列表
             }
             timeCursor = cursorPage.getCursor();
             isLast = cursorPage.getIsLast();
         } else if (activeStatusEnum == ChatActiveStatusEnum.OFFLINE) {//离线列表
-            CursorPageBaseResp<Pair<Long, Double>> cursorPage = userCache.getOfflineCursorPage(new CursorPageBaseReq(request.getPageSize(), timeCursor));
-            resultList.addAll(memberAdapter.buildMember(cursorPage.getList(), ChatActiveStatusEnum.OFFLINE));//添加离线线列表
+            CursorPageBaseResp<User> cursorPage = userDao.getCursorPage(memberUidList, request, ChatActiveStatusEnum.OFFLINE);
+            resultList.addAll(MemberAdapter.buildMember(cursorPage.getList()));//添加离线线列表
             timeCursor = cursorPage.getCursor();
             isLast = cursorPage.getIsLast();
         }
@@ -150,18 +154,6 @@ public class ChatServiceImpl implements ChatService {
             return CursorPageBaseResp.empty();
         }
         return CursorPageBaseResp.init(cursorPage, getMsgRespBatch(cursorPage.getList(), receiveUid));
-    }
-
-    @Override
-    public CursorPageBaseResp<ChatRoomResp> getRoomPage(CursorPageBaseReq request, Long uid) {
-        CursorPageBaseResp<Room> cursorPage = roomDao.getCursorPage(request);
-        ArrayList<Room> rooms = new ArrayList<>(cursorPage.getList());
-        if (request.isFirstPage()) {
-            //第一页插入置顶的大群聊
-            Room group = roomDao.getById(ROOM_GROUP_ID);
-            rooms.add(0, group);
-        }
-        return CursorPageBaseResp.init(cursorPage, RoomAdapter.buildResp(rooms));
     }
 
     @Override
@@ -238,6 +230,24 @@ public class ChatServiceImpl implements ChatService {
             return CursorPageBaseResp.empty();
         }
         return CursorPageBaseResp.init(page, RoomAdapter.buildReadResp(page.getList()));
+    }
+
+    @Override
+    @RedissonLock(key = "#uid")
+    public void msgRead(Long uid, ChatMessageMemberReq request) {
+        Contact contact = contactDao.get(uid, request.getRoomId());
+        if (Objects.nonNull(contact)) {
+            Contact update = new Contact();
+            update.setId(contact.getId());
+            update.setReadTime(new Date());
+            contactDao.updateById(update);
+        } else {
+            Contact insert = new Contact();
+            insert.setUid(uid);
+            insert.setRoomId(request.getRoomId());
+            insert.setReadTime(new Date());
+            contactDao.save(insert);
+        }
     }
 
     private void checkRecall(Long uid, Message message) {

@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 
 /**
@@ -20,7 +20,7 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 public class FriendDeleteReq {
 
-    @NotBlank
+    @NotNull
     @ApiModelProperty("好友uid")
     private Long targetUid;
 

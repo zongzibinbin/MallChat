@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * <p>
@@ -52,8 +52,8 @@ public class RoomFriend implements Serializable {
     /**
      * 房间key由两个uid拼接，先做排序uid1_uid2
      */
-    @TableField("key")
-    private String key;
+    @TableField("room_key")
+    private String roomKey;
 
     /**
      * 房间状态 0正常 1禁用(删好友了禁用)
@@ -65,12 +65,12 @@ public class RoomFriend implements Serializable {
      * 创建时间
      */
     @TableField("create_time")
-    private LocalDateTime createTime;
+    private Date createTime;
 
     /**
      * 修改时间
      */
     @TableField("update_time")
-    private LocalDateTime updateTime;
+    private Date updateTime;
 
 }

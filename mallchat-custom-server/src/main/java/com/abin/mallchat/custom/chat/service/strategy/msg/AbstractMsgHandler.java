@@ -43,4 +43,9 @@ public abstract class AbstractMsgHandler {
      */
     public abstract Object showReplyMsg(Message msg);
 
+    /**
+     * 会话列表——展示的消息
+     */
+    public abstract String showContactMsg(Message msg);
+
 }

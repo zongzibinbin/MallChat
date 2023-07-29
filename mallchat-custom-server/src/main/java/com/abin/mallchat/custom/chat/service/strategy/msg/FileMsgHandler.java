@@ -54,4 +54,9 @@ public class FileMsgHandler extends AbstractMsgHandler {
     public Object showReplyMsg(Message msg) {
         return "文件:" + msg.getExtra().getFileMsg().getFileName();
     }
+
+    @Override
+    public String showContactMsg(Message msg) {
+        return "[文件]" + msg.getExtra().getFileMsg().getFileName();
+    }
 }

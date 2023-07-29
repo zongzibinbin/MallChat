@@ -28,6 +28,8 @@ public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    public static Long UID_SYSTEM = 1L;//系统uid
+
     /**
      * 用户id
      */

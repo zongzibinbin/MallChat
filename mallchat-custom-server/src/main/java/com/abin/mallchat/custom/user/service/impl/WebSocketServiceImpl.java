@@ -10,11 +10,11 @@ import com.abin.mallchat.common.common.event.UserOnlineEvent;
 import com.abin.mallchat.common.user.dao.UserDao;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.domain.enums.RoleEnum;
+import com.abin.mallchat.common.user.domain.enums.WSBaseResp;
+import com.abin.mallchat.common.user.domain.vo.request.ws.WSAuthorize;
 import com.abin.mallchat.common.user.service.IRoleService;
 import com.abin.mallchat.common.user.service.cache.UserCache;
 import com.abin.mallchat.custom.user.domain.dto.ws.WSChannelExtraDTO;
-import com.abin.mallchat.custom.user.domain.vo.request.ws.WSAuthorize;
-import com.abin.mallchat.custom.user.domain.vo.response.ws.WSBaseResp;
 import com.abin.mallchat.custom.user.service.LoginService;
 import com.abin.mallchat.custom.user.service.WebSocketService;
 import com.abin.mallchat.custom.user.service.adapter.WSAdapter;
@@ -98,7 +98,7 @@ public class WebSocketServiceImpl implements WebSocketService {
      */
     @SneakyThrows
     @Override
-    @FrequencyControl(time = 100, count = 5, spEl = "T(com.abin.mallchat.common.common.utils.RequestHolder).get().getIp()")
+    @FrequencyControl(time = 1000, count = 50, spEl = "T(com.abin.mallchat.common.common.utils.RequestHolder).get().getIp()")
     public void handleLoginReq(Channel channel) {
         //生成随机不重复的登录码
         Integer code = generateLoginCode(channel);
@@ -245,7 +245,7 @@ public class WebSocketServiceImpl implements WebSocketService {
     @Override
     public void sendToAllOnline(WSBaseResp<?> wsBaseResp, Long skipUid) {
         ONLINE_WS_MAP.forEach((channel, ext) -> {
-            if (ObjectUtil.equal(ext.getUid(), skipUid)) {
+            if (Objects.nonNull(skipUid) && Objects.equals(ext.getUid(), skipUid)) {
                 return;
             }
             threadPoolTaskExecutor.execute(() -> sendMsg(channel, wsBaseResp));
@@ -258,13 +258,21 @@ public class WebSocketServiceImpl implements WebSocketService {
     }
 
     @Override
-    public void sendToFriend(WSBaseResp<?> wsBaseResp, Long friendUid) {
-        CopyOnWriteArrayList<Channel> channels = ONLINE_UID_MAP.get(friendUid);
+    public void sendToUid(WSBaseResp<?> wsBaseResp, Long uid) {
+        CopyOnWriteArrayList<Channel> channels = ONLINE_UID_MAP.get(uid);
         if (CollectionUtil.isEmpty(channels)) {
-            log.info("用户：{}不在线", friendUid);
+            log.info("用户：{}不在线", uid);
             return;
         }
-        threadPoolTaskExecutor.execute(() -> sendMsg(channels.get(0), wsBaseResp));
+        channels.forEach(channel -> {
+            threadPoolTaskExecutor.execute(() -> sendMsg(channel, wsBaseResp));
+        });
+
+    }
+
+    @Override
+    public void sendToUidList(WSBaseResp<?> wsBaseResp, List<Long> uidList) {
+        uidList.forEach(uid -> sendToUid(wsBaseResp, uid));
     }
 
     private void sendMsg(Channel channel, WSBaseResp<?> wsBaseResp) {

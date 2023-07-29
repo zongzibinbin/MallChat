@@ -2,10 +2,10 @@ package com.abin.mallchat.custom.common.event.listener;
 
 import com.abin.mallchat.common.chat.dao.MessageDao;
 import com.abin.mallchat.common.common.event.UserBlackEvent;
+import com.abin.mallchat.common.user.domain.enums.WSBaseResp;
+import com.abin.mallchat.common.user.domain.enums.WSRespTypeEnum;
+import com.abin.mallchat.common.user.domain.vo.response.ws.WSBlack;
 import com.abin.mallchat.common.user.service.cache.UserCache;
-import com.abin.mallchat.custom.user.domain.enums.WSRespTypeEnum;
-import com.abin.mallchat.custom.user.domain.vo.response.ws.WSBaseResp;
-import com.abin.mallchat.custom.user.domain.vo.response.ws.WSBlack;
 import com.abin.mallchat.custom.user.service.WebSocketService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

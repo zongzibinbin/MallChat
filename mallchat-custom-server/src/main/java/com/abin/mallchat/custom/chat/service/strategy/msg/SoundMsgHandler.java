@@ -54,4 +54,9 @@ public class SoundMsgHandler extends AbstractMsgHandler {
     public Object showReplyMsg(Message msg) {
         return "语音";
     }
+
+    @Override
+    public String showContactMsg(Message msg) {
+        return "[语音]";
+    }
 }

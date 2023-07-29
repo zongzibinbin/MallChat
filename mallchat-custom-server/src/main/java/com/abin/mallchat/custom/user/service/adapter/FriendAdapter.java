@@ -35,6 +35,7 @@ public class FriendAdapter {
             FriendApplyResp friendApplyResp = new FriendApplyResp();
             friendApplyResp.setUid(userApply.getUid());
             friendApplyResp.setType(userApply.getType());
+            friendApplyResp.setApplyId(userApply.getId());
             friendApplyResp.setMsg(userApply.getMsg());
             friendApplyResp.setStatus(userApply.getStatus());
             return friendApplyResp;

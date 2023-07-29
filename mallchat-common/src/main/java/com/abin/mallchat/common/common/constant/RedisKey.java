@@ -17,6 +17,11 @@ public class RedisKey {
     public static final String OFFLINE_UID_ZET = "offline";
 
     /**
+     * 热门房间列表
+     */
+    public static final String HOT_ROOM_ZET = "hotRoom";
+
+    /**
      * 用户信息
      */
     public static final String USER_INFO_STRING = "userInfo:uid_%d";

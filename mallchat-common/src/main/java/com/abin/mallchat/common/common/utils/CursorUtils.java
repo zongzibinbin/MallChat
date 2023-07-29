@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.data.redis.core.ZSetOperations;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -55,10 +56,18 @@ public class CursorUtils {
         Page<T> page = mapper.page(request.plusPage(), wrapper);
         String cursor = Optional.ofNullable(CollectionUtil.getLast(page.getRecords()))
                 .map(cursorColumn)
-                .map(String::valueOf)
+                .map(CursorUtils::parseCursor)
                 .orElse(null);
         Boolean isLast = page.getRecords().size() != request.getPageSize();
         return new CursorPageBaseResp<>(cursor, isLast, page.getRecords());
+    }
+
+    private static String parseCursor(Object o) {
+        if (o instanceof Date) {
+            return String.valueOf(((Date) o).getTime());
+        } else {
+            return o.toString();
+        }
     }
 
 }

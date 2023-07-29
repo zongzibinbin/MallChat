@@ -54,4 +54,9 @@ public class ImgMsgHandler extends AbstractMsgHandler {
     public Object showReplyMsg(Message msg) {
         return "图片";
     }
+
+    @Override
+    public String showContactMsg(Message msg) {
+        return "[图片]";
+    }
 }

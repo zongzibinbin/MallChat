@@ -44,7 +44,7 @@ public class UserApplyDao extends ServiceImpl<UserApplyMapper, UserApply> {
         return lambdaQuery()
                 .eq(UserApply::getTargetId, uid)
                 .eq(UserApply::getType, ApplyTypeEnum.ADD_FRIEND.getCode())
-                .orderByAsc(UserApply::getCreateTime)
+                .orderByDesc(UserApply::getCreateTime)
                 .page(page);
     }
 

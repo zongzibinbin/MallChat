@@ -4,7 +4,7 @@ import com.abin.mallchat.common.common.utils.AssertUtil;
 import com.abin.mallchat.common.common.utils.oss.MinIOTemplate;
 import com.abin.mallchat.common.common.utils.oss.domain.OssReq;
 import com.abin.mallchat.common.common.utils.oss.domain.OssResp;
-import com.abin.mallchat.custom.user.domain.enums.OssSceneEnum;
+import com.abin.mallchat.common.user.domain.enums.OssSceneEnum;
 import com.abin.mallchat.custom.user.domain.vo.request.oss.UploadUrlReq;
 import com.abin.mallchat.custom.user.service.OssService;
 import org.springframework.beans.factory.annotation.Autowired;

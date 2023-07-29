@@ -21,7 +21,7 @@ import java.util.List;
 @NoArgsConstructor
 public class MemberAddReq {
     @NotNull
-    @ApiModelProperty("会话id")
+    @ApiModelProperty("房间id")
     private Long roomId;
 
     @NotNull

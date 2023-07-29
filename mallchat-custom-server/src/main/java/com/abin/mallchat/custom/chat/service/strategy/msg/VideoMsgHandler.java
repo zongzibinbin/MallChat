@@ -54,4 +54,9 @@ public class VideoMsgHandler extends AbstractMsgHandler {
     public Object showReplyMsg(Message msg) {
         return "视频";
     }
+
+    @Override
+    public String showContactMsg(Message msg) {
+        return "[视频]";
+    }
 }

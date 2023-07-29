@@ -20,7 +20,7 @@ import java.util.List;
 public class RoomFriendDao extends ServiceImpl<RoomFriendMapper, RoomFriend> {
 
     public RoomFriend getByKey(String key) {
-        return lambdaQuery().eq(RoomFriend::getKey, key).one();
+        return lambdaQuery().eq(RoomFriend::getRoomKey, key).one();
     }
 
     public void restoreRoom(Long id) {
@@ -32,7 +32,13 @@ public class RoomFriendDao extends ServiceImpl<RoomFriendMapper, RoomFriend> {
 
     public List<RoomFriend> listByRoomIds(List<Long> roomIds) {
         return lambdaQuery()
-                .eq(RoomFriend::getRoomId, roomIds)
+                .in(RoomFriend::getRoomId, roomIds)
                 .list();
+    }
+
+    public RoomFriend getByRoomId(Long roomID) {
+        return lambdaQuery()
+                .eq(RoomFriend::getRoomId, roomID)
+                .one();
     }
 }

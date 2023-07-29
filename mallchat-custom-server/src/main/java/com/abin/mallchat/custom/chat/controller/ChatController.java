@@ -2,17 +2,19 @@ package com.abin.mallchat.custom.chat.controller;
 
 
 import com.abin.mallchat.common.chat.domain.dto.MsgReadInfoDTO;
+import com.abin.mallchat.common.chat.domain.vo.response.ChatMessageResp;
 import com.abin.mallchat.common.common.annotation.FrequencyControl;
-import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
 import com.abin.mallchat.common.common.domain.vo.response.ApiResult;
 import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
 import com.abin.mallchat.common.common.utils.RequestHolder;
 import com.abin.mallchat.common.user.domain.enums.BlackTypeEnum;
+import com.abin.mallchat.common.user.domain.vo.response.ws.ChatMemberResp;
 import com.abin.mallchat.common.user.service.cache.UserCache;
 import com.abin.mallchat.custom.chat.domain.vo.request.*;
-import com.abin.mallchat.custom.chat.domain.vo.response.*;
+import com.abin.mallchat.custom.chat.domain.vo.response.ChatMemberListResp;
+import com.abin.mallchat.custom.chat.domain.vo.response.ChatMemberStatisticResp;
+import com.abin.mallchat.custom.chat.domain.vo.response.ChatMessageReadResp;
 import com.abin.mallchat.custom.chat.service.ChatService;
-import com.abin.mallchat.custom.user.service.impl.UserServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -43,17 +45,12 @@ public class ChatController {
     @Autowired
     private UserCache userCache;
 
-    @GetMapping("/public/room/page")
-    @ApiOperation("会话列表")
-    public ApiResult<CursorPageBaseResp<ChatRoomResp>> getRoomPage(@Valid CursorPageBaseReq request) {
-        return ApiResult.success(chatService.getRoomPage(request, RequestHolder.get().getUid()));
-    }
-
     @GetMapping("/public/member/page")
     @ApiOperation("群成员列表")
+    @Deprecated
     @FrequencyControl(time = 120, count = 20, target = FrequencyControl.Target.IP)
-    public ApiResult<CursorPageBaseResp<ChatMemberResp>> getMemberPage(@Valid CursorPageBaseReq request) {
-        CursorPageBaseResp<ChatMemberResp> memberPage = chatService.getMemberPage(request);
+    public ApiResult<CursorPageBaseResp<ChatMemberResp>> getMemberPage(@Valid MemberReq request) {
+        CursorPageBaseResp<ChatMemberResp> memberPage = chatService.getMemberPage(null, request);
         filterBlackMember(memberPage);
         return ApiResult.success(memberPage);
     }
@@ -80,9 +77,6 @@ public class ChatController {
     public ApiResult<ChatMemberStatisticResp> getMemberStatistic() {
         return ApiResult.success(chatService.getMemberStatistic());
     }
-
-    @Autowired
-    private UserServiceImpl userService;
 
     @GetMapping("/public/msg/page")
     @ApiOperation("消息列表")
@@ -137,6 +131,14 @@ public class ChatController {
     public ApiResult<Collection<MsgReadInfoDTO>> getReadInfo(@Valid ChatMessageReadInfoReq request) {
         Long uid = RequestHolder.get().getUid();
         return ApiResult.success(chatService.getMsgReadInfo(uid, request));
+    }
+
+    @PutMapping("/msg/read")
+    @ApiOperation("消息阅读上报")
+    public ApiResult<Void> msgRead(@Valid @RequestBody ChatMessageMemberReq request) {
+        Long uid = RequestHolder.get().getUid();
+        chatService.msgRead(uid, request);
+        return ApiResult.success();
     }
 }
 

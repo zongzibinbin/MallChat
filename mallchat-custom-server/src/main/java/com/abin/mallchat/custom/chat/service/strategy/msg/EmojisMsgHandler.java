@@ -54,4 +54,9 @@ public class EmojisMsgHandler extends AbstractMsgHandler {
     public Object showReplyMsg(Message msg) {
         return "表情";
     }
+
+    @Override
+    public String showContactMsg(Message msg) {
+        return "[表情包]";
+    }
 }

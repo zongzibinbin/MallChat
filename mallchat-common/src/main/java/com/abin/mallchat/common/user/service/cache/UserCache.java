@@ -70,6 +70,13 @@ public class UserCache {
         RedisUtils.zAdd(onlineKey, uid, optTime.getTime());
     }
 
+    //获取用户上线列表
+    public List<Long> getOnlineUidList() {
+        String onlineKey = RedisKey.getKey(RedisKey.ONLINE_UID_ZET);
+        Set<String> strings = RedisUtils.zAll(onlineKey);
+        return strings.stream().map(Long::parseLong).collect(Collectors.toList());
+    }
+
     public boolean isOnline(Long uid) {
         String onlineKey = RedisKey.getKey(RedisKey.ONLINE_UID_ZET);
         return RedisUtils.zIsMember(onlineKey, uid);

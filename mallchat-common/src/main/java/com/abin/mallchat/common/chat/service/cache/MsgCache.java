@@ -2,7 +2,6 @@ package com.abin.mallchat.common.chat.service.cache;
 
 import com.abin.mallchat.common.chat.dao.MessageDao;
 import com.abin.mallchat.common.chat.domain.entity.Message;
-import com.abin.mallchat.common.common.utils.CursorUtils;
 import com.abin.mallchat.common.user.dao.BlackDao;
 import com.abin.mallchat.common.user.dao.RoleDao;
 import com.abin.mallchat.common.user.dao.UserDao;
@@ -19,8 +18,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class MsgCache {
 
-    @Autowired
-    private CursorUtils cursorUtils;
     @Autowired
     private UserDao userDao;
     @Autowired

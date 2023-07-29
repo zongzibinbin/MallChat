@@ -4,7 +4,7 @@ import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
 import com.abin.mallchat.common.common.domain.vo.request.PageBaseReq;
 import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
 import com.abin.mallchat.common.common.domain.vo.response.PageBaseResp;
-import com.abin.mallchat.custom.chat.domain.vo.response.ChatMemberResp;
+import com.abin.mallchat.common.user.domain.vo.response.ws.ChatMemberResp;
 import com.abin.mallchat.custom.user.domain.vo.request.friend.FriendApplyReq;
 import com.abin.mallchat.custom.user.domain.vo.request.friend.FriendApproveReq;
 import com.abin.mallchat.custom.user.domain.vo.request.friend.FriendCheckReq;

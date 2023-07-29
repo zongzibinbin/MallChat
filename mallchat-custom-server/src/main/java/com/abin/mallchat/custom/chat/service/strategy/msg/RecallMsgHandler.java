@@ -76,4 +76,9 @@ public class RecallMsgHandler extends AbstractMsgHandler {
         applicationEventPublisher.publishEvent(new MessageRecallEvent(this, new ChatMsgRecallDTO(message.getId(), message.getRoomId(), recallUid)));
 
     }
+
+    @Override
+    public String showContactMsg(Message msg) {
+        return "撤回了一条消息";
+    }
 }

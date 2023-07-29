@@ -135,4 +135,9 @@ public class TextMsgHandler extends AbstractMsgHandler {
     public Object showReplyMsg(Message msg) {
         return msg.getContent();
     }
+
+    @Override
+    public String showContactMsg(Message msg) {
+        return msg.getContent();
+    }
 }

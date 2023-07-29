@@ -17,7 +17,7 @@ import com.abin.mallchat.common.user.dao.UserFriendDao;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.domain.entity.UserApply;
 import com.abin.mallchat.common.user.domain.entity.UserFriend;
-import com.abin.mallchat.custom.chat.domain.vo.response.ChatMemberResp;
+import com.abin.mallchat.common.user.domain.vo.response.ws.ChatMemberResp;
 import com.abin.mallchat.custom.chat.service.ChatService;
 import com.abin.mallchat.custom.chat.service.adapter.MemberAdapter;
 import com.abin.mallchat.custom.chat.service.adapter.MessageAdapter;
@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -43,7 +44,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.abin.mallchat.common.user.domain.enums.ApplyStatusEnum.AGREE;
+import static com.abin.mallchat.common.user.domain.enums.ApplyStatusEnum.WAIT_APPROVAL;
 
 /**
  * @author : limeng
@@ -148,22 +149,22 @@ public class FriendServiceImpl implements FriendService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @RedissonLock(key = "#uid")
     public void applyApprove(Long uid, FriendApproveReq request) {
         UserApply userApply = userApplyDao.getById(request.getApplyId());
         AssertUtil.isNotEmpty(userApply, "不存在申请记录");
         AssertUtil.equal(userApply.getTargetId(), uid, "不存在申请记录");
-        AssertUtil.equal(userApply.getStatus(), AGREE.getCode(), "已同意好友申请");
+        AssertUtil.equal(userApply.getStatus(), WAIT_APPROVAL.getCode(), "已同意好友申请");
         //同意申请
         userApplyDao.agree(request.getApplyId());
         //创建双方好友关系
         createFriend(uid, userApply.getUid());
         //创建一个聊天房间
         RoomFriend roomFriend = roomService.createFriendRoom(Arrays.asList(uid, userApply.getUid()));
-        //创建双方的会话
-        contactService.createContact(uid, roomFriend.getRoomId());
-        contactService.createContact(userApply.getUid(), roomFriend.getRoomId());
+//        //创建双方的会话
+//        contactService.createContact(uid, roomFriend.getRoomId());
+//        contactService.createContact(userApply.getUid(), roomFriend.getRoomId());
         //发送一条同意消息。。我们已经是好友了，开始聊天吧
         chatService.sendMsg(MessageAdapter.buildAgreeMsg(roomFriend.getRoomId()), uid);
     }
@@ -188,6 +189,9 @@ public class FriendServiceImpl implements FriendService {
     @Override
     public CursorPageBaseResp<ChatMemberResp> friendList(Long uid, CursorPageBaseReq request) {
         CursorPageBaseResp<UserFriend> friendPage = userFriendDao.getFriendPage(uid, request);
+        if (CollectionUtils.isEmpty(friendPage.getList())) {
+            return CursorPageBaseResp.empty();
+        }
         List<Long> friendUids = friendPage.getList()
                 .stream().map(UserFriend::getFriendUid)
                 .collect(Collectors.toList());

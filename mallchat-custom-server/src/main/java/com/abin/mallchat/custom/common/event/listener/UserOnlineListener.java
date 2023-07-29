@@ -3,6 +3,7 @@ package com.abin.mallchat.custom.common.event.listener;
 import com.abin.mallchat.common.common.event.UserOnlineEvent;
 import com.abin.mallchat.common.user.dao.UserDao;
 import com.abin.mallchat.common.user.domain.entity.User;
+import com.abin.mallchat.common.user.domain.enums.ChatActiveStatusEnum;
 import com.abin.mallchat.common.user.service.IpService;
 import com.abin.mallchat.common.user.service.cache.UserCache;
 import com.abin.mallchat.custom.user.service.WebSocketService;
@@ -49,6 +50,7 @@ public class UserOnlineListener {
         update.setId(user.getId());
         update.setLastOptTime(user.getLastOptTime());
         update.setIpInfo(user.getIpInfo());
+        update.setActiveStatus(ChatActiveStatusEnum.ONLINE.getStatus());
         userDao.updateById(update);
         //更新用户ip详情
         ipService.refreshIpDetailAsync(user.getId());

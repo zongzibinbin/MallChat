@@ -2,12 +2,13 @@ package com.abin.mallchat.custom.chat.controller;
 
 
 import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
+import com.abin.mallchat.common.common.domain.vo.request.IdReqVO;
 import com.abin.mallchat.common.common.domain.vo.response.ApiResult;
 import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
 import com.abin.mallchat.common.common.utils.RequestHolder;
 import com.abin.mallchat.custom.chat.domain.vo.response.ChatRoomResp;
 import com.abin.mallchat.custom.chat.service.ChatService;
-import com.abin.mallchat.custom.chat.service.RoomService;
+import com.abin.mallchat.custom.chat.service.RoomAppService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +35,7 @@ public class ContactController {
     @Autowired
     private ChatService chatService;
     @Autowired
-    private RoomService roomService;
+    private RoomAppService roomService;
 
     @GetMapping("/public/contact/page")
     @ApiOperation("会话列表")
@@ -43,6 +44,11 @@ public class ContactController {
         return ApiResult.success(roomService.getContactPage(request, uid));
     }
 
-
+    @GetMapping("/public/contact/detail")
+    @ApiOperation("会话详情")
+    public ApiResult<ChatRoomResp> getRoomPage(@Valid IdReqVO request) {
+        Long uid = RequestHolder.get().getUid();
+        return ApiResult.success(roomService.getContactDetail(uid, request.getId()));
+    }
 }
 

@@ -9,6 +9,9 @@ import com.abin.mallchat.common.common.utils.CursorUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+import java.util.Objects;
+
 /**
  * <p>
  * 消息表 服务实现类
@@ -51,5 +54,12 @@ public class MessageDao extends ServiceImpl<MessageMapper, Message> {
                 .eq(Message::getFromUid, uid)
                 .set(Message::getStatus, MessageStatusEnum.DELETE.getStatus())
                 .update();
+    }
+
+    public Integer getUnReadCount(Long roomId, Date readTime) {
+        return lambdaQuery()
+                .eq(Message::getRoomId, roomId)
+                .gt(Objects.nonNull(readTime), Message::getCreateTime, readTime)
+                .count();
     }
 }

@@ -23,6 +23,7 @@ public enum MessageTypeEnum {
     SOUND(5, "语音"),
     VIDEO(6, "视频"),
     EMOJI(7, "表情"),
+    SYSTEM(8, "系统消息"),
     ;
 
     private final Integer type;

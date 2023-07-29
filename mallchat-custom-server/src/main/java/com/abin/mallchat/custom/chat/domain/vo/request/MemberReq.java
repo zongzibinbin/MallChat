@@ -7,8 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotNull;
-
 /**
  * Description:
  * Author: <a href="https://github.com/zongzibinbin">abin</a>
@@ -20,6 +18,5 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class MemberReq extends CursorPageBaseReq {
     @ApiModelProperty("房间号")
-    @NotNull
-    private Long roomId;
+    private Long roomId = 1L;
 }

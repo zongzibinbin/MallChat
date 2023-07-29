@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * <p>
@@ -32,6 +32,8 @@ public class Room implements Serializable {
 
     /**
      * 房间类型 1群聊 2单聊
+     *
+     * @see com.abin.mallchat.common.chat.domain.enums.RoomTypeEnum
      */
     @TableField("type")
     private Integer type;
@@ -48,7 +50,13 @@ public class Room implements Serializable {
      * 群最后消息的更新时间（热点群不需要写扩散，更新这里就行）
      */
     @TableField("active_time")
-    private LocalDateTime activeTime;
+    private Date activeTime;
+
+    /**
+     * 最后一条消息id
+     */
+    @TableField("last_msg_id")
+    private Long lastMsgId;
 
     /**
      * 额外信息（根据不同类型房间有不同存储的东西）
@@ -60,13 +68,13 @@ public class Room implements Serializable {
      * 创建时间
      */
     @TableField("create_time")
-    private LocalDateTime createTime;
+    private Date createTime;
 
     /**
      * 修改时间
      */
     @TableField("update_time")
-    private LocalDateTime updateTime;
+    private Date updateTime;
 
 
 }

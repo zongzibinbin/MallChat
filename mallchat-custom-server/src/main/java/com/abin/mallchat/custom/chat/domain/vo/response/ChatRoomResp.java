@@ -31,7 +31,7 @@ public class ChatRoomResp {
     @ApiModelProperty("会话头像")
     private String avatar;
     @ApiModelProperty("房间最后活跃时间(用来排序)")
-    private Date lastActiveTime;
+    private Date activeTime;
     @ApiModelProperty("未读数")
     private Integer unreadCount;
 }

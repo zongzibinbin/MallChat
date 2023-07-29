@@ -1,9 +1,11 @@
 package com.abin.mallchat.custom.user.service;
 
 import com.abin.mallchat.common.user.domain.entity.User;
-import com.abin.mallchat.custom.user.domain.vo.request.ws.WSAuthorize;
-import com.abin.mallchat.custom.user.domain.vo.response.ws.WSBaseResp;
+import com.abin.mallchat.common.user.domain.enums.WSBaseResp;
+import com.abin.mallchat.common.user.domain.vo.request.ws.WSAuthorize;
 import io.netty.channel.Channel;
+
+import java.util.List;
 
 public interface WebSocketService {
     /**
@@ -66,7 +68,9 @@ public interface WebSocketService {
      */
     void sendToAllOnline(WSBaseResp<?> wsBaseResp);
 
-    void sendToFriend(WSBaseResp<?> wsBaseResp, Long friendUid);
+    void sendToUid(WSBaseResp<?> wsBaseResp, Long uid);
+
+    void sendToUidList(WSBaseResp<?> wsBaseResp, List<Long> uidList);
 
 
 }

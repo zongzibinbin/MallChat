@@ -23,8 +23,8 @@ public class RoomGroupCache extends AbstractRedisStringCache<Long, RoomGroup> {
     private RoomGroupDao roomGroupDao;
 
     @Override
-    protected String getKey(Long groupId) {
-        return RedisKey.getKey(RedisKey.GROUP_INFO_STRING, groupId);
+    protected String getKey(Long roomId) {
+        return RedisKey.getKey(RedisKey.GROUP_INFO_STRING, roomId);
     }
 
     @Override

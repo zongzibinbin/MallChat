@@ -3,7 +3,7 @@ package com.abin.mallchat.custom.common.event.listener;
 import com.abin.mallchat.common.common.event.UserApplyEvent;
 import com.abin.mallchat.common.user.dao.UserApplyDao;
 import com.abin.mallchat.common.user.domain.entity.UserApply;
-import com.abin.mallchat.custom.user.domain.vo.response.ws.WSFriendApply;
+import com.abin.mallchat.common.user.domain.vo.response.ws.WSFriendApply;
 import com.abin.mallchat.custom.user.service.WebSocketService;
 import com.abin.mallchat.custom.user.service.adapter.WSAdapter;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,7 @@ public class UserApplyListener {
     public void notifyFriend(UserApplyEvent event) {
         UserApply userApply = event.getUserApply();
         Integer unReadCount = userApplyDao.getUnReadCount(userApply.getTargetId());
-        webSocketService.sendToFriend(WSAdapter.buildApplySend(new WSFriendApply(userApply.getUid(), unReadCount)), userApply.getTargetId());
+        webSocketService.sendToUid(WSAdapter.buildApplySend(new WSFriendApply(userApply.getUid(), unReadCount)), userApply.getTargetId());
     }
 
 }

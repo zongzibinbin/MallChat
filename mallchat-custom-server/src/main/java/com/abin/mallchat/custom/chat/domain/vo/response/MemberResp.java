@@ -16,14 +16,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MemberResp {
-    @ApiModelProperty("群id")
-    private Long id;
+    @ApiModelProperty("房间id")
+    private Long roomId;
     @ApiModelProperty("群名称")
-    private Long groupName;
+    private String groupName;
+    @ApiModelProperty("群头像")
+    private String avatar;
     @ApiModelProperty("在线人数")
     private Long onlineNum;//在线人数
-    @ApiModelProperty("群聊描述")
-    private String desc;//在线人数
+    /**
+     * @see com.abin.mallchat.custom.chat.domain.vo.enums.GroupRoleAPPEnum
+     */
     @ApiModelProperty("成员角色 1群主 2管理员 3普通成员 4踢出群聊")
-    private Integer role;//在线人数
+    private Integer role;
 }
