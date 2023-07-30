@@ -23,7 +23,7 @@ public class UploadUrlReq {
     @ApiModelProperty(value = "文件名（带后缀）")
     @NotBlank
     private String fileName;
-    @ApiModelProperty(value = "上传场景1.聊天室")
+    @ApiModelProperty(value = "上传场景1.聊天室,2.表情包")
     @NotNull
     private Integer scene;
 }

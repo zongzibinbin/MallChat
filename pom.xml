@@ -10,6 +10,7 @@
     <modules>
         <module>mallchat-common</module>
         <module>mallchat-custom-server</module>
+        <module>mallchat-tools</module>
     </modules>
     <packaging>pom</packaging>
 

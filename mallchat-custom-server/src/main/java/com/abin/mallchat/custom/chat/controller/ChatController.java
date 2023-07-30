@@ -84,7 +84,7 @@ public class ChatController {
     @GetMapping("/public/msg/page")
     @ApiOperation("消息列表")
     @FrequencyControl(time = 120, count = 20, target = FrequencyControl.Target.IP)
-    public ApiResult<CursorPageBaseResp<ChatMessageResp>> getMsgPage1(@Valid ChatMessagePageReq request) {
+    public ApiResult<CursorPageBaseResp<ChatMessageResp>> getMsgPage(@Valid ChatMessagePageReq request) {
 //        black(request);
         CursorPageBaseResp<ChatMessageResp> msgPage = chatService.getMsgPage(request, RequestHolder.get().getUid());
         filterBlackMsg(msgPage);
@@ -94,7 +94,6 @@ public class ChatController {
     private void filterBlackMsg(CursorPageBaseResp<ChatMessageResp> memberPage) {
         Set<String> blackMembers = getBlackUidSet();
         memberPage.getList().removeIf(a -> blackMembers.contains(a.getFromUser().getUid().toString()));
-        System.out.println(1);
     }
 
     @PostMapping("/msg")

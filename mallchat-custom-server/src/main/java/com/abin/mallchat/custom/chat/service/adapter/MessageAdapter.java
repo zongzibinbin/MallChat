@@ -3,14 +3,9 @@ package com.abin.mallchat.custom.chat.service.adapter;
 import cn.hutool.core.bean.BeanUtil;
 import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.chat.domain.entity.MessageMark;
-import com.abin.mallchat.common.chat.domain.entity.msg.MessageExtra;
 import com.abin.mallchat.common.chat.domain.enums.MessageMarkTypeEnum;
 import com.abin.mallchat.common.chat.domain.enums.MessageStatusEnum;
 import com.abin.mallchat.common.common.domain.enums.YesOrNoEnum;
-import com.abin.mallchat.common.user.domain.entity.IpDetail;
-import com.abin.mallchat.common.user.domain.entity.IpInfo;
-import com.abin.mallchat.common.user.domain.entity.ItemConfig;
-import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.custom.chat.domain.vo.request.ChatMessageReq;
 import com.abin.mallchat.custom.chat.domain.vo.response.ChatMessageResp;
 import com.abin.mallchat.custom.chat.service.strategy.msg.AbstractMsgHandler;
@@ -38,37 +33,25 @@ public class MessageAdapter {
 
     }
 
-    public static List<ChatMessageResp> buildMsgResp(List<Message> messages, Map<Long, Message> replyMap, Map<Long, User> userMap, List<MessageMark> msgMark, Long receiveUid, Map<Long, ItemConfig> itemMap) {
+    public static List<ChatMessageResp> buildMsgResp(List<Message> messages, Map<Long, Message> replyMap, List<MessageMark> msgMark, Long receiveUid) {
         Map<Long, List<MessageMark>> markMap = msgMark.stream().collect(Collectors.groupingBy(MessageMark::getMsgId));
         return messages.stream().map(a -> {
             ChatMessageResp resp = new ChatMessageResp();
-            resp.setFromUser(buildFromUser(userMap.get(a.getFromUid()), itemMap));
-            resp.setMessage(buildMessage(a, replyMap, userMap, markMap.getOrDefault(a.getId(), new ArrayList<>()), receiveUid));
+            resp.setFromUser(buildFromUser(a.getFromUid()));
+            resp.setMessage(buildMessage(a, replyMap, markMap.getOrDefault(a.getId(), new ArrayList<>()), receiveUid));
             return resp;
         })
                 .sorted(Comparator.comparing(a -> a.getMessage().getSendTime()))//帮前端排好序，更方便它展示
                 .collect(Collectors.toList());
     }
 
-    private static ChatMessageResp.Message buildMessage(Message message, Map<Long, Message> replyMap, Map<Long, User> userMap, List<MessageMark> marks, Long receiveUid) {
+    private static ChatMessageResp.Message buildMessage(Message message, Map<Long, Message> replyMap, List<MessageMark> marks, Long receiveUid) {
         ChatMessageResp.Message messageVO = new ChatMessageResp.Message();
         BeanUtil.copyProperties(message, messageVO);
         messageVO.setSendTime(message.getCreateTime());
         AbstractMsgHandler msgHandler = MsgHandlerFactory.getStrategyNoNull(message.getType());
-        messageVO.setBody(msgHandler.showMsg(message));
-        messageVO.setUrlTitleMap(Optional.ofNullable(message.getExtra()).map(MessageExtra::getUrlTitleMap).orElse(null));
-        Message replyMessage = replyMap.get(message.getReplyMsgId());
-
-        //回复消息
-        if (Objects.nonNull(replyMessage)) {
-            ChatMessageResp.ReplyMsg replyMsgVO = new ChatMessageResp.ReplyMsg();
-            replyMsgVO.setId(replyMessage.getId());
-            replyMsgVO.setContent(replyMessage.getContent());
-            User replyUser = userMap.get(replyMessage.getFromUid());
-            replyMsgVO.setUsername(replyUser.getName());
-            replyMsgVO.setCanCallback(YesOrNoEnum.toStatus(Objects.nonNull(message.getGapCount()) && message.getGapCount() <= CAN_CALLBACK_GAP_COUNT));
-            replyMsgVO.setGapCount(message.getGapCount());
-            messageVO.setReply(replyMsgVO);
+        if (Objects.nonNull(msgHandler)) {
+            messageVO.setBody(msgHandler.showMsg(message));
         }
         //消息标记
         messageVO.setMessageMark(buildMsgMark(marks, receiveUid));
@@ -87,19 +70,9 @@ public class MessageAdapter {
         return mark;
     }
 
-    private static ChatMessageResp.UserInfo buildFromUser(User fromUser, Map<Long, ItemConfig> itemMap) {
+    private static ChatMessageResp.UserInfo buildFromUser(Long fromUid) {
         ChatMessageResp.UserInfo userInfo = new ChatMessageResp.UserInfo();
-        userInfo.setUsername(fromUser.getName());
-        userInfo.setAvatar(fromUser.getAvatar());
-        userInfo.setLocPlace(Optional.ofNullable(fromUser.getIpInfo()).map(IpInfo::getUpdateIpDetail).map(IpDetail::getCity).orElse(null));
-        userInfo.setUid(fromUser.getId());
-        if (Objects.nonNull(fromUser.getItemId())) {
-            ChatMessageResp.Badge badge = new ChatMessageResp.Badge();
-            ItemConfig itemConfig = itemMap.get(fromUser.getItemId());
-            badge.setImg(itemConfig.getImg());
-            badge.setDescribe(itemConfig.getDescribe());
-            userInfo.setBadge(badge);
-        }
+        userInfo.setUid(fromUid);
         return userInfo;
     }
 

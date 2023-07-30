@@ -1,5 +1,6 @@
 package com.abin.mallchat.common.chat.domain.entity.msg;
 
+import com.abin.mallchat.common.common.utils.discover.domain.UrlInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +24,7 @@ import java.util.Map;
 public class MessageExtra implements Serializable {
     private static final long serialVersionUID = 1L;
     //url跳转链接
-    private Map<String, String> urlTitleMap;
+    private Map<String, UrlInfo> urlContentMap;
     //消息撤回详情
     private MsgRecall recall;
     //艾特的uid
@@ -36,4 +37,9 @@ public class MessageExtra implements Serializable {
     private SoundMsgDTO soundMsgDTO;
     //文件消息
     private VideoMsgDTO videoMsgDTO;
+
+    /**
+     * 表情图片信息
+     */
+    private EmojisMsgDTO emojisMsgDTO;
 }

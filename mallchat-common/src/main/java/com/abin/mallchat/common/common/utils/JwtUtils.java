@@ -26,7 +26,7 @@ public class JwtUtils {
     /**
      * token秘钥，请勿泄露，请勿随便修改
      */
-    @Value("jwt.secret")
+    @Value("${mallchat.jwt.secret}")
     private String secret;
 
     private static final String UID_CLAIM = "uid";
@@ -67,7 +67,7 @@ public class JwtUtils {
             DecodedJWT jwt = verifier.verify(token);
             return jwt.getClaims();
         } catch (Exception e) {
-            log.info("decode error,token:{}", token, e);
+            log.error("decode error,token:{}", token, e);
         }
         return null;
     }
