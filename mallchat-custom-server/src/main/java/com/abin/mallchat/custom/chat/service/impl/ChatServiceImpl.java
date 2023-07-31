@@ -1,7 +1,6 @@
 package com.abin.mallchat.custom.chat.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Pair;
@@ -18,6 +17,7 @@ import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
 import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
 import com.abin.mallchat.common.common.event.MessageSendEvent;
 import com.abin.mallchat.common.common.utils.AssertUtil;
+import com.abin.mallchat.common.common.utils.CollStreamUtil;
 import com.abin.mallchat.common.user.dao.UserDao;
 import com.abin.mallchat.common.user.domain.enums.ChatActiveStatusEnum;
 import com.abin.mallchat.common.user.domain.enums.RoleEnum;
@@ -36,6 +36,7 @@ import com.abin.mallchat.custom.chat.service.strategy.mark.MsgMarkFactory;
 import com.abin.mallchat.custom.chat.service.strategy.msg.AbstractMsgHandler;
 import com.abin.mallchat.custom.chat.service.strategy.msg.MsgHandlerFactory;
 import com.abin.mallchat.custom.chat.service.strategy.msg.RecallMsgHandler;
+import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +47,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Description: 消息处理类
@@ -192,17 +192,16 @@ public class ChatServiceImpl implements ChatService {
     @Override
     @Cacheable(cacheNames = "member", key = "'memberList.'+#req.roomId")
     public List<ChatMemberListResp> getMemberList(ChatMessageMemberReq req) {
-        if (Objects.equals(1L, req.getRoomId())) {//大群聊可看见所有人
-            return userDao.getMemberList()
-                    .stream()
-                    .map(a -> {
-                        ChatMemberListResp resp = new ChatMemberListResp();
-                        BeanUtils.copyProperties(a, resp);
-                        resp.setUid(a.getId());
-                        return resp;
-                    }).collect(Collectors.toList());
+        if (Objects.equals(1L, req.getRoomId())) {
+            //大群聊可看见所有人
+            return CollStreamUtil.toList(userDao.getMemberList(), a -> {
+                ChatMemberListResp resp = new ChatMemberListResp();
+                BeanUtils.copyProperties(a, resp);
+                resp.setUid(a.getId());
+                return resp;
+            });
         }
-        return null;
+        return Collections.emptyList();
     }
 
     private void checkRecall(Long uid, Message message) {
@@ -219,17 +218,20 @@ public class ChatServiceImpl implements ChatService {
     }
 
     public List<ChatMessageResp> getMsgRespBatch(List<Message> messages, Long receiveUid) {
-        if (CollectionUtil.isEmpty(messages)) {
-            return new ArrayList<>();
+        if (CollUtil.isEmpty(messages)) {
+            return Collections.emptyList();
         }
-        Map<Long, Message> replyMap = new HashMap<>();
+        Map<Long, Message> replyMap = Maps.newHashMap();
         //批量查出回复的消息
-        List<Long> replyIds = messages.stream().map(Message::getReplyMsgId).filter(Objects::nonNull).distinct().collect(Collectors.toList());
-        if (CollectionUtil.isNotEmpty(replyIds)) {
-            replyMap = messageDao.listByIds(replyIds).stream().collect(Collectors.toMap(Message::getId, Function.identity()));
+        List<Long> replyIds = CollStreamUtil.filterThenToList(messages, Objects::nonNull, Message::getReplyMsgId);
+        //List<Long> replyIds = messages.stream().map(Message::getReplyMsgId).filter(Objects::nonNull).distinct().collect(Collectors.toList());
+        if (CollUtil.isNotEmpty(replyIds)) {
+            replyMap.putAll(CollStreamUtil.toMap(messageDao.listByIds(replyIds), Message::getId, Function.identity()));
+            //replyMap= messageDao.listByIds(replyIds).stream().collect(Collectors.toMap(Message::getId, Function.identity()));
         }
         //查询消息标志
-        List<MessageMark> msgMark = messageMarkDao.getValidMarkByMsgIdBatch(messages.stream().map(Message::getId).collect(Collectors.toList()));
+        List<MessageMark> msgMark = messageMarkDao.getValidMarkByMsgIdBatch(CollStreamUtil.toList(messages, Message::getId));
+        //List<MessageMark> msgMark = messageMarkDao.getValidMarkByMsgIdBatch(messages.stream().map(Message::getId).collect(Collectors.toList()));
         return MessageAdapter.buildMsgResp(messages, replyMap, msgMark, receiveUid);
     }
 
