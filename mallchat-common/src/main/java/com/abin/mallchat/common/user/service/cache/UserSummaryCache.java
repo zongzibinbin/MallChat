@@ -27,6 +27,10 @@ public class UserSummaryCache extends AbstractRedisStringCache<Long, SummeryInfo
     @Autowired
     private ItemCache itemCache;
 
+    protected UserSummaryCache() {
+        super(SummeryInfoDTO.class);
+    }
+
     @Override
     protected String getKey(Long uid) {
         return RedisKey.getKey(RedisKey.USER_SUMMARY_STRING, uid);
