@@ -3,6 +3,7 @@ package com.abin.mallchat.custom.common.event.listener;
 import com.abin.mallchat.common.chat.domain.dto.ChatMsgRecallDTO;
 import com.abin.mallchat.common.chat.service.cache.MsgCache;
 import com.abin.mallchat.common.common.event.MessageRecallEvent;
+import com.abin.mallchat.common.user.service.impl.PushService;
 import com.abin.mallchat.custom.chat.service.ChatService;
 import com.abin.mallchat.custom.user.service.WebSocketService;
 import com.abin.mallchat.custom.user.service.adapter.WSAdapter;
@@ -26,6 +27,8 @@ public class MessageRecallListener {
     private ChatService chatService;
     @Autowired
     private MsgCache msgCache;
+    @Autowired
+    private PushService pushService;
 
     @Async
     @TransactionalEventListener(classes = MessageRecallEvent.class, fallbackExecution = true)
@@ -37,7 +40,7 @@ public class MessageRecallListener {
     @Async
     @TransactionalEventListener(classes = MessageRecallEvent.class, fallbackExecution = true)
     public void sendToAll(MessageRecallEvent event) {
-        webSocketService.sendToAllOnline(WSAdapter.buildMsgRecall(event.getRecallDTO()));
+        pushService.sendPushMsg(WSAdapter.buildMsgRecall(event.getRecallDTO()));
     }
 
 }

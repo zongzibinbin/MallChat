@@ -5,8 +5,6 @@ import com.abin.mallchat.common.user.domain.enums.WSBaseResp;
 import com.abin.mallchat.common.user.domain.vo.request.ws.WSAuthorize;
 import io.netty.channel.Channel;
 
-import java.util.List;
-
 public interface WebSocketService {
     /**
      * 处理用户登录请求，需要返回一张带code的二维码
@@ -69,8 +67,5 @@ public interface WebSocketService {
     void sendToAllOnline(WSBaseResp<?> wsBaseResp);
 
     void sendToUid(WSBaseResp<?> wsBaseResp, Long uid);
-
-    void sendToUidList(WSBaseResp<?> wsBaseResp, List<Long> uidList);
-
 
 }

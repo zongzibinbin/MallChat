@@ -41,6 +41,7 @@ import com.abin.mallchat.custom.chat.service.strategy.mark.MsgMarkFactory;
 import com.abin.mallchat.custom.chat.service.strategy.msg.AbstractMsgHandler;
 import com.abin.mallchat.custom.chat.service.strategy.msg.MsgHandlerFactory;
 import com.abin.mallchat.custom.chat.service.strategy.msg.RecallMsgHandler;
+import com.abin.mallchat.transaction.service.MQProducer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,6 +94,8 @@ public class ChatServiceImpl implements ChatService {
     private GroupMemberDao groupMemberDao;
     @Autowired
     private RoomGroupCache roomGroupCache;
+    @Autowired
+    private MQProducer mqProducer;
 
     /**
      * 发送消息
@@ -149,7 +152,7 @@ public class ChatServiceImpl implements ChatService {
         List<ChatMemberResp> resultList = new ArrayList<>();//最终列表
         Boolean isLast = Boolean.FALSE;
         if (activeStatusEnum == ChatActiveStatusEnum.ONLINE) {//在线列表
-            CursorPageBaseResp<User> cursorPage = userDao.getCursorPage(memberUidList, request, ChatActiveStatusEnum.ONLINE);
+            CursorPageBaseResp<User> cursorPage = userDao.getCursorPage(memberUidList, new CursorPageBaseReq(request.getPageSize(), timeCursor), ChatActiveStatusEnum.ONLINE);
             resultList.addAll(MemberAdapter.buildMember(cursorPage.getList()));//添加在线列表
             if (cursorPage.getIsLast()) {//如果是最后一页,从离线列表再补点数据
                 activeStatusEnum = ChatActiveStatusEnum.OFFLINE;
@@ -160,7 +163,7 @@ public class ChatServiceImpl implements ChatService {
             timeCursor = cursorPage.getCursor();
             isLast = cursorPage.getIsLast();
         } else if (activeStatusEnum == ChatActiveStatusEnum.OFFLINE) {//离线列表
-            CursorPageBaseResp<User> cursorPage = userDao.getCursorPage(memberUidList, request, ChatActiveStatusEnum.OFFLINE);
+            CursorPageBaseResp<User> cursorPage = userDao.getCursorPage(memberUidList, new CursorPageBaseReq(request.getPageSize(), timeCursor), ChatActiveStatusEnum.OFFLINE);
             resultList.addAll(MemberAdapter.buildMember(cursorPage.getList()));//添加离线线列表
             timeCursor = cursorPage.getCursor();
             isLast = cursorPage.getIsLast();
@@ -171,11 +174,24 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public CursorPageBaseResp<ChatMessageResp> getMsgPage(ChatMessagePageReq request, Long receiveUid) {
-        CursorPageBaseResp<Message> cursorPage = messageDao.getCursorPage(request.getRoomId(), request);
+        //用最后一条消息id，来限制被踢出的人能看见的最大一条消息
+        Long lastMsgId = getLastMsgId(request.getRoomId(), receiveUid);
+        CursorPageBaseResp<Message> cursorPage = messageDao.getCursorPage(request.getRoomId(), request, lastMsgId);
         if (cursorPage.isEmpty()) {
             return CursorPageBaseResp.empty();
         }
         return CursorPageBaseResp.init(cursorPage, getMsgRespBatch(cursorPage.getList(), receiveUid));
+    }
+
+    private Long getLastMsgId(Long roomId, Long receiveUid) {
+        Room room = roomCache.get(roomId);
+        AssertUtil.isNotEmpty(room, "房间号有误");
+        if (room.isHotRoom()) {
+            return null;
+        }
+        AssertUtil.isNotEmpty(receiveUid, "请先登录");
+        Contact contact = contactDao.get(receiveUid, roomId);
+        return contact.getLastMsgId();
     }
 
     @Override

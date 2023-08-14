@@ -46,7 +46,7 @@ public class ChatController {
     private UserCache userCache;
 
     @GetMapping("/public/member/page")
-    @ApiOperation("群成员列表")
+    @ApiOperation("群成员列表（废弃）")
     @Deprecated
     @FrequencyControl(time = 120, count = 20, target = FrequencyControl.Target.IP)
     public ApiResult<CursorPageBaseResp<ChatMemberResp>> getMemberPage(@Valid MemberReq request) {
@@ -56,7 +56,7 @@ public class ChatController {
     }
 
     @GetMapping("/member/list")
-    @ApiOperation("房间内的所有群成员列表-@专用")
+    @ApiOperation("房间内的所有群成员列表-@专用（废弃）")
     @Deprecated
     public ApiResult<List<ChatMemberListResp>> getMemberList(@Valid ChatMessageMemberReq chatMessageMemberReq) {
         return ApiResult.success(chatService.getMemberList(chatMessageMemberReq));

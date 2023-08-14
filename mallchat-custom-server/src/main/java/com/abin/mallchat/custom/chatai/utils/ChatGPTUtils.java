@@ -1,8 +1,8 @@
 package com.abin.mallchat.custom.chatai.utils;
 
 import com.abin.mallchat.common.common.exception.BusinessException;
-import com.abin.mallchat.common.common.utils.JsonUtils;
 import com.abin.mallchat.custom.chatai.domain.ChatGPTMsg;
+import com.abin.mallchat.utils.JsonUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.knuddels.jtokkit.Encodings;
 import com.knuddels.jtokkit.api.Encoding;

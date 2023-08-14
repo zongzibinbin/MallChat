@@ -270,10 +270,6 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     }
 
-    @Override
-    public void sendToUidList(WSBaseResp<?> wsBaseResp, List<Long> uidList) {
-        uidList.forEach(uid -> sendToUid(wsBaseResp, uid));
-    }
 
     private void sendMsg(Channel channel, WSBaseResp<?> wsBaseResp) {
         channel.writeAndFlush(new TextWebSocketFrame(JSONUtil.toJsonStr(wsBaseResp)));

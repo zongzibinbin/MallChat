@@ -6,33 +6,28 @@ import com.abin.mallchat.common.chat.dao.RoomDao;
 import com.abin.mallchat.common.chat.dao.RoomFriendDao;
 import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.chat.domain.entity.Room;
-import com.abin.mallchat.common.chat.domain.entity.RoomFriend;
 import com.abin.mallchat.common.chat.domain.enums.HotFlagEnum;
-import com.abin.mallchat.common.chat.domain.enums.RoomTypeEnum;
-import com.abin.mallchat.common.chat.domain.vo.response.ChatMessageResp;
 import com.abin.mallchat.common.chat.service.cache.GroupMemberCache;
 import com.abin.mallchat.common.chat.service.cache.HotRoomCache;
 import com.abin.mallchat.common.chat.service.cache.RoomCache;
+import com.abin.mallchat.common.common.constant.MQConstant;
+import com.abin.mallchat.common.common.domain.dto.MsgSendMessageDTO;
 import com.abin.mallchat.common.common.event.MessageSendEvent;
-import com.abin.mallchat.common.common.event.WSPushEvent;
 import com.abin.mallchat.common.user.service.cache.UserCache;
 import com.abin.mallchat.custom.chat.service.ChatService;
 import com.abin.mallchat.custom.chat.service.WeChatMsgOperationService;
 import com.abin.mallchat.custom.chatai.service.IChatAIService;
 import com.abin.mallchat.custom.user.service.WebSocketService;
-import com.abin.mallchat.custom.user.service.adapter.WSAdapter;
+import com.abin.mallchat.transaction.service.MQProducer;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -69,35 +64,13 @@ public class MessageSendListener {
     private ContactDao contactDao;
     @Autowired
     private HotRoomCache hotRoomCache;
+    @Autowired
+    private MQProducer mqProducer;
 
-    @Async
-    @TransactionalEventListener(classes = MessageSendEvent.class, fallbackExecution = true)
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT, classes = MessageSendEvent.class, fallbackExecution = true)
     public void messageRoute(MessageSendEvent event) {
-        Message message = messageDao.getById(event.getMsgId());
-        Room room = roomCache.get(message.getRoomId());
-        ChatMessageResp msgResp = chatService.getMsgResp(message, null);
-        //更新房间最新消息
-        roomDao.refreshActiveTime(room.getId(), message.getId(), message.getCreateTime());
-        roomCache.delete(room.getId());
-        if (isHotRoom(room)) {//热门群聊推送所有在线的人
-            //更新热门群聊列表
-            hotRoomCache.refreshActiveTime(room.getId(), message.getCreateTime());
-            //推送所有人
-            applicationEventPublisher.publishEvent(new WSPushEvent(this, WSAdapter.buildMsgSend(msgResp)));
-        } else {
-            List<Long> memberUidList = new ArrayList<>();
-            if (Objects.equals(room.getType(), RoomTypeEnum.GROUP.getType())) {//普通群聊推送所有群成员
-                memberUidList = groupMemberCache.getMemberUidList(room.getId());
-            } else if (Objects.equals(room.getType(), RoomTypeEnum.FRIEND.getType())) {//单聊对象
-                //对单人推送
-                RoomFriend roomFriend = roomFriendDao.getByRoomId(room.getId());
-                memberUidList = Arrays.asList(roomFriend.getUid1(), roomFriend.getUid2());
-            }
-            //更新所有群成员的会话时间
-            contactDao.refreshOrCreateActiveTime(room.getId(), memberUidList, message.getId(), message.getCreateTime());
-            //推送房间成员
-            applicationEventPublisher.publishEvent(new WSPushEvent(this, memberUidList, WSAdapter.buildMsgSend(msgResp)));
-        }
+        Long msgId = event.getMsgId();
+        mqProducer.sendSecureMsg(MQConstant.SEND_MSG_TOPIC, new MsgSendMessageDTO(msgId), msgId);
     }
 
     @TransactionalEventListener(classes = MessageSendEvent.class, fallbackExecution = true)

@@ -47,22 +47,23 @@ public class CursorUtils {
     }
 
     public static <T> CursorPageBaseResp<T> getCursorPageByMysql(IService<T> mapper, CursorPageBaseReq request, Consumer<LambdaQueryWrapper<T>> initWrapper, SFunction<T, ?> cursorColumn) {
+        Class<?> cursorType = LambdaUtils.getReturnType(cursorColumn);
         LambdaQueryWrapper<T> wrapper = new LambdaQueryWrapper<>();
         initWrapper.accept(wrapper);
         if (StrUtil.isNotBlank(request.getCursor())) {
-            wrapper.lt(cursorColumn, request.getCursor());
+            wrapper.lt(cursorColumn, parseCursor(request.getCursor(), cursorType));
         }
         wrapper.orderByDesc(cursorColumn);
         Page<T> page = mapper.page(request.plusPage(), wrapper);
         String cursor = Optional.ofNullable(CollectionUtil.getLast(page.getRecords()))
                 .map(cursorColumn)
-                .map(CursorUtils::parseCursor)
+                .map(CursorUtils::toCursor)
                 .orElse(null);
         Boolean isLast = page.getRecords().size() != request.getPageSize();
         return new CursorPageBaseResp<>(cursor, isLast, page.getRecords());
     }
 
-    private static String parseCursor(Object o) {
+    private static String toCursor(Object o) {
         if (o instanceof Date) {
             return String.valueOf(((Date) o).getTime());
         } else {
@@ -70,4 +71,11 @@ public class CursorUtils {
         }
     }
 
+    private static Object parseCursor(String cursor, Class<?> cursorClass) {
+        if (Date.class.isAssignableFrom(cursorClass)) {
+            return new Date(Long.parseLong(cursor));
+        } else {
+            return cursor;
+        }
+    }
 }

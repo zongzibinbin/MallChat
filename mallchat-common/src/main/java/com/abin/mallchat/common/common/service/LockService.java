@@ -9,8 +9,6 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -54,16 +52,5 @@ public class LockService {
          * @return a result
          */
         T get() throws Throwable;
-    }
-
-
-    public static void main(String[] args) {
-        List<String> sensitiveList = Arrays.asList("abcd", "abcbba", "adabca");
-        String text = "abcdefg";
-        for (String s : sensitiveList) {
-            boolean hit = text.contains(s);
-            System.out.println(hit);
-        }
-
     }
 }

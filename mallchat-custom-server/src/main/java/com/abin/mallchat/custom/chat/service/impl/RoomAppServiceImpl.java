@@ -17,7 +17,6 @@ import com.abin.mallchat.common.common.annotation.RedissonLock;
 import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
 import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
 import com.abin.mallchat.common.common.event.GroupMemberAddEvent;
-import com.abin.mallchat.common.common.event.WSPushEvent;
 import com.abin.mallchat.common.common.utils.AssertUtil;
 import com.abin.mallchat.common.user.dao.UserDao;
 import com.abin.mallchat.common.user.domain.entity.User;
@@ -28,6 +27,7 @@ import com.abin.mallchat.common.user.domain.vo.response.ws.WSMemberChange;
 import com.abin.mallchat.common.user.service.IRoleService;
 import com.abin.mallchat.common.user.service.cache.UserCache;
 import com.abin.mallchat.common.user.service.cache.UserInfoCache;
+import com.abin.mallchat.common.user.service.impl.PushService;
 import com.abin.mallchat.custom.chat.domain.vo.enums.GroupRoleAPPEnum;
 import com.abin.mallchat.custom.chat.domain.vo.request.*;
 import com.abin.mallchat.custom.chat.domain.vo.response.ChatMemberListResp;
@@ -90,18 +90,20 @@ public class RoomAppServiceImpl implements RoomAppService {
     private RoomService roomService;
     @Autowired
     private GroupMemberCache groupMemberCache;
+    @Autowired
+    private PushService pushService;
 
     @Override
     public CursorPageBaseResp<ChatRoomResp> getContactPage(CursorPageBaseReq request, Long uid) {
         //查出用户要展示的会话列表
         CursorPageBaseResp<Long> page;
         if (Objects.nonNull(uid)) {
-            Double hotStart = getCursorOrNull(request.getCursor());
-            Double hotEnd;
+            Double hotEnd = getCursorOrNull(request.getCursor());
+            Double hotStart;
             //用户基础会话
             CursorPageBaseResp<Contact> contactPage = contactDao.getContactPage(uid, request);
             List<Long> baseRoomIds = contactPage.getList().stream().map(Contact::getRoomId).collect(Collectors.toList());
-            hotEnd = getCursorOrNull(contactPage.getCursor());
+            hotStart = getCursorOrNull(contactPage.getCursor());
             //热门房间
             Set<ZSetOperations.TypedTuple<String>> typedTuples = hotRoomCache.getRoomRange(hotStart, hotEnd);
             List<Long> hotRoomIds = typedTuples.stream().map(ZSetOperations.TypedTuple::getValue).filter(Objects::nonNull).map(Long::parseLong).collect(Collectors.toList());
@@ -193,7 +195,7 @@ public class RoomAppServiceImpl implements RoomAppService {
         //发送移除事件告知群成员
         List<Long> memberUidList = groupMemberCache.getMemberUidList(roomGroup.getRoomId());
         WSBaseResp<WSMemberChange> ws = MemberAdapter.buildMemberRemoveWS(roomGroup.getRoomId(), member.getUid());
-        applicationEventPublisher.publishEvent(new WSPushEvent(this, memberUidList, ws));
+        pushService.sendPushMsg(ws, memberUidList);
         groupMemberCache.evictMemberUidList(member.getId());
     }
 
