@@ -63,6 +63,8 @@ public class RedisKey {
      */
     public static final String USER_GLM2_TIME_LAST = "userGLM2UseTime:uid_%d";
 
+    public static final String WX_RANDOM_CODE_STRING = "wxRandomCode";
+
     public static String getKey(String key, Object... objects) {
         return BASE_KEY + String.format(key, objects);
     }

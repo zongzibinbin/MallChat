@@ -5,8 +5,12 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.abin.mallchat.common.common.annotation.FrequencyControl;
 import com.abin.mallchat.common.common.config.ThreadPoolConfig;
+import com.abin.mallchat.common.common.constant.RedisKey;
 import com.abin.mallchat.common.common.event.UserOfflineEvent;
 import com.abin.mallchat.common.common.event.UserOnlineEvent;
+import com.abin.mallchat.common.common.exception.BusinessException;
+import com.abin.mallchat.common.common.exception.CommonErrorEnum;
+import com.abin.mallchat.common.common.utils.RedisUtils;
 import com.abin.mallchat.common.user.dao.UserDao;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.domain.enums.RoleEnum;
@@ -71,6 +75,12 @@ public class WebSocketServiceImpl implements WebSocketService {
      */
     private static final ConcurrentHashMap<Long, CopyOnWriteArrayList<Channel>> ONLINE_UID_MAP = new ConcurrentHashMap<>();
 
+    /**
+     * 微信二维码code过期时间
+     */
+    private static final Duration CODE_EXPIRE_TIME = Duration.ofHours(1);
+
+
     public static ConcurrentHashMap<Channel, WSChannelExtraDTO> getOnlineMap() {
         return ONLINE_WS_MAP;
     }
@@ -100,8 +110,8 @@ public class WebSocketServiceImpl implements WebSocketService {
     @Override
     @FrequencyControl(time = 1000, count = 50, spEl = "T(com.abin.mallchat.common.common.utils.RequestHolder).get().getIp()")
     public void handleLoginReq(Channel channel) {
-        //生成随机不重复的登录码
-        Integer code = generateLoginCode(channel);
+        //通过redis生成随机不重复的登录码
+        Integer code = generateLoginCodeByRedis(channel);
         //请求微信接口，获取登录码地址
         WxMpQrCodeTicket wxMpQrCodeTicket = wxMpService.getQrcodeService().qrCodeCreateTmpTicket(code, (int) EXPIRE_TIME.getSeconds());
         //返回给前端
@@ -120,6 +130,22 @@ public class WebSocketServiceImpl implements WebSocketService {
         } while (WAIT_LOGIN_MAP.asMap().containsKey(CODE.get())
                 || Objects.isNull(WAIT_LOGIN_MAP.get(CODE.get(), c -> channel)));
         return CODE.get();
+    }
+
+    /**
+     * 通过redis原子自增操作获取code，获取后将code放入到redis的kv中，同时设置过期时间
+     * @param channel
+     * @return
+     */
+    private Integer generateLoginCodeByRedis(Channel channel) {
+        Long code = RedisUtils.inc(RedisKey.WX_RANDOM_CODE_STRING);
+        if (code > Integer.MAX_VALUE) {
+            RedisUtils.reset(RedisKey.WX_RANDOM_CODE_STRING);
+        }
+        if (!RedisUtils.setnx(String.valueOf(code), channel, CODE_EXPIRE_TIME.getSeconds())) {
+            throw new BusinessException(CommonErrorEnum.SYSTEM_ERROR);
+        }
+        return code.intValue();
     }
 
     /**
@@ -206,12 +232,12 @@ public class WebSocketServiceImpl implements WebSocketService {
     @Override
     public Boolean scanLoginSuccess(Integer loginCode, User user, String token) {
         //发送消息
-        Channel channel = WAIT_LOGIN_MAP.getIfPresent(loginCode);
+        Channel channel = RedisUtils.get(String.valueOf(loginCode), Channel.class);
         if (Objects.isNull(channel)) {
             return Boolean.FALSE;
         }
         //移除code
-        WAIT_LOGIN_MAP.invalidate(loginCode);
+        RedisUtils.del(String.valueOf(loginCode));
         //用户登录
         loginSuccess(channel, user, token);
         return true;
@@ -219,7 +245,7 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     @Override
     public Boolean scanSuccess(Integer loginCode) {
-        Channel channel = WAIT_LOGIN_MAP.getIfPresent(loginCode);
+        Channel channel = RedisUtils.get(String.valueOf(loginCode), Channel.class);
         if (Objects.isNull(channel)) {
             return Boolean.FALSE;
         }
