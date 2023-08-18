@@ -36,7 +36,7 @@ public interface WebSocketService {
     void authorize(Channel channel, WSAuthorize wsAuthorize);
 
     /**
-     * 扫码用户登录成功通知
+     * 扫码用户登录成功通知,清除本地Cache中的loginCode和channel的关系
      *
      * @param loginCode
      * @param user
@@ -45,11 +45,11 @@ public interface WebSocketService {
     Boolean scanLoginSuccess(Integer loginCode, User user, String token);
 
     /**
-     * 用户扫码成功
+     * 通知用户扫码成功
      *
      * @param loginCode
      */
-    Boolean scanSuccess(Integer loginCode);
+    Boolean scanSuccess(Integer loginCode, Long uid);
 
     /**
      * 推动消息给所有在线的人

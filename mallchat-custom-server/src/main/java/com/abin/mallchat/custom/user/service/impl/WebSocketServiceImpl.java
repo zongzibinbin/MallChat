@@ -5,8 +5,13 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.abin.mallchat.common.common.annotation.FrequencyControl;
 import com.abin.mallchat.common.common.config.ThreadPoolConfig;
+import com.abin.mallchat.common.common.constant.MQConstant;
+import com.abin.mallchat.common.common.constant.RedisKey;
+import com.abin.mallchat.common.common.domain.dto.ScanSuccessMessageDTO;
 import com.abin.mallchat.common.common.event.UserOfflineEvent;
 import com.abin.mallchat.common.common.event.UserOnlineEvent;
+import com.abin.mallchat.common.common.utils.CacheHolder;
+import com.abin.mallchat.common.common.utils.RedisUtils;
 import com.abin.mallchat.common.user.dao.UserDao;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.domain.enums.RoleEnum;
@@ -19,8 +24,7 @@ import com.abin.mallchat.custom.user.service.LoginService;
 import com.abin.mallchat.custom.user.service.WebSocketService;
 import com.abin.mallchat.custom.user.service.adapter.WSAdapter;
 import com.abin.mallchat.custom.user.websocket.NettyUtil;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
+import com.abin.mallchat.transaction.service.MQProducer;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import lombok.SneakyThrows;
@@ -37,7 +41,7 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -51,17 +55,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class WebSocketServiceImpl implements WebSocketService {
 
     private static final Duration EXPIRE_TIME = Duration.ofHours(1);
-    private static final Long MAX_MUM_SIZE = 10000L;
 
-    private static final AtomicInteger CODE = new AtomicInteger();
-
-    /**
-     * 所有请求登录的code与channel关系
-     */
-    private static final Cache<Integer, Channel> WAIT_LOGIN_MAP = Caffeine.newBuilder()
-            .expireAfterWrite(EXPIRE_TIME)
-            .maximumSize(MAX_MUM_SIZE)
-            .build();
     /**
      * 所有已连接的websocket连接列表和一些额外参数
      */
@@ -74,7 +68,10 @@ public class WebSocketServiceImpl implements WebSocketService {
     public static ConcurrentHashMap<Channel, WSChannelExtraDTO> getOnlineMap() {
         return ONLINE_WS_MAP;
     }
-
+    /**
+     * redis保存loginCode的key
+     */
+    private static final String LOGIN_CODE = "loginCode";
     @Autowired
     private WxMpService wxMpService;
     @Autowired
@@ -90,6 +87,8 @@ public class WebSocketServiceImpl implements WebSocketService {
     private UserCache userCache;
     @Autowired
     private IRoleService iRoleService;
+    @Autowired
+    private MQProducer mqProducer;
 
     /**
      * 处理用户登录请求，需要返回一张带code的二维码
@@ -100,11 +99,11 @@ public class WebSocketServiceImpl implements WebSocketService {
     @Override
     @FrequencyControl(time = 1000, count = 50, spEl = "T(com.abin.mallchat.common.common.utils.RequestHolder).get().getIp()")
     public void handleLoginReq(Channel channel) {
-        //生成随机不重复的登录码
+        //生成随机不重复的登录码,并将channel存在本地cache中
         Integer code = generateLoginCode(channel);
         //请求微信接口，获取登录码地址
         WxMpQrCodeTicket wxMpQrCodeTicket = wxMpService.getQrcodeService().qrCodeCreateTmpTicket(code, (int) EXPIRE_TIME.getSeconds());
-        //返回给前端
+        //返回给前端（channel必在本地）
         sendMsg(channel, WSAdapter.buildLoginResp(wxMpQrCodeTicket));
     }
 
@@ -115,11 +114,14 @@ public class WebSocketServiceImpl implements WebSocketService {
      * @return
      */
     private Integer generateLoginCode(Channel channel) {
+        int inc = 0;
         do {
-            CODE.getAndIncrement();
-        } while (WAIT_LOGIN_MAP.asMap().containsKey(CODE.get())
-                || Objects.isNull(WAIT_LOGIN_MAP.get(CODE.get(), c -> channel)));
-        return CODE.get();
+            //本地cache时间必须比redis key过期时间短，否则会出现并发问题
+            inc = RedisUtils.integerInc(RedisKey.getKey(LOGIN_CODE), 61, TimeUnit.MINUTES);
+        } while (CacheHolder.WAIT_LOGIN_MAP.asMap().containsKey(inc));
+        //储存一份在本地
+        CacheHolder.WAIT_LOGIN_MAP.put(inc, channel);
+        return inc;
     }
 
     /**
@@ -160,13 +162,14 @@ public class WebSocketServiceImpl implements WebSocketService {
     }
 
     /**
-     * 登录成功，并更新状态
+     * (channel必在本地)登录成功，并更新状态
      */
     private void loginSuccess(Channel channel, User user, String token) {
         //更新上线列表
         online(channel, user.getId());
         //返回给用户登录成功
         boolean hasPower = iRoleService.hasPower(user.getId(), RoleEnum.CHAT_MANAGER);
+        //发送给对应的用户
         sendMsg(channel, WSAdapter.buildLoginSuccessResp(user, token, hasPower));
         //发送用户上线事件
         boolean online = userCache.isOnline(user.getId());
@@ -206,25 +209,28 @@ public class WebSocketServiceImpl implements WebSocketService {
     @Override
     public Boolean scanLoginSuccess(Integer loginCode, User user, String token) {
         //发送消息
-        Channel channel = WAIT_LOGIN_MAP.getIfPresent(loginCode);
+        Channel channel = CacheHolder.WAIT_LOGIN_MAP.getIfPresent(loginCode);
         if (Objects.isNull(channel)) {
             return Boolean.FALSE;
         }
         //移除code
-        WAIT_LOGIN_MAP.invalidate(loginCode);
+        CacheHolder.WAIT_LOGIN_MAP.invalidate(loginCode);
         //用户登录
         loginSuccess(channel, user, token);
         return true;
     }
 
     @Override
-    public Boolean scanSuccess(Integer loginCode) {
-        Channel channel = WAIT_LOGIN_MAP.getIfPresent(loginCode);
-        if (Objects.isNull(channel)) {
+    public Boolean scanSuccess(Integer loginCode, Long uid) {
+        Channel channel = CacheHolder.WAIT_LOGIN_MAP.getIfPresent(loginCode);
+        if (Objects.nonNull(channel)) {
+            sendMsg(channel, WSAdapter.buildScanSuccessResp());
+            return Boolean.TRUE;
+        }else {
+            //广播通知次channel服务扫码成功
+            mqProducer.sendMsg(MQConstant.SCAN_MSG_TOPIC, new ScanSuccessMessageDTO(loginCode, WSAdapter.buildScanSuccessResp()));
             return Boolean.FALSE;
         }
-        sendMsg(channel, WSAdapter.buildScanSuccessResp());
-        return true;
     }
 
 
@@ -267,10 +273,15 @@ public class WebSocketServiceImpl implements WebSocketService {
         channels.forEach(channel -> {
             threadPoolTaskExecutor.execute(() -> sendMsg(channel, wsBaseResp));
         });
-
     }
 
 
+    /**
+     *  给本地channel发送消息
+     *
+     * @param channel
+     * @param wsBaseResp
+     */
     private void sendMsg(Channel channel, WSBaseResp<?> wsBaseResp) {
         channel.writeAndFlush(new TextWebSocketFrame(JSONUtil.toJsonStr(wsBaseResp)));
     }

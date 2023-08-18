@@ -2,6 +2,7 @@ package com.abin.mallchat.custom.user.service;
 
 import com.abin.mallchat.common.user.domain.dto.ItemInfoDTO;
 import com.abin.mallchat.common.user.domain.dto.SummeryInfoDTO;
+import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.custom.user.domain.vo.request.user.*;
 import com.abin.mallchat.custom.user.domain.vo.response.user.BadgeResp;
 import com.abin.mallchat.custom.user.domain.vo.response.user.UserInfoResp;
@@ -50,11 +51,11 @@ public interface UserService {
     void wearingBadge(Long uid, WearingBadgeReq req);
 
     /**
-     * 用户注册
+     * 用户注册，需要获得id
      *
-     * @param openId
+     * @param user
      */
-    void register(String openId);
+    void register(User user);
 
     void black(BlackReq req);
 
