@@ -31,7 +31,7 @@ public class WeChatMsgOperationServiceImpl implements WeChatMsgOperationService 
             TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<Runnable>(20),
             new NamedThreadFactory("wechat-operation-thread", null, false,
-                    new GlobalUncaughtExceptionHandler()));
+                    GlobalUncaughtExceptionHandler.getInstance()));
 
     // at消息的微信推送模板id
     private final String atMsgPublishTemplateId = "Xd7sWPZsuWa0UmpvLaZPvaJVjNj1KjEa0zLOm5_Z7IU";

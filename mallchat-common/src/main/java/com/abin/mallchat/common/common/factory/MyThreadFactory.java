@@ -15,7 +15,7 @@ public class MyThreadFactory  implements ThreadFactory {
     @Override
     public Thread newThread(Runnable r) {
         Thread thread =factory.newThread(r);
-        thread.setUncaughtExceptionHandler(new GlobalUncaughtExceptionHandler());
+        thread.setUncaughtExceptionHandler(GlobalUncaughtExceptionHandler.getInstance());
         return thread;
     }
 }
