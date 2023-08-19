@@ -16,4 +16,16 @@ public interface MQConstant {
      */
     String PUSH_TOPIC = "websocket_push";
     String PUSH_GROUP = "websocket_push_group";
+
+    /**
+     * (授权完成后)登录信息mq
+     */
+    String LOGIN_MSG_TOPIC = "login_send_msg";
+    String LOGIN_MSG_GROUP = "login_send_msg_group";
+
+    /**
+     * 扫码成功 信息发送mq
+     */
+    String SCAN_MSG_TOPIC = "scan_send_msg";
+    String SCAN_MSG_GROUP = "scan_send_msg_group";
 }

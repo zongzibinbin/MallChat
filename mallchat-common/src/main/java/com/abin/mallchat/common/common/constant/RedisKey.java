@@ -59,6 +59,12 @@ public class RedisKey {
     public static final String USER_CHAT_CONTEXT = "useChatGPTContext:uid_%d_roomId_%d";
 
     /**
+     * 保存Open id
+     */
+    public static final String OPEN_ID_STRING = "openid:%s";
+
+
+    /**
      * 用户上次使用GLM使用时间
      */
     public static final String USER_GLM2_TIME_LAST = "userGLM2UseTime:uid_%d";

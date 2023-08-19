@@ -120,10 +120,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void register(String openId) {
-        User insert = User.builder().openId(openId).build();
-        userDao.save(insert);
-        applicationEventPublisher.publishEvent(new UserRegisterEvent(this, insert));
+    public void register(User user) {
+        userDao.save(user);
+        applicationEventPublisher.publishEvent(new UserRegisterEvent(this, user));
     }
 
     @Override
