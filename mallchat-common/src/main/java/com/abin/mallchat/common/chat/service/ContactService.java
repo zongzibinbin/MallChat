@@ -25,5 +25,5 @@ public interface ContactService {
 
     Integer getMsgUnReadCount(Message message);
 
-    Map<Long, MsgReadInfoDTO> getMsgReadInfo(List<Message> messages, boolean needUnread);
+    Map<Long, MsgReadInfoDTO> getMsgReadInfo(List<Message> messages);
 }

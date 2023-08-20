@@ -22,6 +22,4 @@ public class ChatMessageReadInfoReq {
     @ApiModelProperty("消息id集合（只查本人）")
     @Size(max = 20)
     private List<Long> msgIds;
-    @ApiModelProperty("是否需要查未读数")
-    private boolean needUnread;
 }

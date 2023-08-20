@@ -250,7 +250,7 @@ public class ChatServiceImpl implements ChatService {
         messages.forEach(message -> {
             AssertUtil.equal(uid, message.getFromUid(), "只能查询自己发送的消息");
         });
-        return contactService.getMsgReadInfo(messages, request.isNeedUnread()).values();
+        return contactService.getMsgReadInfo(messages).values();
     }
 
     @Override
