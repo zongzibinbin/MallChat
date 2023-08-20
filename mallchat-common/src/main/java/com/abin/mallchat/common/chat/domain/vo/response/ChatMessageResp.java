@@ -34,6 +34,8 @@ public class ChatMessageResp {
     public static class Message {
         @ApiModelProperty("消息id")
         private Long id;
+        @ApiModelProperty("房间id")
+        private Long roomId;
         @ApiModelProperty("消息发送时间")
         private Date sendTime;
         @ApiModelProperty("消息类型 1正常文本 2.撤回消息")

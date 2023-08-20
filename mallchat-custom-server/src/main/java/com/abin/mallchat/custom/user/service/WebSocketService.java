@@ -1,6 +1,5 @@
 package com.abin.mallchat.custom.user.service;
 
-import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.domain.enums.WSBaseResp;
 import com.abin.mallchat.common.user.domain.vo.request.ws.WSAuthorize;
 import io.netty.channel.Channel;
@@ -37,19 +36,15 @@ public interface WebSocketService {
 
     /**
      * 扫码用户登录成功通知,清除本地Cache中的loginCode和channel的关系
-     *
-     * @param loginCode
-     * @param user
-     * @param token
      */
-    Boolean scanLoginSuccess(Integer loginCode, User user, String token);
+    Boolean scanLoginSuccess(Integer loginCode, Long uid);
 
     /**
      * 通知用户扫码成功
      *
      * @param loginCode
      */
-    Boolean scanSuccess(Integer loginCode, Long uid);
+    Boolean scanSuccess(Integer loginCode);
 
     /**
      * 推动消息给所有在线的人

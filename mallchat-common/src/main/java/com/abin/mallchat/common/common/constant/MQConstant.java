@@ -20,12 +20,12 @@ public interface MQConstant {
     /**
      * (授权完成后)登录信息mq
      */
-    String LOGIN_MSG_TOPIC = "login_send_msg";
-    String LOGIN_MSG_GROUP = "login_send_msg_group";
+    String LOGIN_MSG_TOPIC = "user_login_send_msg";
+    String LOGIN_MSG_GROUP = "user_login_send_msg_group";
 
     /**
      * 扫码成功 信息发送mq
      */
-    String SCAN_MSG_TOPIC = "scan_send_msg";
-    String SCAN_MSG_GROUP = "scan_send_msg_group";
+    String SCAN_MSG_TOPIC = "user_scan_send_msg";
+    String SCAN_MSG_GROUP = "user_scan_send_msg_group";
 }

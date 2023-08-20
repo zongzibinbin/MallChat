@@ -5,12 +5,9 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.abin.mallchat.common.common.annotation.FrequencyControl;
 import com.abin.mallchat.common.common.config.ThreadPoolConfig;
-import com.abin.mallchat.common.common.constant.MQConstant;
 import com.abin.mallchat.common.common.constant.RedisKey;
-import com.abin.mallchat.common.common.domain.dto.ScanSuccessMessageDTO;
 import com.abin.mallchat.common.common.event.UserOfflineEvent;
 import com.abin.mallchat.common.common.event.UserOnlineEvent;
-import com.abin.mallchat.common.common.utils.CacheHolder;
 import com.abin.mallchat.common.common.utils.RedisUtils;
 import com.abin.mallchat.common.user.dao.UserDao;
 import com.abin.mallchat.common.user.domain.entity.User;
@@ -25,6 +22,8 @@ import com.abin.mallchat.custom.user.service.WebSocketService;
 import com.abin.mallchat.custom.user.service.adapter.WSAdapter;
 import com.abin.mallchat.custom.user.websocket.NettyUtil;
 import com.abin.mallchat.transaction.service.MQProducer;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import lombok.SneakyThrows;
@@ -38,12 +37,12 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.Date;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Description: websocket处理类
@@ -55,7 +54,14 @@ import java.util.concurrent.locks.ReentrantLock;
 public class WebSocketServiceImpl implements WebSocketService {
 
     private static final Duration EXPIRE_TIME = Duration.ofHours(1);
-
+    private static final Long MAX_MUM_SIZE = 10000L;
+    /**
+     * 所有请求登录的code与channel关系
+     */
+    public static final Cache<Integer, Channel> WAIT_LOGIN_MAP = Caffeine.newBuilder()
+            .expireAfterWrite(EXPIRE_TIME)
+            .maximumSize(MAX_MUM_SIZE)
+            .build();
     /**
      * 所有已连接的websocket连接列表和一些额外参数
      */
@@ -68,6 +74,7 @@ public class WebSocketServiceImpl implements WebSocketService {
     public static ConcurrentHashMap<Channel, WSChannelExtraDTO> getOnlineMap() {
         return ONLINE_WS_MAP;
     }
+
     /**
      * redis保存loginCode的key
      */
@@ -97,7 +104,7 @@ public class WebSocketServiceImpl implements WebSocketService {
      */
     @SneakyThrows
     @Override
-    @FrequencyControl(time = 1000, count = 50, spEl = "T(com.abin.mallchat.common.common.utils.RequestHolder).get().getIp()")
+    @FrequencyControl(time = 1000, count = 50, spEl = "T(com.abin.mallchat.custom.user.websocket.NettyUtil).getAttr(#channel,T(com.abin.mallchat.custom.user.websocket.NettyUtil).IP)")
     public void handleLoginReq(Channel channel) {
         //生成随机不重复的登录码,并将channel存在本地cache中
         Integer code = generateLoginCode(channel);
@@ -114,13 +121,13 @@ public class WebSocketServiceImpl implements WebSocketService {
      * @return
      */
     private Integer generateLoginCode(Channel channel) {
-        int inc = 0;
+        int inc;
         do {
             //本地cache时间必须比redis key过期时间短，否则会出现并发问题
-            inc = RedisUtils.integerInc(RedisKey.getKey(LOGIN_CODE), 61, TimeUnit.MINUTES);
-        } while (CacheHolder.WAIT_LOGIN_MAP.asMap().containsKey(inc));
+            inc = RedisUtils.integerInc(RedisKey.getKey(LOGIN_CODE), (int) EXPIRE_TIME.toMinutes(), TimeUnit.MINUTES);
+        } while (WAIT_LOGIN_MAP.asMap().containsKey(inc));
         //储存一份在本地
-        CacheHolder.WAIT_LOGIN_MAP.put(inc, channel);
+        WAIT_LOGIN_MAP.put(inc, channel);
         return inc;
     }
 
@@ -130,7 +137,6 @@ public class WebSocketServiceImpl implements WebSocketService {
      * @param channel
      */
     @Override
-//    @FrequencyControl(time = 10, count = 5, spEl = "T(com.abin.mallchat.common.common.utils.RequestHolder).get().getIp()")
     public void connect(Channel channel) {
         ONLINE_WS_MAP.put(channel, new WSChannelExtraDTO());
     }
@@ -207,30 +213,30 @@ public class WebSocketServiceImpl implements WebSocketService {
     }
 
     @Override
-    public Boolean scanLoginSuccess(Integer loginCode, User user, String token) {
-        //发送消息
-        Channel channel = CacheHolder.WAIT_LOGIN_MAP.getIfPresent(loginCode);
+    public Boolean scanLoginSuccess(Integer loginCode, Long uid) {
+        //确认连接在该机器
+        Channel channel = WAIT_LOGIN_MAP.getIfPresent(loginCode);
         if (Objects.isNull(channel)) {
             return Boolean.FALSE;
         }
+        User user = userDao.getById(uid);
         //移除code
-        CacheHolder.WAIT_LOGIN_MAP.invalidate(loginCode);
+        WAIT_LOGIN_MAP.invalidate(loginCode);
+        //调用用户登录模块
+        String token = loginService.login(uid);
         //用户登录
         loginSuccess(channel, user, token);
-        return true;
+        return Boolean.TRUE;
     }
 
     @Override
-    public Boolean scanSuccess(Integer loginCode, Long uid) {
-        Channel channel = CacheHolder.WAIT_LOGIN_MAP.getIfPresent(loginCode);
+    public Boolean scanSuccess(Integer loginCode) {
+        Channel channel = WAIT_LOGIN_MAP.getIfPresent(loginCode);
         if (Objects.nonNull(channel)) {
             sendMsg(channel, WSAdapter.buildScanSuccessResp());
             return Boolean.TRUE;
-        }else {
-            //广播通知次channel服务扫码成功
-            mqProducer.sendMsg(MQConstant.SCAN_MSG_TOPIC, new ScanSuccessMessageDTO(loginCode, WSAdapter.buildScanSuccessResp()));
-            return Boolean.FALSE;
         }
+        return Boolean.FALSE;
     }
 
 
@@ -277,7 +283,7 @@ public class WebSocketServiceImpl implements WebSocketService {
 
 
     /**
-     *  给本地channel发送消息
+     * 给本地channel发送消息
      *
      * @param channel
      * @param wsBaseResp
@@ -285,40 +291,5 @@ public class WebSocketServiceImpl implements WebSocketService {
     private void sendMsg(Channel channel, WSBaseResp<?> wsBaseResp) {
         channel.writeAndFlush(new TextWebSocketFrame(JSONUtil.toJsonStr(wsBaseResp)));
     }
-
-    /**
-     * 案例证明ConcurrentHashMap#entrySet的值不是快照数据
-     *
-     * @param args
-     * @throws InterruptedException
-     */
-    public static void main(String[] args) throws InterruptedException {
-        ReentrantLock reentrantLock = new ReentrantLock();
-        Condition condition = reentrantLock.newCondition();
-        ConcurrentHashMap<Integer, Integer> a = new ConcurrentHashMap<>();
-        a.put(1, 1);
-        a.put(2, 2);
-        new Thread(() -> {
-            reentrantLock.lock();
-            Set<Map.Entry<Integer, Integer>> entries = a.entrySet();
-            System.out.println(entries);
-            try {
-                condition.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            System.out.println(entries);
-            reentrantLock.unlock();
-
-        }).start();
-        Thread.sleep(1000);
-        reentrantLock.lock();
-        a.put(3, 3);
-        System.out.println("haha");
-        condition.signalAll();
-        reentrantLock.unlock();
-        Thread.sleep(1000);
-    }
-
 
 }
