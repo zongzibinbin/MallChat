@@ -66,7 +66,7 @@ public class ContactServiceImpl implements ContactService {
             Integer readCount = contactDao.getReadCount(message);
             readInfoDTO.setReadCount(readCount);
             if (needUnread) {
-                readInfoDTO.setUnReadCount(finalTotalCount - readCount);
+                readInfoDTO.setUnReadCount(finalTotalCount - readCount - 1);
             }
             return readInfoDTO;
         }).collect(Collectors.toMap(MsgReadInfoDTO::getMsgId, Function.identity()));

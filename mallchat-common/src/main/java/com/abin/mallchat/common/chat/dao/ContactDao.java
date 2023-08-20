@@ -33,6 +33,7 @@ public class ContactDao extends ServiceImpl<ContactMapper, Contact> {
     public Integer getReadCount(Message message) {
         return lambdaQuery()
                 .eq(Contact::getRoomId, message.getRoomId())
+                .ne(Contact::getUid, message.getFromUid())//不需要查询出自己
                 .ge(Contact::getReadTime, message.getCreateTime())
                 .count();
     }
