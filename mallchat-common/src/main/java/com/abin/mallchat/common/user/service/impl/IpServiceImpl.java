@@ -18,12 +18,8 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.Objects;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * Description: ip
@@ -118,12 +114,60 @@ public class IpServiceImpl implements IpService, DisposableBean {
 
     @Override
     public void destroy() throws InterruptedException {
-        EXECUTOR.shutdown();
-        if (!EXECUTOR.awaitTermination(30, TimeUnit.SECONDS)) {//最多等30秒，处理不完就拉倒
-            if (log.isErrorEnabled()) {
-                log.error("Timed out while waiting for executor [{}] to terminate", EXECUTOR);
+        shutDownThreadPoolLazyHolder();
+    }
+
+    public void shutdownThreadPoolGracefully() {
+        try {
+            EXECUTOR.shutdown();   //拒绝接受新任务
+        } catch (SecurityException | NullPointerException e) {
+            log.error("shutdown ThreadPool:{} has exception:{}",EXECUTOR,e);
+            return;
+        }
+
+        // 若已经关闭则返回
+        if (EXECUTOR == null || EXECUTOR.isTerminated()) {
+            return;
+        }
+
+        try {
+            // 等待30秒，等待线程池中的任务完成执行
+            if (!EXECUTOR.awaitTermination(30L, TimeUnit.SECONDS)) {
+                // 调用 shutdownNow() 方法取消正在执行的任务
+                EXECUTOR.shutdownNow();
+                // 再次等待30秒，如果还未结束，可以再次尝试，或者直接放弃
+                if (!EXECUTOR.awaitTermination(30L, TimeUnit.SECONDS)) {
+                    log.error("The ThreadPool:{} task did not execute normally and ended",EXECUTOR);
+
+                }
+            }
+        } catch (InterruptedException ie) {
+            // 捕获异常，重新调用 shutdownNow()方法
+            EXECUTOR.shutdownNow();
+
+        }
+        // 仍然没有关闭，循环关闭1000次，每次等待10毫秒
+        if (!EXECUTOR.isTerminated()) {
+            try {
+                for (int i = 0; i < 1000; i++) {
+                    if (EXECUTOR.awaitTermination(10L, TimeUnit.MILLISECONDS)) {
+                        break;
+                    }
+                    EXECUTOR.shutdownNow();
+                }
+            } catch (Throwable e) {
+                log.error("Timed out while waiting for executor [{}] to terminate,exception:{}",EXECUTOR, e.toString());
+
             }
         }
     }
+
+    private void shutDownThreadPoolLazyHolder() {
+        //注册JVM关闭时的钩子函数
+        //优雅地关闭线程池
+        Runtime.getRuntime().addShutdownHook(
+                new Thread(this::shutdownThreadPoolGracefully));
+    }
+
 
 }
