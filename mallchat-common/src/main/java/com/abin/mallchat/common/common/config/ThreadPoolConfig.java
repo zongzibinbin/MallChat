@@ -1,5 +1,6 @@
 package com.abin.mallchat.common.common.config;
 
+import com.abin.mallchat.common.common.concurrent.MdcThreadPoolTaskExecutor;
 import com.abin.mallchat.common.common.factory.MyThreadFactory;
 import com.abin.mallchat.transaction.annotation.SecureInvokeConfigurer;
 import org.springframework.context.annotation.Bean;
@@ -45,7 +46,7 @@ public class ThreadPoolConfig implements AsyncConfigurer, SecureInvokeConfigurer
     @Bean(MALLCHAT_EXECUTOR)
     @Primary
     public ThreadPoolTaskExecutor mallchatExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        ThreadPoolTaskExecutor executor = new MdcThreadPoolTaskExecutor();
         executor.setCorePoolSize(10);
         executor.setMaxPoolSize(10);
         executor.setQueueCapacity(200);
@@ -58,7 +59,7 @@ public class ThreadPoolConfig implements AsyncConfigurer, SecureInvokeConfigurer
 
     @Bean(WS_EXECUTOR)
     public ThreadPoolTaskExecutor websocketExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        ThreadPoolTaskExecutor executor = new MdcThreadPoolTaskExecutor();
         executor.setCorePoolSize(16);
         executor.setMaxPoolSize(16);
         executor.setQueueCapacity(1000);//支持同时推送1000人
@@ -80,4 +81,5 @@ public class ThreadPoolConfig implements AsyncConfigurer, SecureInvokeConfigurer
         executor.setThreadFactory(new MyThreadFactory(executor));
         return executor;
     }
+
 }
