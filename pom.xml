@@ -8,8 +8,7 @@
     <artifactId>mallchat</artifactId>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>mallchat-common</module>
-        <module>mallchat-custom-server</module>
+        <module>mallchat-chat-server</module>
         <module>mallchat-tools</module>
     </modules>
     <packaging>pom</packaging>
