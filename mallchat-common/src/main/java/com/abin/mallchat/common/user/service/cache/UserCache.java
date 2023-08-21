@@ -8,7 +8,6 @@ import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
 import com.abin.mallchat.common.common.utils.CursorUtils;
 import com.abin.mallchat.common.common.utils.RedisUtils;
 import com.abin.mallchat.common.user.dao.BlackDao;
-import com.abin.mallchat.common.user.dao.RoleDao;
 import com.abin.mallchat.common.user.dao.UserDao;
 import com.abin.mallchat.common.user.dao.UserRoleDao;
 import com.abin.mallchat.common.user.domain.entity.Black;
@@ -35,8 +34,6 @@ public class UserCache {
     private UserDao userDao;
     @Autowired
     private BlackDao blackDao;
-    @Autowired
-    private RoleDao roleDao;
     @Autowired
     private UserRoleDao userRoleDao;
 
