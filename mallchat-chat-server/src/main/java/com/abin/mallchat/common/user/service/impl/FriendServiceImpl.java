@@ -33,6 +33,7 @@ import com.abin.mallchat.common.user.service.adapter.FriendAdapter;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -105,10 +106,16 @@ public class FriendServiceImpl implements FriendService {
         //是否有好友关系
         UserFriend friend = userFriendDao.getByFriend(uid, request.getTargetUid());
         AssertUtil.isEmpty(friend, "你们已经是好友了");
-        //是否有待审批的申请记录
-        UserApply friendApproving = userApplyDao.getFriendApproving(uid, request.getTargetUid());
-        if (Objects.nonNull(friendApproving)) {
+        //是否有待审批的申请记录(自己的)
+        UserApply selfApproving = userApplyDao.getFriendApproving(uid, request.getTargetUid());
+        if (Objects.nonNull(selfApproving)) {
             log.info("已有好友申请记录,uid:{}, targetId:{}", uid, request.getTargetUid());
+            return;
+        }
+        //是否有待审批的申请记录(别人请求自己的)
+        UserApply friendApproving = userApplyDao.getFriendApproving(request.getTargetUid(), uid);
+        if (Objects.nonNull(friendApproving)) {
+            ((FriendService) AopContext.currentProxy()).applyApprove(uid, new FriendApproveReq(friendApproving.getId()));
             return;
         }
         //申请入库
