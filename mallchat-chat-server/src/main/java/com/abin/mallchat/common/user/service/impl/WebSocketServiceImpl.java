@@ -3,7 +3,6 @@ package com.abin.mallchat.common.user.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
-import com.abin.mallchat.common.common.annotation.FrequencyControl;
 import com.abin.mallchat.common.common.config.ThreadPoolConfig;
 import com.abin.mallchat.common.common.constant.RedisKey;
 import com.abin.mallchat.common.common.event.UserOfflineEvent;
@@ -104,7 +103,6 @@ public class WebSocketServiceImpl implements WebSocketService {
      */
     @SneakyThrows
     @Override
-    @FrequencyControl(time = 1000, count = 50, spEl = "T(com.abin.mallchat.common.websocket.NettyUtil).getAttr(#channel,T(com.abin.mallchat.common.websocket.NettyUtil).IP)")
     public void handleLoginReq(Channel channel) {
         //生成随机不重复的登录码,并将channel存在本地cache中
         Integer code = generateLoginCode(channel);
