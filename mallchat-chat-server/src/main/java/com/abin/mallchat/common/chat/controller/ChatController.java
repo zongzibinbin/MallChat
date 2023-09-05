@@ -48,7 +48,7 @@ public class ChatController {
     @GetMapping("/public/member/page")
     @ApiOperation("群成员列表（废弃）")
     @Deprecated
-    @FrequencyControl(time = 120, count = 20, target = FrequencyControl.Target.IP)
+//    @FrequencyControl(time = 120, count = 20, target = FrequencyControl.Target.IP)
     public ApiResult<CursorPageBaseResp<ChatMemberResp>> getMemberPage(@Valid MemberReq request) {
         CursorPageBaseResp<ChatMemberResp> memberPage = chatService.getMemberPage(null, request);
         filterBlackMember(memberPage);
@@ -80,7 +80,7 @@ public class ChatController {
 
     @GetMapping("/public/msg/page")
     @ApiOperation("消息列表")
-    @FrequencyControl(time = 120, count = 20, target = FrequencyControl.Target.IP)
+//    @FrequencyControl(time = 120, count = 20, target = FrequencyControl.Target.IP)
     public ApiResult<CursorPageBaseResp<ChatMessageResp>> getMsgPage(@Valid ChatMessagePageReq request) {
         CursorPageBaseResp<ChatMessageResp> msgPage = chatService.getMsgPage(request, RequestHolder.get().getUid());
         filterBlackMsg(msgPage);
