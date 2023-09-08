@@ -21,6 +21,7 @@ public enum ItemEnum {
     REG_TOP10_BADGE(3L, ItemTypeEnum.BADGE, "前十注册徽章"),
     REG_TOP100_BADGE(4L, ItemTypeEnum.BADGE, "前100注册徽章"),
     PLANET(5L, ItemTypeEnum.BADGE, "知识星球"),
+    CONTRIBUTOR(6L, ItemTypeEnum.BADGE, "代码贡献者"),
     ;
 
     private final Long id;
