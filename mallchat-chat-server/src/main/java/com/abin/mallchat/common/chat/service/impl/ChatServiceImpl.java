@@ -290,7 +290,7 @@ public class ChatServiceImpl implements ChatService {
 
     private void checkRecall(Long uid, Message message) {
         AssertUtil.isNotEmpty(message, "消息有误");
-        AssertUtil.notEqual(message.getType(), MessageTypeEnum.RECALL, "消息无法撤回");
+        AssertUtil.notEqual(message.getType(), MessageTypeEnum.RECALL.getType(), "消息无法撤回");
         boolean hasPower = iRoleService.hasPower(uid, RoleEnum.CHAT_MANAGER);
         if (hasPower) {
             return;

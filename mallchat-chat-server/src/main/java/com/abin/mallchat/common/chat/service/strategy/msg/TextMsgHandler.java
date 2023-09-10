@@ -120,7 +120,7 @@ public class TextMsgHandler extends AbstractMsgHandler {
             TextMsgResp.ReplyMsg replyMsgVO = new TextMsgResp.ReplyMsg();
             replyMsgVO.setId(replyMessage.getId());
             replyMsgVO.setUid(replyMessage.getFromUid());
-            replyMessage.setType(replyMessage.getType());
+            replyMsgVO.setType(replyMessage.getType());
             replyMsgVO.setBody(MsgHandlerFactory.getStrategyNoNull(replyMessage.getType()).showReplyMsg(replyMessage));
             User replyUser = userCache.getUserInfo(replyMessage.getFromUid());
             replyMsgVO.setUsername(replyUser.getName());
