@@ -15,6 +15,7 @@
         <module>mallchat-redis</module>
         <module>mallchat-transaction</module>
         <module>mallchat-common-starter</module>
+        <module>mallchat-frequency-control</module>
     </modules>
 
 
