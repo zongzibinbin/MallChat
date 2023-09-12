@@ -78,7 +78,7 @@ public class ContactDao extends ServiceImpl<ContactMapper, Contact> {
 
     public List<Contact> getByRoomIds(List<Long> roomIds, Long uid) {
         return lambdaQuery()
-                .eq(Contact::getRoomId, roomIds)
+                .in(Contact::getRoomId, roomIds)
                 .eq(Contact::getUid, uid)
                 .list();
     }
