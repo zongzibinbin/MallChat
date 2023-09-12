@@ -58,7 +58,7 @@ public class SlidingWindowFrequencyController extends AbstractFrequencyControlSe
 
     @Override
     protected String getStrategyName() {
-        return FrequencyControlConstant.SLIDING_WINDOW_FREQUENCY_CONTROLLER;
+        return FrequencyControlConstant.SLIDING_WINDOW;
 
     }
 }

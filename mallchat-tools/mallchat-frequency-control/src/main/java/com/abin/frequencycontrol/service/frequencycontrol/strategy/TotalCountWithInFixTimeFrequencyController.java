@@ -58,6 +58,6 @@ public class TotalCountWithInFixTimeFrequencyController extends AbstractFrequenc
 
     @Override
     protected String getStrategyName() {
-        return FrequencyControlConstant.TOTAL_COUNT_WITH_IN_FIX_TIME_FREQUENCY_CONTROLLER;
+        return FrequencyControlConstant.TOTAL_COUNT_WITH_IN_FIX_TIME;
     }
 }

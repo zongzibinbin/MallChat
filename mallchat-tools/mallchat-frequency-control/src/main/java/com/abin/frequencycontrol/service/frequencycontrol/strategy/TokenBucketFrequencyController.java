@@ -49,6 +49,6 @@ public class TokenBucketFrequencyController extends AbstractFrequencyControlServ
 
     @Override
     protected String getStrategyName() {
-        return FrequencyControlConstant.TOKEN_BUCKET_FREQUENCY_CONTROLLER;
+        return FrequencyControlConstant.TOKEN_BUCKET;
     }
 }

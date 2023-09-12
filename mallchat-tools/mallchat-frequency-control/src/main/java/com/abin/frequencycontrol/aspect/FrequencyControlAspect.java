@@ -37,7 +37,7 @@ public class FrequencyControlAspect {
         Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
         FrequencyControl[] annotationsByType = method.getAnnotationsByType(FrequencyControl.class);
         Map<String, FrequencyControl> keyMap = new HashMap<>();
-        String strategy = FrequencyControlConstant.TOTAL_COUNT_WITH_IN_FIX_TIME_FREQUENCY_CONTROLLER;
+        String strategy = FrequencyControlConstant.TOTAL_COUNT_WITH_IN_FIX_TIME;
         for (int i = 0; i < annotationsByType.length; i++) {
             // 获取频控注解
             FrequencyControl frequencyControl = annotationsByType[i];
@@ -57,12 +57,12 @@ public class FrequencyControlAspect {
             strategy = frequencyControl.strategy();
         }
         // 将注解的参数转换为编程式调用需要的参数
-        if (FrequencyControlConstant.TOTAL_COUNT_WITH_IN_FIX_TIME_FREQUENCY_CONTROLLER.equals(strategy)) {
+        if (FrequencyControlConstant.TOTAL_COUNT_WITH_IN_FIX_TIME.equals(strategy)) {
             // 调用编程式注解 固定窗口
             List<FrequencyControlDTO> frequencyControlDTOS = keyMap.entrySet().stream().map(entrySet -> buildFixedWindowDTO(entrySet.getKey(), entrySet.getValue())).collect(Collectors.toList());
             return FrequencyControlUtil.executeWithFrequencyControlList(strategy, frequencyControlDTOS, joinPoint::proceed);
 
-        } else if (FrequencyControlConstant.TOKEN_BUCKET_FREQUENCY_CONTROLLER.equals(strategy)) {
+        } else if (FrequencyControlConstant.TOKEN_BUCKET.equals(strategy)) {
             // 调用编程式注解 令牌桶
             List<TokenBucketDTO> frequencyControlDTOS = keyMap.entrySet().stream().map(entrySet -> buildTokenBucketDTO(entrySet.getKey(), entrySet.getValue())).collect(Collectors.toList());
             return FrequencyControlUtil.executeWithFrequencyControlList(strategy, frequencyControlDTOS, joinPoint::proceed);

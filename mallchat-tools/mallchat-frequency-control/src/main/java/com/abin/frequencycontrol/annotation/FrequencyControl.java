@@ -16,7 +16,7 @@ public @interface FrequencyControl {
     /**
      * 策略
      */
-    String strategy() default FrequencyControlConstant.TOTAL_COUNT_WITH_IN_FIX_TIME_FREQUENCY_CONTROLLER;
+    String strategy() default FrequencyControlConstant.TOTAL_COUNT_WITH_IN_FIX_TIME;
 
     /**
      * 窗口大小，默认 5 个 period
