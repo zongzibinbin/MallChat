@@ -17,6 +17,8 @@ public interface RoomService {
      */
     RoomFriend createFriendRoom(List<Long> uidList);
 
+    RoomFriend getFriendRoom(Long uid1, Long uid2);
+
     /**
      * 禁用一个单聊房间
      */
@@ -27,4 +29,6 @@ public interface RoomService {
      * 创建一个群聊房间
      */
     RoomGroup createGroupRoom(Long uid);
+
+
 }

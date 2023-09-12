@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -57,6 +58,12 @@ public class RoomServiceImpl implements RoomService {
             roomFriend = createFriendRoom(room.getId(), uidList);
         }
         return roomFriend;
+    }
+
+    @Override
+    public RoomFriend getFriendRoom(Long uid1, Long uid2) {
+        String key = ChatAdapter.generateRoomKey(Arrays.asList(uid1, uid2));
+        return roomFriendDao.getByKey(key);
     }
 
     @Override

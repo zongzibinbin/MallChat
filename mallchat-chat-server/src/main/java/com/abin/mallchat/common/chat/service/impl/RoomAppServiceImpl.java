@@ -128,6 +128,13 @@ public class RoomAppServiceImpl implements RoomAppService {
     }
 
     @Override
+    public ChatRoomResp getContactDetailByFriend(Long uid, Long friendUid) {
+        RoomFriend friendRoom = roomService.getFriendRoom(uid, friendUid);
+        AssertUtil.isNotEmpty(friendRoom, "他不是您的好友");
+        return buildContactResp(uid, Collections.singletonList(friendRoom.getRoomId())).get(0);
+    }
+
+    @Override
     public MemberResp getGroupDetail(Long uid, long roomId) {
         RoomGroup roomGroup = roomGroupCache.get(roomId);
         Room room = roomCache.get(roomId);

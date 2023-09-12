@@ -1,6 +1,7 @@
 package com.abin.mallchat.common.chat.controller;
 
 
+import com.abin.mallchat.common.chat.domain.vo.request.ContactFriendReq;
 import com.abin.mallchat.common.chat.domain.vo.response.ChatRoomResp;
 import com.abin.mallchat.common.chat.service.ChatService;
 import com.abin.mallchat.common.chat.service.RoomAppService;
@@ -46,9 +47,16 @@ public class ContactController {
 
     @GetMapping("/public/contact/detail")
     @ApiOperation("会话详情")
-    public ApiResult<ChatRoomResp> getRoomPage(@Valid IdReqVO request) {
+    public ApiResult<ChatRoomResp> getContactDetail(@Valid IdReqVO request) {
         Long uid = RequestHolder.get().getUid();
         return ApiResult.success(roomService.getContactDetail(uid, request.getId()));
+    }
+
+    @GetMapping("/public/contact/detail/friend")
+    @ApiOperation("会话详情(联系人列表发消息用)")
+    public ApiResult<ChatRoomResp> getContactDetailByFriend(@Valid ContactFriendReq request) {
+        Long uid = RequestHolder.get().getUid();
+        return ApiResult.success(roomService.getContactDetailByFriend(uid, request.getUid()));
     }
 }
 

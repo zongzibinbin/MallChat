@@ -37,4 +37,6 @@ public interface RoomAppService {
     Long addGroup(Long uid, GroupAddReq request);
 
     ChatRoomResp getContactDetail(Long uid, Long roomId);
+
+    ChatRoomResp getContactDetailByFriend(Long uid, Long friendUid);
 }
