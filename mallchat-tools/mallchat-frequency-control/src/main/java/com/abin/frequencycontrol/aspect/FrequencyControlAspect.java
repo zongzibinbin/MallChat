@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 public class FrequencyControlAspect {
     @Around("@annotation(com.abin.frequencycontrol.annotation.FrequencyControl)||@annotation(com.abin.frequencycontrol.annotation.FrequencyControlContainer)")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
-        System.out.println("FrequencyControlAspect start");
         Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
         FrequencyControl[] annotationsByType = method.getAnnotationsByType(FrequencyControl.class);
         Map<String, FrequencyControl> keyMap = new HashMap<>();
