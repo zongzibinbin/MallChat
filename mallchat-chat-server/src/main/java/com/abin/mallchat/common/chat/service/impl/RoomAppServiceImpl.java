@@ -99,11 +99,13 @@ public class RoomAppServiceImpl implements RoomAppService {
         CursorPageBaseResp<Long> page;
         if (Objects.nonNull(uid)) {
             Double hotEnd = getCursorOrNull(request.getCursor());
-            Double hotStart;
+            Double hotStart = null;
             //用户基础会话
             CursorPageBaseResp<Contact> contactPage = contactDao.getContactPage(uid, request);
             List<Long> baseRoomIds = contactPage.getList().stream().map(Contact::getRoomId).collect(Collectors.toList());
-            hotStart = getCursorOrNull(contactPage.getCursor());
+            if (!contactPage.getIsLast()) {
+                hotStart = getCursorOrNull(contactPage.getCursor());
+            }
             //热门房间
             Set<ZSetOperations.TypedTuple<String>> typedTuples = hotRoomCache.getRoomRange(hotStart, hotEnd);
             List<Long> hotRoomIds = typedTuples.stream().map(ZSetOperations.TypedTuple::getValue).filter(Objects::nonNull).map(Long::parseLong).collect(Collectors.toList());
