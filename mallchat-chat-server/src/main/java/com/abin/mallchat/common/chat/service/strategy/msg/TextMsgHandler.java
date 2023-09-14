@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Description: 普通文本消息
@@ -68,9 +69,12 @@ public class TextMsgHandler extends AbstractMsgHandler {
             AssertUtil.equal(replyMsg.getRoomId(), request.getRoomId(), "只能回复相同会话内的消息");
         }
         if (CollectionUtil.isNotEmpty(body.getAtUidList())) {
-            List<Long> atUidList = body.getAtUidList();
+            //前端传入的@用户列表可能会重复，需要去重
+            List<Long> atUidList = body.getAtUidList().stream().distinct().collect(Collectors.toList());
             Map<Long, User> batch = userInfoCache.getBatch(atUidList);
-            AssertUtil.equal(atUidList.size(), batch.values().size(), "@用户不存在");
+            //如果@用户不存在，userInfoCache 返回的map中依然存在该key，但是value为null，需要过滤掉再校验
+            long batchCount = batch.values().stream().filter(Objects::nonNull).count();
+            AssertUtil.equal((long)atUidList.size(), batchCount, "@用户不存在");
             boolean atAll = body.getAtUidList().contains(0L);
             if (atAll) {
                 AssertUtil.isTrue(iRoleService.hasPower(uid, RoleEnum.CHAT_MANAGER), "没有权限");
