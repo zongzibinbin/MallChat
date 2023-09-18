@@ -83,12 +83,15 @@ public class SecureInvokeService {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @SneakyThrows
             @Override
-            public void afterCommit() {
-                //事务后执行
-                if (async) {
-                    doAsyncInvoke(record);
-                } else {
-                    doInvoke(record);
+            public void afterCompletion(int status) {
+                if (status==TransactionSynchronization.STATUS_COMMITTED){
+                    TransactionSynchronizationManager.clear();
+                    if (async){
+                        //事务后执行
+                        doAsyncInvoke(record);
+                    } else {
+                        doInvoke(record);
+                    }
                 }
             }
         });
