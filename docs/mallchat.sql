@@ -187,8 +187,6 @@ CREATE TABLE `user_role` (
   KEY `idx_update_time` (`update_time`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户角色关系表';
 
-insert into role(id,`name`) values(1,'超级管理员');
-insert into role(id,`name`) values(2,'抹茶群聊管理员');
 
 DROP TABLE IF EXISTS `sensitive_word`;
 CREATE TABLE `sensitive_word` (
