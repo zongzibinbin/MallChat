@@ -27,6 +27,7 @@ import javax.annotation.PreDestroy;
 @Configuration
 public class NettyWebSocketServer {
     public static final int WEB_SOCKET_PORT = 8090;
+    public static final NettyWebSocketServerHandler NETTY_WEB_SOCKET_SERVER_HANDLER = new NettyWebSocketServerHandler();
     // 创建线程池执行器
     private EventLoopGroup bossGroup = new NioEventLoopGroup(1);
     private EventLoopGroup workerGroup = new NioEventLoopGroup(NettyRuntime.availableProcessors());
@@ -90,7 +91,7 @@ public class NettyWebSocketServer {
                          */
                         pipeline.addLast(new WebSocketServerProtocolHandler("/"));
                         // 自定义handler ，处理业务逻辑
-                        pipeline.addLast(new NettyWebSocketServerHandler());
+                        pipeline.addLast(NETTY_WEB_SOCKET_SERVER_HANDLER);
                     }
                 });
         // 启动服务器，监听端口，阻塞直到启动成功
