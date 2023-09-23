@@ -51,11 +51,6 @@
         <dependencies>
             <dependency>
                 <groupId>com.abin.mallchat</groupId>
-                <artifactId>mallchat-common</artifactId>
-                <version>${version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.abin.mallchat</groupId>
                 <artifactId>mallchat-common-starter</artifactId>
                 <version>${version}</version>
             </dependency>

@@ -7,6 +7,7 @@ import com.abin.mallchat.common.user.domain.enums.WSReqTypeEnum;
 import com.abin.mallchat.common.user.domain.vo.request.ws.WSAuthorize;
 import com.abin.mallchat.common.user.domain.vo.request.ws.WSBaseReq;
 import com.abin.mallchat.common.user.service.WebSocketService;
+import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
@@ -17,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
+@Sharable
 public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
 
     private WebSocketService webSocketService;

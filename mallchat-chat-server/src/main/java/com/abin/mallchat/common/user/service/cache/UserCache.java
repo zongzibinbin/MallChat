@@ -39,6 +39,8 @@ public class UserCache {
     private RoleDao roleDao;
     @Autowired
     private UserRoleDao userRoleDao;
+    @Autowired
+    private UserSummaryCache userSummaryCache;
 
     public Long getOnlineNum() {
         String onlineKey = RedisKey.getKey(RedisKey.ONLINE_UID_ZET);
@@ -137,6 +139,8 @@ public class UserCache {
 
     public void userInfoChange(Long uid) {
         delUserInfo(uid);
+        //删除UserSummaryCache，前端下次懒加载的时候可以获取到最新的数据
+        userSummaryCache.delete(uid);
         refreshUserModifyTime(uid);
     }
 
