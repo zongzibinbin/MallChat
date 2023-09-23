@@ -54,7 +54,9 @@ public class CursorUtils {
             wrapper.lt(cursorColumn, parseCursor(request.getCursor(), cursorType));
         }
         wrapper.orderByDesc(cursorColumn);
-        Page<T> page = mapper.page(request.plusPage(), wrapper);
+        Page pageReq = request.plusPage();
+        pageReq.setSearchCount(false);
+        Page<T> page = mapper.page(pageReq, wrapper);
         String cursor = Optional.ofNullable(CollectionUtil.getLast(page.getRecords()))
                 .map(cursorColumn)
                 .map(CursorUtils::toCursor)
