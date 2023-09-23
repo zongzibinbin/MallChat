@@ -195,7 +195,7 @@ public class FriendServiceImpl implements FriendService {
         List<Long> friendRecordIds = userFriends.stream().map(UserFriend::getId).collect(Collectors.toList());
         userFriendDao.removeByIds(friendRecordIds);
         //禁用房间
-        roomService.disableFriendRoom(friendRecordIds);
+        roomService.disableFriendRoom(Arrays.asList(uid, friendUid));
     }
 
     @Override
