@@ -70,28 +70,6 @@ CREATE TABLE `message_mark`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '消息标记表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for room
--- ----------------------------
-DROP TABLE IF EXISTS `room`;
-CREATE TABLE `room`  (
-  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'id',
-  `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '会话名',
-  `type` int(11) NOT NULL COMMENT '会话类型 1大群聊 2沸点',
-  `active_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '最后活跃时间-排序',
-  `create_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
-  `update_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '修改时间',
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `idx_active_time`(`active_time`) USING BTREE,
-  INDEX `idx_create_time`(`create_time`) USING BTREE,
-  INDEX `idx_update_time`(`update_time`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '会话表' ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of room
--- ----------------------------
-INSERT INTO `room` VALUES (1, '抹茶群聊', 1, '2023-03-25 22:30:07.328', '2023-03-25 22:30:07.328', '2023-03-25 22:30:07.328');
-
--- ----------------------------
 -- Table structure for user
 -- ----------------------------
 DROP TABLE IF EXISTS `user`;
