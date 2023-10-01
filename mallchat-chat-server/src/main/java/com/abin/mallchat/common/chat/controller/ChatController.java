@@ -3,8 +3,6 @@ package com.abin.mallchat.common.chat.controller;
 
 import com.abin.mallchat.common.chat.domain.dto.MsgReadInfoDTO;
 import com.abin.mallchat.common.chat.domain.vo.request.*;
-import com.abin.mallchat.common.chat.domain.vo.response.ChatMemberListResp;
-import com.abin.mallchat.common.chat.domain.vo.response.ChatMemberStatisticResp;
 import com.abin.mallchat.common.chat.domain.vo.response.ChatMessageReadResp;
 import com.abin.mallchat.common.chat.domain.vo.response.ChatMessageResp;
 import com.abin.mallchat.common.chat.service.ChatService;
@@ -13,7 +11,6 @@ import com.abin.mallchat.common.common.domain.vo.response.ApiResult;
 import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
 import com.abin.mallchat.common.common.utils.RequestHolder;
 import com.abin.mallchat.common.user.domain.enums.BlackTypeEnum;
-import com.abin.mallchat.common.user.domain.vo.response.ws.ChatMemberResp;
 import com.abin.mallchat.common.user.service.cache.UserCache;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -24,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -45,37 +41,8 @@ public class ChatController {
     @Autowired
     private UserCache userCache;
 
-    @GetMapping("/public/member/page")
-    @ApiOperation("群成员列表（废弃）")
-    @Deprecated
-//    @FrequencyControl(time = 120, count = 20, target = FrequencyControl.Target.IP)
-    public ApiResult<CursorPageBaseResp<ChatMemberResp>> getMemberPage(@Valid MemberReq request) {
-        CursorPageBaseResp<ChatMemberResp> memberPage = chatService.getMemberPage(null, request);
-        filterBlackMember(memberPage);
-        return ApiResult.success(memberPage);
-    }
-
-    @GetMapping("/member/list")
-    @ApiOperation("房间内的所有群成员列表-@专用（废弃）")
-    @Deprecated
-    public ApiResult<List<ChatMemberListResp>> getMemberList(@Valid ChatMessageMemberReq chatMessageMemberReq) {
-        return ApiResult.success(chatService.getMemberList(chatMessageMemberReq));
-    }
-
-    private void filterBlackMember(CursorPageBaseResp<ChatMemberResp> memberPage) {
-        Set<String> blackMembers = getBlackUidSet();
-        memberPage.getList().removeIf(a -> blackMembers.contains(a.getUid().toString()));
-    }
-
     private Set<String> getBlackUidSet() {
         return userCache.getBlackMap().getOrDefault(BlackTypeEnum.UID.getType(), new HashSet<>());
-    }
-
-    @GetMapping("public/member/statistic")
-    @ApiOperation("群成员人数统计")
-    @Deprecated
-    public ApiResult<ChatMemberStatisticResp> getMemberStatistic() {
-        return ApiResult.success(chatService.getMemberStatistic());
     }
 
     @GetMapping("/public/msg/page")
@@ -97,7 +64,7 @@ public class ChatController {
     @FrequencyControl(time = 5, count = 3, target = FrequencyControl.Target.UID)
     @FrequencyControl(time = 30, count = 5, target = FrequencyControl.Target.UID)
     @FrequencyControl(time = 60, count = 10, target = FrequencyControl.Target.UID)
-    public ApiResult<ChatMessageResp> sendMsg(@Valid @RequestBody ChatMessageReq request) {//todo 发送给单聊
+    public ApiResult<ChatMessageResp> sendMsg(@Valid @RequestBody ChatMessageReq request) {
         Long msgId = chatService.sendMsg(request, RequestHolder.get().getUid());
         //返回完整消息格式，方便前端展示
         return ApiResult.success(chatService.getMsgResp(msgId, RequestHolder.get().getUid()));

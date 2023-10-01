@@ -24,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
@@ -82,11 +81,14 @@ public class MessageSendListener {
         }
     }
 
-    @Transactional
     public boolean isHotRoom(Room room) {
         return Objects.equals(HotFlagEnum.YES.getType(), room.getHotFlag());
     }
 
+    /**
+     * 给用户微信推送艾特好友的消息通知
+     * （这个没开启，微信不让推）
+     */
     @TransactionalEventListener(classes = MessageSendEvent.class, fallbackExecution = true)
     public void publishChatToWechat(@NotNull MessageSendEvent event) {
         Message message = messageDao.getById(event.getMsgId());
