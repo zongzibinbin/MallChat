@@ -285,7 +285,7 @@ CREATE TABLE `room_group` (
 DROP TABLE IF EXISTS `group_member`;
 CREATE TABLE `group_member` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
-  `group_id` bigint(20) NOT NULL COMMENT '群主id',
+  `group_id` bigint(20) NOT NULL COMMENT '群组id',
   `uid` bigint(20) NOT NULL COMMENT '成员uid',
   `role` int(11) NOT NULL COMMENT '成员角色 1群主 2管理员 3普通成员',
   `create_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
