@@ -13,8 +13,8 @@ import com.abin.mallchat.common.user.domain.vo.request.friend.FriendCheckReq;
 import com.abin.mallchat.common.user.domain.vo.request.friend.FriendDeleteReq;
 import com.abin.mallchat.common.user.domain.vo.response.friend.FriendApplyResp;
 import com.abin.mallchat.common.user.domain.vo.response.friend.FriendCheckResp;
+import com.abin.mallchat.common.user.domain.vo.response.friend.FriendResp;
 import com.abin.mallchat.common.user.domain.vo.response.friend.FriendUnreadResp;
-import com.abin.mallchat.common.user.domain.vo.response.ws.ChatMemberResp;
 import com.abin.mallchat.common.user.service.FriendService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -78,7 +78,7 @@ public class FriendController {
     }
 
     @PutMapping("/apply")
-    @ApiOperation("审批申请")
+    @ApiOperation("审批同意")
     public ApiResult<Void> applyApprove(@Valid @RequestBody FriendApproveReq request) {
         friendService.applyApprove(RequestHolder.get().getUid(), request);
         return ApiResult.success();
@@ -86,7 +86,7 @@ public class FriendController {
 
     @GetMapping("/page")
     @ApiOperation("联系人列表")
-    public ApiResult<CursorPageBaseResp<ChatMemberResp>> friendList(@Valid CursorPageBaseReq request) {
+    public ApiResult<CursorPageBaseResp<FriendResp>> friendList(@Valid CursorPageBaseReq request) {
         Long uid = RequestHolder.get().getUid();
         return ApiResult.success(friendService.friendList(uid, request));
     }

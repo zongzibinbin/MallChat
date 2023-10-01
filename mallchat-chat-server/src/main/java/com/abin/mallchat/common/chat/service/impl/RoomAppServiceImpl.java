@@ -162,7 +162,7 @@ public class RoomAppServiceImpl implements RoomAppService {
     public CursorPageBaseResp<ChatMemberResp> getMemberPage(MemberReq request) {
         Room room = roomCache.get(request.getRoomId());
         AssertUtil.isNotEmpty(room, "房间号有误");
-        List<Long> memberUidList = null;
+        List<Long> memberUidList;
         if (isHotGroup(room)) {//全员群展示所有用户
             memberUidList = null;
         } else {//只展示房间内的群成员

@@ -1,9 +1,6 @@
 package com.abin.mallchat.common.user.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -42,6 +39,13 @@ public class UserFriend implements Serializable {
      */
     @TableField("friend_uid")
     private Long friendUid;
+
+    /**
+     * 逻辑删除(0-正常,1-删除)
+     */
+    @TableField("delete_status")
+    @TableLogic(value = "0", delval = "1")
+    private Integer deleteStatus;
 
     /**
      * 创建时间

@@ -167,16 +167,16 @@ public class UserServiceImpl implements UserService {
     }
 
     private List<Long> getNeedSyncUidList(List<SummeryInfoReq.infoReq> reqList) {
-        List<Long> result = new ArrayList<>();
+        List<Long> needSyncUidList = new ArrayList<>();
         List<Long> userModifyTime = userCache.getUserModifyTime(reqList.stream().map(SummeryInfoReq.infoReq::getUid).collect(Collectors.toList()));
         for (int i = 0; i < reqList.size(); i++) {
             SummeryInfoReq.infoReq infoReq = reqList.get(i);
             Long modifyTime = userModifyTime.get(i);
             if (Objects.isNull(infoReq.getLastModifyTime()) || (Objects.nonNull(modifyTime) && modifyTime > infoReq.getLastModifyTime())) {
-                result.add(infoReq.getUid());
+                needSyncUidList.add(infoReq.getUid());
             }
         }
-        return result;
+        return needSyncUidList;
     }
 
     public void blackIp(String ip) {

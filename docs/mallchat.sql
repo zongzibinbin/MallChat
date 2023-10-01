@@ -218,7 +218,8 @@ CREATE TABLE `user_apply` (
   `create_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
   `update_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE,
-  KEY `idx_target_id_uid_status` (`target_id`,`uid`,`status`) USING BTREE,
+  KEY `idx_uid_target_id` (`uid`,`target_id`) USING BTREE,
+  KEY `idx_target_id_read_status` (`target_id`,`read_status`) USING BTREE,
   KEY `idx_target_id` (`target_id`) USING BTREE,
   KEY `idx_create_time` (`create_time`) USING BTREE,
   KEY `idx_update_time` (`update_time`) USING BTREE

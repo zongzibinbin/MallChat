@@ -1,5 +1,6 @@
 package com.abin.mallchat.common.user.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,6 +19,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class SummeryInfoDTO {
     @ApiModelProperty(value = "用户id")
     private Long uid;

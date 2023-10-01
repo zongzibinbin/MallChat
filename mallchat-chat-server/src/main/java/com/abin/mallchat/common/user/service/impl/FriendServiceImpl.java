@@ -6,7 +6,6 @@ import com.abin.mallchat.common.chat.domain.entity.RoomFriend;
 import com.abin.mallchat.common.chat.service.ChatService;
 import com.abin.mallchat.common.chat.service.ContactService;
 import com.abin.mallchat.common.chat.service.RoomService;
-import com.abin.mallchat.common.chat.service.adapter.MemberAdapter;
 import com.abin.mallchat.common.chat.service.adapter.MessageAdapter;
 import com.abin.mallchat.common.common.annotation.RedissonLock;
 import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
@@ -26,8 +25,8 @@ import com.abin.mallchat.common.user.domain.vo.request.friend.FriendApproveReq;
 import com.abin.mallchat.common.user.domain.vo.request.friend.FriendCheckReq;
 import com.abin.mallchat.common.user.domain.vo.response.friend.FriendApplyResp;
 import com.abin.mallchat.common.user.domain.vo.response.friend.FriendCheckResp;
+import com.abin.mallchat.common.user.domain.vo.response.friend.FriendResp;
 import com.abin.mallchat.common.user.domain.vo.response.friend.FriendUnreadResp;
-import com.abin.mallchat.common.user.domain.vo.response.ws.ChatMemberResp;
 import com.abin.mallchat.common.user.service.FriendService;
 import com.abin.mallchat.common.user.service.adapter.FriendAdapter;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -138,12 +137,16 @@ public class FriendServiceImpl implements FriendService {
             return PageBaseResp.empty();
         }
         //将这些申请列表设为已读
+        readApples(uid, userApplyIPage);
+        //返回消息
+        return PageBaseResp.init(userApplyIPage, FriendAdapter.buildFriendApplyList(userApplyIPage.getRecords()));
+    }
+
+    private void readApples(Long uid, IPage<UserApply> userApplyIPage) {
         List<Long> applyIds = userApplyIPage.getRecords()
                 .stream().map(UserApply::getId)
                 .collect(Collectors.toList());
         userApplyDao.readApples(uid, applyIds);
-        //返回消息
-        return PageBaseResp.init(userApplyIPage, FriendAdapter.buildFriendApplyList(userApplyIPage.getRecords()));
     }
 
     /**
@@ -171,9 +174,6 @@ public class FriendServiceImpl implements FriendService {
         createFriend(uid, userApply.getUid());
         //创建一个聊天房间
         RoomFriend roomFriend = roomService.createFriendRoom(Arrays.asList(uid, userApply.getUid()));
-//        //创建双方的会话
-//        contactService.createContact(uid, roomFriend.getRoomId());
-//        contactService.createContact(userApply.getUid(), roomFriend.getRoomId());
         //发送一条同意消息。。我们已经是好友了，开始聊天吧
         chatService.sendMsg(MessageAdapter.buildAgreeMsg(roomFriend.getRoomId()), uid);
     }
@@ -199,7 +199,7 @@ public class FriendServiceImpl implements FriendService {
     }
 
     @Override
-    public CursorPageBaseResp<ChatMemberResp> friendList(Long uid, CursorPageBaseReq request) {
+    public CursorPageBaseResp<FriendResp> friendList(Long uid, CursorPageBaseReq request) {
         CursorPageBaseResp<UserFriend> friendPage = userFriendDao.getFriendPage(uid, request);
         if (CollectionUtils.isEmpty(friendPage.getList())) {
             return CursorPageBaseResp.empty();
@@ -207,8 +207,8 @@ public class FriendServiceImpl implements FriendService {
         List<Long> friendUids = friendPage.getList()
                 .stream().map(UserFriend::getFriendUid)
                 .collect(Collectors.toList());
-        List<User> userList = userDao.getUserList(friendUids);
-        return CursorPageBaseResp.init(friendPage, MemberAdapter.buildMember(friendPage.getList(), userList));
+        List<User> userList = userDao.getFriendList(friendUids);
+        return CursorPageBaseResp.init(friendPage, FriendAdapter.buildFriend(friendPage.getList(), userList));
     }
 
     private void createFriend(Long uid, Long targetUid) {

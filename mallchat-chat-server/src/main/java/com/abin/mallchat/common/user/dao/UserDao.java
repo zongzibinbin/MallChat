@@ -60,11 +60,10 @@ public class UserDao extends ServiceImpl<UserMapper, User> {
 
     }
 
-    public List<User> getUserList(List<Long> uids) {
+    public List<User> getFriendList(List<Long> uids) {
         return lambdaQuery()
                 .in(User::getId, uids)
-                .orderByDesc(User::getId)
-                .select(User::getId, User::getActiveStatus, User::getLastOptTime)
+                .select(User::getId, User::getActiveStatus, User::getName, User::getAvatar)
                 .list();
 
     }

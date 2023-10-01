@@ -38,9 +38,13 @@ public abstract class AbstractRedisStringCache<IN, OUT> implements BatchCache<IN
         if (CollectionUtil.isEmpty(req)) {//防御性编程
             return new HashMap<>();
         }
+        //去重
         req = req.stream().distinct().collect(Collectors.toList());
+        //组装key
         List<String> keys = req.stream().map(this::getKey).collect(Collectors.toList());
+        //批量get
         List<OUT> valueList = RedisUtils.mget(keys, outClass);
+        //差集计算
         List<IN> loadReqs = new ArrayList<>();
         for (int i = 0; i < valueList.size(); i++) {
             if (Objects.isNull(valueList.get(i))) {
@@ -50,6 +54,7 @@ public abstract class AbstractRedisStringCache<IN, OUT> implements BatchCache<IN
         Map<IN, OUT> load = new HashMap<>();
         //不足的重新加载进redis
         if (CollectionUtil.isNotEmpty(loadReqs)) {
+            //批量load
             load = load(loadReqs);
             Map<String, OUT> loadMap = load.entrySet().stream()
                     .map(a -> Pair.of(getKey(a.getKey()), a.getValue()))

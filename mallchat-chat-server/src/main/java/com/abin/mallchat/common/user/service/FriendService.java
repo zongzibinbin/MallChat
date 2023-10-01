@@ -9,8 +9,8 @@ import com.abin.mallchat.common.user.domain.vo.request.friend.FriendApproveReq;
 import com.abin.mallchat.common.user.domain.vo.request.friend.FriendCheckReq;
 import com.abin.mallchat.common.user.domain.vo.response.friend.FriendApplyResp;
 import com.abin.mallchat.common.user.domain.vo.response.friend.FriendCheckResp;
+import com.abin.mallchat.common.user.domain.vo.response.friend.FriendResp;
 import com.abin.mallchat.common.user.domain.vo.response.friend.FriendUnreadResp;
-import com.abin.mallchat.common.user.domain.vo.response.ws.ChatMemberResp;
 
 /**
  * @author : limeng
@@ -69,5 +69,5 @@ public interface FriendService {
      */
     void deleteFriend(Long uid, Long friendUid);
 
-    CursorPageBaseResp<ChatMemberResp> friendList(Long uid, CursorPageBaseReq request);
+    CursorPageBaseResp<FriendResp> friendList(Long uid, CursorPageBaseReq request);
 }
