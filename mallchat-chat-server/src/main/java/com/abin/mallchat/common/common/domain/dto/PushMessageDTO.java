@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Description: 推送给用户的消息对象
@@ -24,7 +26,7 @@ public class PushMessageDTO implements Serializable {
     /**
      * 推送的uid
      */
-    private Long uid;
+    private List<Long> uidList;
 
     /**
      * 推送类型 1个人 2全员
@@ -34,7 +36,13 @@ public class PushMessageDTO implements Serializable {
     private Integer pushType;
 
     public PushMessageDTO(Long uid, WSBaseResp<?> wsBaseMsg) {
-        this.uid = uid;
+        this.uidList = Collections.singletonList(uid);
+        this.wsBaseMsg = wsBaseMsg;
+        this.pushType = WSPushTypeEnum.USER.getType();
+    }
+
+    public PushMessageDTO(List<Long> uidList, WSBaseResp<?> wsBaseMsg) {
+        this.uidList = uidList;
         this.wsBaseMsg = wsBaseMsg;
         this.pushType = WSPushTypeEnum.USER.getType();
     }

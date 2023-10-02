@@ -20,9 +20,7 @@ public class PushService {
     private MQProducer mqProducer;
 
     public void sendPushMsg(WSBaseResp<?> msg, List<Long> uidList) {
-        uidList.parallelStream().forEach(uid -> {
-            mqProducer.sendMsg(MQConstant.PUSH_TOPIC, new PushMessageDTO(uid, msg));
-        });
+        mqProducer.sendMsg(MQConstant.PUSH_TOPIC, new PushMessageDTO(uidList, msg));
     }
 
     public void sendPushMsg(WSBaseResp<?> msg, Long uid) {

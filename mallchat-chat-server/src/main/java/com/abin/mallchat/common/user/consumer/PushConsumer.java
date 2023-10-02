@@ -26,7 +26,9 @@ public class PushConsumer implements RocketMQListener<PushMessageDTO> {
         WSPushTypeEnum wsPushTypeEnum = WSPushTypeEnum.of(message.getPushType());
         switch (wsPushTypeEnum) {
             case USER:
-                webSocketService.sendToUid(message.getWsBaseMsg(), message.getUid());
+                message.getUidList().forEach(uid -> {
+                    webSocketService.sendToUid(message.getWsBaseMsg(), uid);
+                });
                 break;
             case ALL:
                 webSocketService.sendToAllOnline(message.getWsBaseMsg(), null);
