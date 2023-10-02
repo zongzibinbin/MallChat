@@ -3,7 +3,6 @@ package com.abin.mallchat.common.chat.service.strategy.msg;
 import com.abin.mallchat.common.chat.dao.MessageDao;
 import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.chat.domain.enums.MessageTypeEnum;
-import com.abin.mallchat.common.chat.domain.vo.request.ChatMessageReq;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +12,7 @@ import org.springframework.stereotype.Component;
  * Date: 2023-06-04
  */
 @Component
-public class SystemMsgHandler extends AbstractMsgHandler {
+public class SystemMsgHandler extends AbstractMsgHandler<String> {
 
     @Autowired
     private MessageDao messageDao;
@@ -24,14 +23,10 @@ public class SystemMsgHandler extends AbstractMsgHandler {
     }
 
     @Override
-    public void checkMsg(ChatMessageReq request, Long uid) {
-    }
-
-    @Override
-    public void saveMsg(Message msg, ChatMessageReq request) {
+    public void saveMsg(Message msg, String body) {
         Message update = new Message();
         update.setId(msg.getId());
-        update.setContent((String) request.getBody());
+        update.setContent(body);
         messageDao.updateById(update);
     }
 

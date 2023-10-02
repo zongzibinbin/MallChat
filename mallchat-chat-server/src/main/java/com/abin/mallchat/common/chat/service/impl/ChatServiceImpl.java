@@ -104,15 +104,11 @@ public class ChatServiceImpl implements ChatService {
     @Transactional
     public Long sendMsg(ChatMessageReq request, Long uid) {
         check(request, uid);
-        AbstractMsgHandler msgHandler = MsgHandlerFactory.getStrategyNoNull(request.getMsgType());//todo 这里先不扩展，后续再改
-        msgHandler.checkMsg(request, uid);
-        //同步获取消息的跳转链接标题
-        Message insert = MessageAdapter.buildMsgSave(request, uid);
-        messageDao.save(insert);
-        msgHandler.saveMsg(insert, request);
+        AbstractMsgHandler<?> msgHandler = MsgHandlerFactory.getStrategyNoNull(request.getMsgType());
+        Long msgId = msgHandler.checkAndSaveMsg(request, uid);
         //发布消息发送事件
-        applicationEventPublisher.publishEvent(new MessageSendEvent(this, insert.getId()));
-        return insert.getId();
+        applicationEventPublisher.publishEvent(new MessageSendEvent(this, msgId));
+        return msgId;
     }
 
     private void check(ChatMessageReq request, Long uid) {

@@ -6,7 +6,6 @@ import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.chat.domain.entity.msg.MessageExtra;
 import com.abin.mallchat.common.chat.domain.entity.msg.MsgRecall;
 import com.abin.mallchat.common.chat.domain.enums.MessageTypeEnum;
-import com.abin.mallchat.common.chat.domain.vo.request.ChatMessageReq;
 import com.abin.mallchat.common.chat.service.cache.MsgCache;
 import com.abin.mallchat.common.common.event.MessageRecallEvent;
 import com.abin.mallchat.common.user.domain.entity.User;
@@ -24,7 +23,7 @@ import java.util.Objects;
  * Date: 2023-06-04
  */
 @Component
-public class RecallMsgHandler extends AbstractMsgHandler {
+public class RecallMsgHandler extends AbstractMsgHandler<Object> {
     @Autowired
     private MessageDao messageDao;
     @Autowired
@@ -40,12 +39,7 @@ public class RecallMsgHandler extends AbstractMsgHandler {
     }
 
     @Override
-    public void checkMsg(ChatMessageReq request, Long uid) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void saveMsg(Message msg, ChatMessageReq request) {
+    public void saveMsg(Message msg, Object body) {
         throw new UnsupportedOperationException();
     }
 

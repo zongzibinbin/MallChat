@@ -1,13 +1,10 @@
 package com.abin.mallchat.common.chat.service.strategy.msg;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.abin.mallchat.common.chat.dao.MessageDao;
 import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.chat.domain.entity.msg.MessageExtra;
 import com.abin.mallchat.common.chat.domain.entity.msg.VideoMsgDTO;
 import com.abin.mallchat.common.chat.domain.enums.MessageTypeEnum;
-import com.abin.mallchat.common.chat.domain.vo.request.ChatMessageReq;
-import com.abin.mallchat.common.common.utils.AssertUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +16,7 @@ import java.util.Optional;
  * Date: 2023-06-04
  */
 @Component
-public class VideoMsgHandler extends AbstractMsgHandler {
+public class VideoMsgHandler extends AbstractMsgHandler<VideoMsgDTO> {
     @Autowired
     private MessageDao messageDao;
 
@@ -29,14 +26,7 @@ public class VideoMsgHandler extends AbstractMsgHandler {
     }
 
     @Override
-    public void checkMsg(ChatMessageReq request, Long uid) {
-        VideoMsgDTO body = BeanUtil.toBean(request.getBody(), VideoMsgDTO.class);
-        AssertUtil.allCheckValidateThrow(body);
-    }
-
-    @Override
-    public void saveMsg(Message msg, ChatMessageReq request) {
-        VideoMsgDTO body = BeanUtil.toBean(request.getBody(), VideoMsgDTO.class);
+    public void saveMsg(Message msg, VideoMsgDTO body) {
         MessageExtra extra = Optional.ofNullable(msg.getExtra()).orElse(new MessageExtra());
         Message update = new Message();
         update.setId(msg.getId());
