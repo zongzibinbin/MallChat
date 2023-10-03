@@ -104,6 +104,7 @@ public class SecureInvokeService {
     public void doInvoke(SecureInvokeRecord record) {
         SecureInvokeDTO secureInvokeDTO = record.getSecureInvokeDTO();
         try {
+            SecureInvokeHolder.setInvoking();
             Class<?> beanClass = Class.forName(secureInvokeDTO.getClassName());
             Object bean = SpringUtil.getBean(beanClass);
             List<String> parameterStrings = JsonUtils.toList(secureInvokeDTO.getParameterTypes(), String.class);
@@ -118,6 +119,8 @@ public class SecureInvokeService {
             log.error("SecureInvokeService invoke fail", e);
             //执行失败，等待下次执行
             retryRecord(record, e.getMessage());
+        } finally {
+            SecureInvokeHolder.invoked();
         }
     }
 

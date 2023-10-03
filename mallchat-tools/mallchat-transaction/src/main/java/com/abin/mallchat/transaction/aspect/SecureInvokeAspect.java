@@ -1,8 +1,10 @@
 package com.abin.mallchat.transaction.aspect;
 
+import cn.hutool.core.date.DateUtil;
 import com.abin.mallchat.transaction.annotation.SecureInvoke;
 import com.abin.mallchat.transaction.domain.dto.SecureInvokeDTO;
 import com.abin.mallchat.transaction.domain.entity.SecureInvokeRecord;
+import com.abin.mallchat.transaction.service.SecureInvokeHolder;
 import com.abin.mallchat.transaction.service.SecureInvokeService;
 import com.abin.mallchat.utils.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.lang.reflect.Method;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -39,7 +42,7 @@ public class SecureInvokeAspect {
         boolean async = secureInvoke.async();
         boolean inTransaction = TransactionSynchronizationManager.isActualTransactionActive();
         //非事务状态，直接执行，不做任何保证。
-        if (!inTransaction) {
+        if (SecureInvokeHolder.isInvoking() || !inTransaction) {
             return joinPoint.proceed();
         }
         Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
@@ -53,6 +56,7 @@ public class SecureInvokeAspect {
         SecureInvokeRecord record = SecureInvokeRecord.builder()
                 .secureInvokeDTO(dto)
                 .maxRetryTimes(secureInvoke.maxRetryTimes())
+                .nextRetryTime(DateUtil.offsetMinute(new Date(), (int) SecureInvokeService.RETRY_INTERVAL_MINUTES))
                 .build();
         secureInvokeService.invoke(record, async);
         return null;

@@ -9,11 +9,14 @@ import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -33,6 +36,14 @@ public class DaoTest {
     @Autowired
     private JwtUtils jwtUtils;
 
+    @Autowired
+    private RocketMQTemplate rocketMQTemplate;
+
+    @Test
+    public void sendMQ() {
+        Message<String> build = MessageBuilder.withPayload("123").build();
+        rocketMQTemplate.send("test-topic", build);
+    }
 
     @Test
     public void jwt() {

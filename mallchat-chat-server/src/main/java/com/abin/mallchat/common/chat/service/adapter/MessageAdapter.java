@@ -51,7 +51,7 @@ public class MessageAdapter {
         ChatMessageResp.Message messageVO = new ChatMessageResp.Message();
         BeanUtil.copyProperties(message, messageVO);
         messageVO.setSendTime(message.getCreateTime());
-        AbstractMsgHandler msgHandler = MsgHandlerFactory.getStrategyNoNull(message.getType());
+        AbstractMsgHandler<?> msgHandler = MsgHandlerFactory.getStrategyNoNull(message.getType());
         if (Objects.nonNull(msgHandler)) {
             messageVO.setBody(msgHandler.showMsg(message));
         }

@@ -44,13 +44,12 @@ public class RecallMsgHandler extends AbstractMsgHandler<Object> {
     }
 
     @Override
-    public Object showMsg(Message msg) {//todo 后期让前端来做
+    public Object showMsg(Message msg) {
         MsgRecall recall = msg.getExtra().getRecall();
+        User userInfo = userCache.getUserInfo(recall.getRecallUid());
         if (!Objects.equals(recall.getRecallUid(), msg.getFromUid())) {
-            User userInfo = userCache.getUserInfo(recall.getRecallUid());
             return "管理员\"" + userInfo.getName() + "\"撤回了一条成员消息";
         }
-        User userInfo = userCache.getUserInfo(msg.getFromUid());
         return "\"" + userInfo.getName() + "\"撤回了一条消息";
     }
 
