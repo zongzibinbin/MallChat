@@ -56,6 +56,11 @@
             </dependency>
             <dependency>
                 <groupId>com.abin.mallchat</groupId>
+                <artifactId>mallchat-oss-starter</artifactId>
+                <version>${version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.abin.mallchat</groupId>
                 <artifactId>mallchat-transaction</artifactId>
                 <version>${version}</version>
             </dependency>

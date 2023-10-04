@@ -1,7 +1,5 @@
-package com.abin.mallchat.common.common.config;
+package com.abin.mallchat.oss;
 
-import com.abin.mallchat.common.common.utils.oss.MinIOTemplate;
-import com.abin.mallchat.common.common.utils.oss.OssProperties;
 import io.minio.MinioClient;
 import lombok.SneakyThrows;
 import org.springframework.boot.autoconfigure.condition.*;

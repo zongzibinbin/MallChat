@@ -21,6 +21,10 @@
             <artifactId>mallchat-transaction</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.abin.mallchat</groupId>
+            <artifactId>mallchat-oss-starter</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.knuddels</groupId>
             <artifactId>jtokkit</artifactId>
             <version>0.6.1</version>

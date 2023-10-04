@@ -1,4 +1,4 @@
-package com.abin.mallchat.common.common.utils.oss.domain;
+package com.abin.mallchat.oss.domain;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;

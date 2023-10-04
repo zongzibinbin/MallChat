@@ -1,4 +1,4 @@
-package com.abin.mallchat.common.common.utils.oss;
+package com.abin.mallchat.oss;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

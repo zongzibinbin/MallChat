@@ -2,9 +2,9 @@ package com.abin.mallchat.common.user.controller;
 
 import com.abin.mallchat.common.common.domain.vo.response.ApiResult;
 import com.abin.mallchat.common.common.utils.RequestHolder;
-import com.abin.mallchat.common.common.utils.oss.domain.OssResp;
 import com.abin.mallchat.common.user.domain.vo.request.oss.UploadUrlReq;
 import com.abin.mallchat.common.user.service.OssService;
+import com.abin.mallchat.oss.domain.OssResp;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,7 @@
 package com.abin.mallchat.common.user.service;
 
-import com.abin.mallchat.common.common.utils.oss.domain.OssResp;
 import com.abin.mallchat.common.user.domain.vo.request.oss.UploadUrlReq;
+import com.abin.mallchat.oss.domain.OssResp;
 
 /**
  * <p>

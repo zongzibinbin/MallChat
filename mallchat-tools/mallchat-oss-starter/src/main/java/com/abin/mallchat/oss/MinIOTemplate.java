@@ -1,11 +1,11 @@
-package com.abin.mallchat.common.common.utils.oss;
+package com.abin.mallchat.oss;
 
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.util.StrUtil;
-import com.abin.mallchat.common.common.utils.oss.domain.OssReq;
-import com.abin.mallchat.common.common.utils.oss.domain.OssResp;
+import com.abin.mallchat.oss.domain.OssReq;
+import com.abin.mallchat.oss.domain.OssResp;
 import io.minio.*;
 import io.minio.http.Method;
 import io.minio.messages.Bucket;
