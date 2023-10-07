@@ -1,10 +1,8 @@
 package com.abin.mallchat.common.chat.domain.entity.msg;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -15,15 +13,13 @@ import java.io.Serializable;
  * Author: <a href="https://github.com/zongzibinbin">abin</a>
  * Date: 2023-06-04
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ImgMsgDTO implements Serializable {
+public class ImgMsgDTO extends BaseFileDTO implements Serializable {
     private static final long serialVersionUID = 1L;
-    @ApiModelProperty("大小（字节）")
-    @NotNull
-    private Long size;
 
     @ApiModelProperty("宽度（像素）")
     @NotNull
@@ -33,9 +29,6 @@ public class ImgMsgDTO implements Serializable {
     @NotNull
     private Integer height;
 
-    @ApiModelProperty("下载地址")
-    @NotBlank
-    private String url;
 }
 
 
