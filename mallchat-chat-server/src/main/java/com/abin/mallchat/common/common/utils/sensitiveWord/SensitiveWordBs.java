@@ -24,7 +24,7 @@ public class SensitiveWordBs {
     /**
      * 敏感词列表
      */
-    private IWordDeny wordDeny;
+    private IWordFactory wordDeny;
 
     public static SensitiveWordBs newInstance() {
         return new SensitiveWordBs();
@@ -40,7 +40,7 @@ public class SensitiveWordBs {
      */
     public SensitiveWordBs init() {
 
-        List<String> words = wordDeny.deny();
+        List<String> words = wordDeny.getWordList();
         loadWord(words);
         return this;
     }
@@ -60,11 +60,11 @@ public class SensitiveWordBs {
         return this;
     }
 
-    public SensitiveWordBs sensitiveWord(IWordDeny wordDeny) {
-        if (wordDeny == null) {
-            throw new IllegalArgumentException("wordDeny can not be null");
+    public SensitiveWordBs sensitiveWord(IWordFactory wordFactory) {
+        if (wordFactory == null) {
+            throw new IllegalArgumentException("wordFactory can not be null");
         }
-        this.wordDeny = wordDeny;
+        this.wordDeny = wordFactory;
         return this;
     }
 

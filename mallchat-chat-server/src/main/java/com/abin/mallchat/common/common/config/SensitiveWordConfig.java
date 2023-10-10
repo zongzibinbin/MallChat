@@ -2,7 +2,7 @@ package com.abin.mallchat.common.common.config;
 
 import com.abin.mallchat.common.common.utils.sensitiveWord.DFAFilter;
 import com.abin.mallchat.common.common.utils.sensitiveWord.SensitiveWordBs;
-import com.abin.mallchat.common.sensitive.MyWordDeny;
+import com.abin.mallchat.common.sensitive.MyWordFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 public class SensitiveWordConfig {
 
     @Autowired
-    private MyWordDeny myWordDeny;
+    private MyWordFactory myWordFactory;
 
     /**
      * 初始化引导类
@@ -23,7 +23,7 @@ public class SensitiveWordConfig {
     public SensitiveWordBs sensitiveWordBs() {
         return SensitiveWordBs.newInstance()
                 .filterStrategy(DFAFilter.getInstance())
-                .sensitiveWord(myWordDeny)
+                .sensitiveWord(myWordFactory)
                 .init();
     }
 

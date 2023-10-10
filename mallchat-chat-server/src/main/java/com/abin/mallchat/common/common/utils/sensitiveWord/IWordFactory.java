@@ -8,12 +8,12 @@ import java.util.List;
  * @author zhaoyuhang
  * @date 2023/07/09
  */
-public interface IWordDeny {
+public interface IWordFactory {
     /**
-     * 获取结果
+     * 返回敏感词数据源
      *
      * @return 结果
      * @since 0.0.13
      */
-    List<String> deny();
+    List<String> getWordList();
 }

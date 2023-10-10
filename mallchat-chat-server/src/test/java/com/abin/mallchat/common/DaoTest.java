@@ -5,6 +5,9 @@ import com.abin.mallchat.common.common.utils.JwtUtils;
 import com.abin.mallchat.common.user.domain.enums.ItemEnum;
 import com.abin.mallchat.common.user.service.IUserBackpackService;
 import com.abin.mallchat.common.user.service.LoginService;
+import com.abin.mallchat.oss.MinIOTemplate;
+import com.abin.mallchat.oss.domain.OssReq;
+import com.abin.mallchat.oss.domain.OssResp;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
@@ -38,6 +41,20 @@ public class DaoTest {
 
     @Autowired
     private RocketMQTemplate rocketMQTemplate;
+
+    @Autowired
+    private MinIOTemplate minIOTemplate;
+
+    @Test
+    public void getUploadUrl() {
+        OssReq ossReq = OssReq.builder()
+                .fileName("test.jpeg")
+                .filePath("/test")
+                .autoPath(false)
+                .build();
+        OssResp preSignedObjectUrl = minIOTemplate.getPreSignedObjectUrl(ossReq);
+        System.out.println(preSignedObjectUrl);
+    }
 
     @Test
     public void sendMQ() {

@@ -1,6 +1,6 @@
 package com.abin.mallchat.common.sensitive;
 
-import com.abin.mallchat.common.common.utils.sensitiveWord.IWordDeny;
+import com.abin.mallchat.common.common.utils.sensitiveWord.IWordFactory;
 import com.abin.mallchat.common.sensitive.dao.SensitiveWordDao;
 import com.abin.mallchat.common.sensitive.domain.SensitiveWord;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,12 +10,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class MyWordDeny implements IWordDeny {
+public class MyWordFactory implements IWordFactory {
     @Autowired
     private SensitiveWordDao sensitiveWordDao;
 
     @Override
-    public List<String> deny() {
+    public List<String> getWordList() {
         return sensitiveWordDao.list()
                 .stream()
                 .map(SensitiveWord::getWord)

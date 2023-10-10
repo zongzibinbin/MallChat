@@ -65,7 +65,6 @@ public class MinIOTemplate {
     public void makeBucket(String bucketName) {
         if (!bucketExists(bucketName)) {
             minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
-
         }
     }
 
@@ -80,7 +79,7 @@ public class MinIOTemplate {
     }
 
     /**
-     * 返回临时带签名、过期时间一天、Get请求方式的访问URL
+     * 返回临时带签名、过期时间一天、PUT请求方式的访问URL
      */
     @SneakyThrows
     public OssResp getPreSignedObjectUrl(OssReq req) {
