@@ -1,7 +1,10 @@
 package com.abin.mallchat.common.chat.domain.entity.msg;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.NotBlank;
@@ -9,20 +12,23 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
- * Description: 语音消息入参
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-06-04
+ * @author: Quan
+ * @description:    文件基类
+ * @date: 2023/10/07 下午 2:47
  */
-@EqualsAndHashCode(callSuper = true)
+
+
 @Data
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class FileMsgDTO extends BaseFileDTO implements Serializable {
+public class BaseFileDTO implements Serializable {
     private static final long serialVersionUID = 1L;
+    @ApiModelProperty("大小（字节）")
+    @NotNull
+    private Long size;
 
-    @ApiModelProperty("文件名（带后缀）")
+    @ApiModelProperty("下载地址")
     @NotBlank
-    private String fileName;
-
+    private String url;
 }
