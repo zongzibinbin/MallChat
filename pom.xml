@@ -8,8 +8,7 @@
     <artifactId>mallchat</artifactId>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>mallchat-common</module>
-        <module>mallchat-custom-server</module>
+        <module>mallchat-chat-server</module>
         <module>mallchat-tools</module>
     </modules>
     <packaging>pom</packaging>
@@ -35,11 +34,9 @@
         <mysql-connector.version>8.0.29</mysql-connector.version>
         <spring-data-commons.version>2.7.5</spring-data-commons.version>
         <jjwt.version>0.9.1</jjwt.version>
-        <aliyun-oss.version>3.16.0</aliyun-oss.version>
         <logstash-logback.version>7.2</logstash-logback.version>
         <minio.version>8.4.5</minio.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
-        <mallchat-common.version>1.0-SNAPSHOT</mallchat-common.version>
         <lombok.version>1.18.10</lombok.version>
         <netty-all.version>4.1.76.Final</netty-all.version>
         <weixin-java-mp.version>4.4.0</weixin-java-mp.version>
@@ -53,8 +50,18 @@
         <dependencies>
             <dependency>
                 <groupId>com.abin.mallchat</groupId>
-                <artifactId>mallchat-common</artifactId>
-                <version>${mallchat-common.version}</version>
+                <artifactId>mallchat-common-starter</artifactId>
+                <version>${version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.abin.mallchat</groupId>
+                <artifactId>mallchat-oss-starter</artifactId>
+                <version>${version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.abin.mallchat</groupId>
+                <artifactId>mallchat-transaction</artifactId>
+                <version>${version}</version>
             </dependency>
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
@@ -116,11 +123,6 @@
                 <version>${jjwt.version}</version>
             </dependency>
             <!-- 阿里云OSS -->
-            <dependency>
-                <groupId>com.aliyun.oss</groupId>
-                <artifactId>aliyun-sdk-oss</artifactId>
-                <version>${aliyun-oss.version}</version>
-            </dependency>
             <dependency>
                 <groupId>io.minio</groupId>
                 <artifactId>minio</artifactId>

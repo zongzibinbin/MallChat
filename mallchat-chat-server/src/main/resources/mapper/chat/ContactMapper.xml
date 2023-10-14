@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abin.mallchat.common.chat.mapper.ContactMapper">
+
+    <insert id="refreshOrCreateActiveTime">
+        insert into contact(`room_id`,`uid`,`last_msg_id`,`active_time`)
+        values
+        <foreach collection="memberUidList" item="uid" separator=",">
+            (#{roomId},#{uid},#{msgId},#{activeTime})
+        </foreach>
+        on DUPLICATE KEY UPDATE
+        `last_msg_id`=VALUES(last_msg_id),
+        `active_time`=VALUES(active_time)
+    </insert>
+</mapper>
