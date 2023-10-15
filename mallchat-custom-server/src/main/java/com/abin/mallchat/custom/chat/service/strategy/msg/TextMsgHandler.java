@@ -2,6 +2,7 @@ package com.abin.mallchat.custom.chat.service.strategy.msg;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import com.abin.mallchat.common.chat.dao.GroupMemberDao;
 import com.abin.mallchat.common.chat.dao.MessageDao;
 import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.chat.domain.entity.msg.MessageExtra;
@@ -49,6 +50,8 @@ public class TextMsgHandler extends AbstractMsgHandler {
     private IRoleService iRoleService;
     @Autowired
     private SensitiveWordBs sensitiveWordBs;
+    @Autowired
+    private GroupMemberDao groupMemberDao;
 
     private static final PrioritizedUrlDiscover URL_TITLE_DISCOVER = new PrioritizedUrlDiscover();
 
@@ -61,7 +64,7 @@ public class TextMsgHandler extends AbstractMsgHandler {
     public void checkMsg(ChatMessageReq request, Long uid) {
         TextMsgReq body = BeanUtil.toBean(request.getBody(), TextMsgReq.class);
         AssertUtil.allCheckValidateThrow(body);
-        //校验下回复消息
+        // 校验下回复消息
         if (Objects.nonNull(body.getReplyMsgId())) {
             Message replyMsg = messageDao.getById(body.getReplyMsgId());
             AssertUtil.isNotEmpty(replyMsg, "回复消息不存在");
@@ -71,6 +74,10 @@ public class TextMsgHandler extends AbstractMsgHandler {
             List<Long> atUidList = body.getAtUidList();
             Map<Long, User> batch = userInfoCache.getBatch(atUidList);
             AssertUtil.equal(atUidList.size(), batch.values().size(), "@用户不存在");
+            // 判断艾特用户是否在群聊中
+            Boolean isGroupShip = groupMemberDao.isGroupShip(request.getRoomId(), atUidList);
+            AssertUtil.isTrue(isGroupShip, "艾特用户不在群聊中");
+            groupMemberDao.isGroupShip(request.getRoomId(), atUidList);
             boolean atAll = body.getAtUidList().contains(0L);
             if (atAll) {
                 AssertUtil.isTrue(iRoleService.hasPower(uid, RoleEnum.CHAT_MANAGER), "没有权限");
@@ -79,24 +86,24 @@ public class TextMsgHandler extends AbstractMsgHandler {
     }
 
     @Override
-    public void saveMsg(Message msg, ChatMessageReq request) {//插入文本内容
+    public void saveMsg(Message msg, ChatMessageReq request) {// 插入文本内容
         TextMsgReq body = BeanUtil.toBean(request.getBody(), TextMsgReq.class);
         MessageExtra extra = Optional.ofNullable(msg.getExtra()).orElse(new MessageExtra());
         Message update = new Message();
         update.setId(msg.getId());
         update.setContent(sensitiveWordBs.filter(body.getContent()));
         update.setExtra(extra);
-        //如果有回复消息
+        // 如果有回复消息
         if (Objects.nonNull(body.getReplyMsgId())) {
             Integer gapCount = messageDao.getGapCount(request.getRoomId(), body.getReplyMsgId(), msg.getId());
             update.setGapCount(gapCount);
             update.setReplyMsgId(body.getReplyMsgId());
 
         }
-        //判断消息url跳转
+        // 判断消息url跳转
         Map<String, UrlInfo> urlContentMap = URL_TITLE_DISCOVER.getUrlContentMap(body.getContent());
         extra.setUrlContentMap(urlContentMap);
-        //艾特功能
+        // 艾特功能
         if (CollectionUtil.isNotEmpty(body.getAtUidList())) {
             extra.setAtUidList(body.getAtUidList());
 
@@ -111,7 +118,7 @@ public class TextMsgHandler extends AbstractMsgHandler {
         resp.setContent(msg.getContent());
         resp.setUrlContentMap(Optional.ofNullable(msg.getExtra()).map(MessageExtra::getUrlContentMap).orElse(null));
         resp.setAtUidList(Optional.ofNullable(msg.getExtra()).map(MessageExtra::getAtUidList).orElse(null));
-        //回复消息
+        // 回复消息
         Optional<Message> reply = Optional.ofNullable(msg.getReplyMsgId())
                 .map(msgCache::getMsg)
                 .filter(a -> Objects.equals(a.getStatus(), MessageStatusEnum.NORMAL.getStatus()));
