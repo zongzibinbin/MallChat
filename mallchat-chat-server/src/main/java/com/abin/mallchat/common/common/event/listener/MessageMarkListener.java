@@ -10,8 +10,8 @@ import com.abin.mallchat.common.common.domain.enums.IdempotentEnum;
 import com.abin.mallchat.common.common.event.MessageMarkEvent;
 import com.abin.mallchat.common.user.domain.enums.ItemEnum;
 import com.abin.mallchat.common.user.service.IUserBackpackService;
-import com.abin.mallchat.common.user.service.WebSocketService;
 import com.abin.mallchat.common.user.service.adapter.WSAdapter;
+import com.abin.mallchat.common.user.service.impl.PushService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -35,7 +35,7 @@ public class MessageMarkListener {
     @Autowired
     private IUserBackpackService iUserBackpackService;
     @Autowired
-    private WebSocketService webSocketService;
+    private PushService pushService;
 
     @Async
     @TransactionalEventListener(classes = MessageMarkEvent.class, fallbackExecution = true)
@@ -61,7 +61,7 @@ public class MessageMarkListener {
     public void notifyAll(MessageMarkEvent event) {//后续可做合并查询，目前异步影响不大
         ChatMessageMarkDTO dto = event.getDto();
         Integer markCount = messageMarkDao.getMarkCount(dto.getMsgId(), dto.getMarkType());
-        webSocketService.sendToAllOnline(WSAdapter.buildMsgMarkSend(dto, markCount), dto.getUid());
+        pushService.sendPushMsg(WSAdapter.buildMsgMarkSend(dto, markCount));
     }
 
 }
