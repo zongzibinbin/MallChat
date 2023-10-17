@@ -1,5 +1,6 @@
 package com.abin.mallchat.common.user.domain.vo.response.ws;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,6 +18,7 @@ import java.util.Date;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ChatMemberResp {
     @ApiModelProperty("uid")
     private Long uid;
@@ -25,6 +27,12 @@ public class ChatMemberResp {
      */
     @ApiModelProperty("在线状态 1在线 2离线")
     private Integer activeStatus;
+
+    /**
+     * 角色ID
+     */
+    private Integer roleId;
+
     @ApiModelProperty("最后一次上下线时间")
     private Date lastOptTime;
 }
