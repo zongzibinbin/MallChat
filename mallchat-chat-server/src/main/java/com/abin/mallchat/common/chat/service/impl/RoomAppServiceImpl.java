@@ -222,7 +222,7 @@ public class RoomAppServiceImpl implements RoomAppService {
         AssertUtil.isNotEmpty(self, "您不是群成员");
         List<Long> memberBatch = groupMemberDao.getMemberBatch(roomGroup.getId(), request.getUidList());
         Set<Long> existUid = new HashSet<>(memberBatch);
-        List<Long> waitAddUidList = request.getUidList().stream().filter(a -> !existUid.contains(a)).collect(Collectors.toList());
+        List<Long> waitAddUidList = request.getUidList().stream().filter(a -> !existUid.contains(a)).distinct().collect(Collectors.toList());
         if (CollectionUtils.isEmpty(waitAddUidList)) {
             return;
         }
@@ -350,7 +350,6 @@ public class RoomAppServiceImpl implements RoomAppService {
                     return userBatch.get(friendUid);
                 }));
     }
-
     private Map<Long, RoomBaseInfo> getRoomBaseInfoMap(List<Long> roomIds, Long uid) {
         Map<Long, Room> roomMap = roomCache.getBatch(roomIds);
         //房间根据好友和群组类型分组
