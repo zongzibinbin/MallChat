@@ -95,7 +95,7 @@ public class ChatServiceImpl implements ChatService {
     @Autowired
     private RoomGroupCache roomGroupCache;
     @Autowired
-    private MQProducer mqProducer;
+    private RoomGroupDao roomGroupDao;
 
     /**
      * 发送消息
@@ -141,7 +141,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public CursorPageBaseResp<ChatMemberResp> getMemberPage(List<Long> memberUidList, CursorPageBaseReq request) {
+    public CursorPageBaseResp<ChatMemberResp> getMemberPage(List<Long> memberUidList, MemberReq request) {
         Pair<ChatActiveStatusEnum, String> pair = ChatMemberHelper.getCursorPair(request.getCursor());
         ChatActiveStatusEnum activeStatusEnum = pair.getKey();
         String timeCursor = pair.getValue();
@@ -164,6 +164,11 @@ public class ChatServiceImpl implements ChatService {
             timeCursor = cursorPage.getCursor();
             isLast = cursorPage.getIsLast();
         }
+        // 获取群成员角色ID
+        List<Long> uidList = resultList.stream().map(ChatMemberResp::getUid).collect(Collectors.toList());
+        RoomGroup roomGroup = roomGroupDao.getByRoomId(request.getRoomId());
+        Map<Long, Integer> uidMapRole = groupMemberDao.getMemberMapRole(roomGroup.getId(), uidList);
+        resultList.forEach(member -> member.setRoleId(uidMapRole.get(member.getUid())));
         //组装结果
         return new CursorPageBaseResp<>(ChatMemberHelper.generateCursor(activeStatusEnum, timeCursor), isLast, resultList);
     }

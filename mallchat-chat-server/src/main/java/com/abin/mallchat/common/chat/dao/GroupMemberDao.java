@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -49,5 +50,21 @@ public class GroupMemberDao extends ServiceImpl<GroupMemberMapper, GroupMember> 
                 .eq(GroupMember::getUid, uid)
                 .eq(GroupMember::getRole, GroupRoleEnum.LEADER.getType())
                 .list();
+    }
+
+    /**
+     * 批量获取成员群角色
+     *
+     * @param groupId 群ID
+     * @param uidList 用户列表
+     * @return 成员群角色列表
+     */
+    public Map<Long, Integer> getMemberMapRole(Long groupId, List<Long> uidList) {
+        List<GroupMember> list = lambdaQuery()
+                .eq(GroupMember::getGroupId, groupId)
+                .in(GroupMember::getUid, uidList)
+                .select(GroupMember::getUid, GroupMember::getRole)
+                .list();
+        return list.stream().collect(Collectors.toMap(GroupMember::getUid, GroupMember::getRole));
     }
 }
