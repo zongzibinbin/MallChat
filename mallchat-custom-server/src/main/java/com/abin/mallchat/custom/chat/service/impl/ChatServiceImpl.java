@@ -95,7 +95,7 @@ public class ChatServiceImpl implements ChatService {
     @Autowired
     private RoomGroupCache roomGroupCache;
     @Autowired
-    private MQProducer mqProducer;
+    private RoomGroupDao roomGroupDao;
 
     /**
      * 发送消息
@@ -104,20 +104,20 @@ public class ChatServiceImpl implements ChatService {
     @Transactional
     public Long sendMsg(ChatMessageReq request, Long uid) {
         check(request, uid);
-        AbstractMsgHandler msgHandler = MsgHandlerFactory.getStrategyNoNull(request.getMsgType());//todo 这里先不扩展，后续再改
+        AbstractMsgHandler msgHandler = MsgHandlerFactory.getStrategyNoNull(request.getMsgType());// todo 这里先不扩展，后续再改
         msgHandler.checkMsg(request, uid);
-        //同步获取消息的跳转链接标题
+        // 同步获取消息的跳转链接标题
         Message insert = MessageAdapter.buildMsgSave(request, uid);
         messageDao.save(insert);
         msgHandler.saveMsg(insert, request);
-        //发布消息发送事件
+        // 发布消息发送事件
         applicationEventPublisher.publishEvent(new MessageSendEvent(this, insert.getId()));
         return insert.getId();
     }
 
     private void check(ChatMessageReq request, Long uid) {
         Room room = roomCache.get(request.getRoomId());
-        if (room.isHotRoom()) {//全员群跳过校验
+        if (room.isHotRoom()) {// 全员群跳过校验
             return;
         }
         if (room.isRoomFriend()) {
@@ -145,36 +145,41 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public CursorPageBaseResp<ChatMemberResp> getMemberPage(List<Long> memberUidList, CursorPageBaseReq request) {
+    public CursorPageBaseResp<ChatMemberResp> getMemberPage(List<Long> memberUidList, MemberReq request) {
         Pair<ChatActiveStatusEnum, String> pair = ChatMemberHelper.getCursorPair(request.getCursor());
         ChatActiveStatusEnum activeStatusEnum = pair.getKey();
         String timeCursor = pair.getValue();
-        List<ChatMemberResp> resultList = new ArrayList<>();//最终列表
+        List<ChatMemberResp> resultList = new ArrayList<>();// 最终列表
         Boolean isLast = Boolean.FALSE;
         if (activeStatusEnum == ChatActiveStatusEnum.ONLINE) {//在线列表
             CursorPageBaseResp<User> cursorPage = userDao.getCursorPage(memberUidList, new CursorPageBaseReq(request.getPageSize(), timeCursor), ChatActiveStatusEnum.ONLINE);
-            resultList.addAll(MemberAdapter.buildMember(cursorPage.getList()));//添加在线列表
+            resultList.addAll(MemberAdapter.buildMember(request.getRoomId(), cursorPage.getList()));//添加在线列表
             if (cursorPage.getIsLast()) {//如果是最后一页,从离线列表再补点数据
                 activeStatusEnum = ChatActiveStatusEnum.OFFLINE;
                 Integer leftSize = request.getPageSize() - cursorPage.getList().size();
                 cursorPage = userDao.getCursorPage(memberUidList, new CursorPageBaseReq(leftSize, null), ChatActiveStatusEnum.OFFLINE);
-                resultList.addAll(MemberAdapter.buildMember(cursorPage.getList()));//添加离线线列表
+                resultList.addAll(MemberAdapter.buildMember(request.getRoomId(), cursorPage.getList()));//添加离线线列表
             }
             timeCursor = cursorPage.getCursor();
             isLast = cursorPage.getIsLast();
         } else if (activeStatusEnum == ChatActiveStatusEnum.OFFLINE) {//离线列表
             CursorPageBaseResp<User> cursorPage = userDao.getCursorPage(memberUidList, new CursorPageBaseReq(request.getPageSize(), timeCursor), ChatActiveStatusEnum.OFFLINE);
-            resultList.addAll(MemberAdapter.buildMember(cursorPage.getList()));//添加离线线列表
+            resultList.addAll(MemberAdapter.buildMember(request.getRoomId(), cursorPage.getList()));//添加离线线列表
             timeCursor = cursorPage.getCursor();
             isLast = cursorPage.getIsLast();
         }
-        //组装结果
+        // 获取群成员角色ID
+        List<Long> uidList = resultList.stream().map(ChatMemberResp::getUid).collect(Collectors.toList());
+        RoomGroup roomGroup = roomGroupDao.getByRoomId(request.getRoomId());
+        Map<Long, Integer> uidMapRole = groupMemberDao.getMemberMapRole(roomGroup.getId(), uidList);
+        resultList.forEach(member -> member.setRoleId(uidMapRole.get(member.getUid())));
+        // 组装结果
         return new CursorPageBaseResp<>(ChatMemberHelper.generateCursor(activeStatusEnum, timeCursor), isLast, resultList);
     }
 
     @Override
     public CursorPageBaseResp<ChatMessageResp> getMsgPage(ChatMessagePageReq request, Long receiveUid) {
-        //用最后一条消息id，来限制被踢出的人能看见的最大一条消息
+        // 用最后一条消息id，来限制被踢出的人能看见的最大一条消息
         Long lastMsgId = getLastMsgId(request.getRoomId(), receiveUid);
         CursorPageBaseResp<Message> cursorPage = messageDao.getCursorPage(request.getRoomId(), request, lastMsgId);
         if (cursorPage.isEmpty()) {
@@ -222,16 +227,16 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public void recallMsg(Long uid, ChatMessageBaseReq request) {
         Message message = messageDao.getById(request.getMsgId());
-        //校验能不能执行撤回
+        // 校验能不能执行撤回
         checkRecall(uid, message);
-        //执行消息撤回
+        // 执行消息撤回
         recallMsgHandler.recall(uid, message);
     }
 
     @Override
     @Cacheable(cacheNames = "member", key = "'memberList.'+#req.roomId")
     public List<ChatMemberListResp> getMemberList(ChatMessageMemberReq req) {
-        if (Objects.equals(1L, req.getRoomId())) {//大群聊可看见所有人
+        if (Objects.equals(1L, req.getRoomId())) {// 大群聊可看见所有人
             return userDao.getMemberList()
                     .stream()
                     .map(a -> {
@@ -259,7 +264,7 @@ public class ChatServiceImpl implements ChatService {
         AssertUtil.isNotEmpty(message, "消息id有误");
         AssertUtil.equal(uid, message.getFromUid(), "只能查看自己的消息");
         CursorPageBaseResp<Contact> page;
-        if (request.getSearchType() == 1) {//已读
+        if (request.getSearchType() == 1) {// 已读
             page = contactDao.getReadPage(message, request);
         } else {
             page = contactDao.getUnReadPage(message, request);
@@ -306,12 +311,12 @@ public class ChatServiceImpl implements ChatService {
             return new ArrayList<>();
         }
         Map<Long, Message> replyMap = new HashMap<>();
-        //批量查出回复的消息
+        // 批量查出回复的消息
         List<Long> replyIds = messages.stream().map(Message::getReplyMsgId).filter(Objects::nonNull).distinct().collect(Collectors.toList());
         if (CollectionUtil.isNotEmpty(replyIds)) {
             replyMap = messageDao.listByIds(replyIds).stream().collect(Collectors.toMap(Message::getId, Function.identity()));
         }
-        //查询消息标志
+        // 查询消息标志
         List<MessageMark> msgMark = messageMarkDao.getValidMarkByMsgIdBatch(messages.stream().map(Message::getId).collect(Collectors.toList()));
         return MessageAdapter.buildMsgResp(messages, replyMap, msgMark, receiveUid);
     }

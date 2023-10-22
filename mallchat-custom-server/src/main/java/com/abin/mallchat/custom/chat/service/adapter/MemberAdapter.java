@@ -1,7 +1,9 @@
 package com.abin.mallchat.custom.chat.service.adapter;
 
+import com.abin.mallchat.common.chat.dao.GroupMemberDao;
 import com.abin.mallchat.common.chat.domain.entity.GroupMember;
 import com.abin.mallchat.common.chat.domain.enums.GroupRoleEnum;
+import com.abin.mallchat.common.chat.service.cache.GroupMemberCache;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.domain.entity.UserFriend;
 import com.abin.mallchat.common.user.domain.enums.WSBaseResp;
@@ -32,10 +34,8 @@ import static com.abin.mallchat.common.user.domain.vo.response.ws.WSMemberChange
 @Component
 @Slf4j
 public class MemberAdapter {
-    @Autowired
-    private UserCache userCache;
 
-    public static List<ChatMemberResp> buildMember(List<User> list) {
+    public static List<ChatMemberResp> buildMember(Long roomId, List<User> list) {
         return list.stream().map(a -> {
             ChatMemberResp resp = new ChatMemberResp();
             resp.setActiveStatus(a.getActiveStatus());
