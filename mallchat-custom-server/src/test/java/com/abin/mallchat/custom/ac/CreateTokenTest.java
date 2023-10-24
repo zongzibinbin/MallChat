@@ -22,7 +22,6 @@ public class CreateTokenTest {
                 .sign(Algorithm.HMAC256("dsfsdfsdfsdfsd")); // signature
         log.info("生成的token为 {}",token);
 
-
         try {
             JWTVerifier verifier = JWT.require(Algorithm.HMAC256("dsfsdfsdfsdfsd")).build();
             DecodedJWT jwt = verifier.verify(token);

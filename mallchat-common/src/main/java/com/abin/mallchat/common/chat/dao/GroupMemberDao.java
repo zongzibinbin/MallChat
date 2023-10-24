@@ -1,19 +1,23 @@
 package com.abin.mallchat.common.chat.dao;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.abin.mallchat.common.chat.domain.entity.GroupMember;
 import com.abin.mallchat.common.chat.domain.enums.GroupRoleEnum;
 import com.abin.mallchat.common.chat.mapper.GroupMemberMapper;
 import com.abin.mallchat.common.chat.service.cache.GroupMemberCache;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.abin.mallchat.common.chat.domain.enums.GroupRoleEnum.ADMIN_LIST;
 
 /**
  * <p>
@@ -58,6 +62,7 @@ public class GroupMemberDao extends ServiceImpl<GroupMemberMapper, GroupMember> 
         List<GroupMember> list = lambdaQuery()
                 .eq(GroupMember::getGroupId, groupId)
                 .in(GroupMember::getUid, uidList)
+                .in(GroupMember::getRole, ADMIN_LIST)
                 .select(GroupMember::getUid, GroupMember::getRole)
                 .list();
         return list.stream().collect(Collectors.toMap(GroupMember::getUid, GroupMember::getRole));
@@ -87,5 +92,50 @@ public class GroupMemberDao extends ServiceImpl<GroupMemberMapper, GroupMember> 
     public Boolean isGroupShip(Long roomId, List<Long> uidList) {
         List<Long> memberUidList = groupMemberCache.getMemberUidList(roomId);
         return memberUidList.containsAll(uidList);
+    }
+
+    /**
+     * 是否是群主
+     *
+     * @param id  群组ID
+     * @param uid 用户ID
+     * @return 是否是群主
+     */
+    public Boolean isLord(Long id, Long uid) {
+        GroupMember groupMember = this.lambdaQuery()
+                .eq(GroupMember::getGroupId, id)
+                .eq(GroupMember::getUid, uid)
+                .one();
+        return ObjectUtil.isNotNull(groupMember);
+    }
+
+    /**
+     * 获取管理员uid列表
+     *
+     * @param id 群主ID
+     * @return 管理员uid列表
+     */
+    public List<Long> getManageUidList(Long id) {
+        return this.lambdaQuery()
+                .eq(GroupMember::getGroupId, id)
+                .eq(GroupMember::getRole, GroupRoleEnum.MANAGER.getType())
+                .list()
+                .stream()
+                .map(GroupMember::getUid)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 增加管理员
+     *
+     * @param id      群主ID
+     * @param uidList 用户列表
+     */
+    public void addAdmin(Long id, List<Long> uidList) {
+        LambdaUpdateWrapper<GroupMember> wrapper = new UpdateWrapper<GroupMember>().lambda()
+                .eq(GroupMember::getGroupId, id)
+                .in(GroupMember::getUid, uidList)
+                .set(GroupMember::getRole, GroupRoleEnum.MANAGER.getType());
+        this.update(wrapper);
     }
 }
