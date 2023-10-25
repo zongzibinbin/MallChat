@@ -54,7 +54,7 @@ public interface ChatService {
      * @param request
      * @return
      */
-    CursorPageBaseResp<ChatMemberResp> getMemberPage(List<Long> memberUidList, CursorPageBaseReq request);
+    CursorPageBaseResp<ChatMemberResp> getMemberPage(List<Long> memberUidList, MemberReq request);
 
     /**
      * 获取消息列表

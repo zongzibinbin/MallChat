@@ -92,6 +92,6 @@ public class Room implements Serializable {
 
     @JsonIgnore
     public boolean isRoomGroup() {
-        return RoomTypeEnum.of(this.hotFlag) == RoomTypeEnum.GROUP;
+        return RoomTypeEnum.of(this.type) == RoomTypeEnum.GROUP;
     }
 }
