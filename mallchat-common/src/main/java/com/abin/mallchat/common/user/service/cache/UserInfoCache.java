@@ -19,6 +19,11 @@ import java.util.stream.Collectors;
  */
 @Component
 public class UserInfoCache extends AbstractRedisStringCache<Long, User> {
+
+    protected UserInfoCache() {
+        super(User.class);
+    }
+
     @Autowired
     private UserDao userDao;
 
