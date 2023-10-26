@@ -151,28 +151,30 @@ public class ChatServiceImpl implements ChatService {
         String timeCursor = pair.getValue();
         List<ChatMemberResp> resultList = new ArrayList<>();// 最终列表
         Boolean isLast = Boolean.FALSE;
-        if (activeStatusEnum == ChatActiveStatusEnum.ONLINE) {//在线列表
+        if (activeStatusEnum == ChatActiveStatusEnum.ONLINE) {// 在线列表
             CursorPageBaseResp<User> cursorPage = userDao.getCursorPage(memberUidList, new CursorPageBaseReq(request.getPageSize(), timeCursor), ChatActiveStatusEnum.ONLINE);
-            resultList.addAll(MemberAdapter.buildMember(request.getRoomId(), cursorPage.getList()));//添加在线列表
-            if (cursorPage.getIsLast()) {//如果是最后一页,从离线列表再补点数据
+            resultList.addAll(MemberAdapter.buildMember(request.getRoomId(), cursorPage.getList()));// 添加在线列表
+            if (cursorPage.getIsLast()) {// 如果是最后一页,从离线列表再补点数据
                 activeStatusEnum = ChatActiveStatusEnum.OFFLINE;
                 Integer leftSize = request.getPageSize() - cursorPage.getList().size();
                 cursorPage = userDao.getCursorPage(memberUidList, new CursorPageBaseReq(leftSize, null), ChatActiveStatusEnum.OFFLINE);
-                resultList.addAll(MemberAdapter.buildMember(request.getRoomId(), cursorPage.getList()));//添加离线线列表
+                resultList.addAll(MemberAdapter.buildMember(request.getRoomId(), cursorPage.getList()));// 添加离线线列表
             }
             timeCursor = cursorPage.getCursor();
             isLast = cursorPage.getIsLast();
-        } else if (activeStatusEnum == ChatActiveStatusEnum.OFFLINE) {//离线列表
+        } else if (activeStatusEnum == ChatActiveStatusEnum.OFFLINE) {// 离线列表
             CursorPageBaseResp<User> cursorPage = userDao.getCursorPage(memberUidList, new CursorPageBaseReq(request.getPageSize(), timeCursor), ChatActiveStatusEnum.OFFLINE);
-            resultList.addAll(MemberAdapter.buildMember(request.getRoomId(), cursorPage.getList()));//添加离线线列表
+            resultList.addAll(MemberAdapter.buildMember(request.getRoomId(), cursorPage.getList()));// 添加离线线列表
             timeCursor = cursorPage.getCursor();
             isLast = cursorPage.getIsLast();
         }
-        // 获取群成员角色ID
-        List<Long> uidList = resultList.stream().map(ChatMemberResp::getUid).collect(Collectors.toList());
-        RoomGroup roomGroup = roomGroupDao.getByRoomId(request.getRoomId());
-        Map<Long, Integer> uidMapRole = groupMemberDao.getMemberMapRole(roomGroup.getId(), uidList);
-        resultList.forEach(member -> member.setRoleId(uidMapRole.get(member.getUid())));
+        if (!roomDao.getById(request.getRoomId()).isHotRoom()) {
+            // 获取群成员角色ID
+            List<Long> uidList = resultList.stream().map(ChatMemberResp::getUid).collect(Collectors.toList());
+            RoomGroup roomGroup = roomGroupDao.getByRoomId(request.getRoomId());
+            Map<Long, Integer> uidMapRole = groupMemberDao.getMemberMapRole(roomGroup.getId(), uidList);
+            resultList.forEach(member -> member.setRoleId(uidMapRole.get(member.getUid())));
+        }
         // 组装结果
         return new CursorPageBaseResp<>(ChatMemberHelper.generateCursor(activeStatusEnum, timeCursor), isLast, resultList);
     }
