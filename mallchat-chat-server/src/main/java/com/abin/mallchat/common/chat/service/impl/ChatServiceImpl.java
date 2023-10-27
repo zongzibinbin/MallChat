@@ -306,15 +306,9 @@ public class ChatServiceImpl implements ChatService {
         if (CollectionUtil.isEmpty(messages)) {
             return new ArrayList<>();
         }
-        Map<Long, Message> replyMap = new HashMap<>();
-        //批量查出回复的消息
-        List<Long> replyIds = messages.stream().map(Message::getReplyMsgId).filter(Objects::nonNull).distinct().collect(Collectors.toList());
-        if (CollectionUtil.isNotEmpty(replyIds)) {
-            replyMap = messageDao.listByIds(replyIds).stream().collect(Collectors.toMap(Message::getId, Function.identity()));
-        }
         //查询消息标志
         List<MessageMark> msgMark = messageMarkDao.getValidMarkByMsgIdBatch(messages.stream().map(Message::getId).collect(Collectors.toList()));
-        return MessageAdapter.buildMsgResp(messages, replyMap, msgMark, receiveUid);
+        return MessageAdapter.buildMsgResp(messages, msgMark, receiveUid);
     }
 
 }
