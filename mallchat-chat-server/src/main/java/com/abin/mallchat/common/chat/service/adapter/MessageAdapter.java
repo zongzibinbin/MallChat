@@ -35,19 +35,19 @@ public class MessageAdapter {
 
     }
 
-    public static List<ChatMessageResp> buildMsgResp(List<Message> messages, Map<Long, Message> replyMap, List<MessageMark> msgMark, Long receiveUid) {
+    public static List<ChatMessageResp> buildMsgResp(List<Message> messages, List<MessageMark> msgMark, Long receiveUid) {
         Map<Long, List<MessageMark>> markMap = msgMark.stream().collect(Collectors.groupingBy(MessageMark::getMsgId));
         return messages.stream().map(a -> {
             ChatMessageResp resp = new ChatMessageResp();
             resp.setFromUser(buildFromUser(a.getFromUid()));
-            resp.setMessage(buildMessage(a, replyMap, markMap.getOrDefault(a.getId(), new ArrayList<>()), receiveUid));
+            resp.setMessage(buildMessage(a, markMap.getOrDefault(a.getId(), new ArrayList<>()), receiveUid));
             return resp;
         })
                 .sorted(Comparator.comparing(a -> a.getMessage().getSendTime()))//帮前端排好序，更方便它展示
                 .collect(Collectors.toList());
     }
 
-    private static ChatMessageResp.Message buildMessage(Message message, Map<Long, Message> replyMap, List<MessageMark> marks, Long receiveUid) {
+    private static ChatMessageResp.Message buildMessage(Message message, List<MessageMark> marks, Long receiveUid) {
         ChatMessageResp.Message messageVO = new ChatMessageResp.Message();
         BeanUtil.copyProperties(message, messageVO);
         messageVO.setSendTime(message.getCreateTime());
