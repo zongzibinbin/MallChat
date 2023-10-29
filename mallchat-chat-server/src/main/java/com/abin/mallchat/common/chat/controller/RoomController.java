@@ -4,6 +4,7 @@ package com.abin.mallchat.common.chat.controller;
 import com.abin.mallchat.common.chat.domain.vo.request.*;
 import com.abin.mallchat.common.chat.domain.vo.response.ChatMemberListResp;
 import com.abin.mallchat.common.chat.domain.vo.response.MemberResp;
+import com.abin.mallchat.common.chat.service.IGroupMemberService;
 import com.abin.mallchat.common.chat.service.RoomAppService;
 import com.abin.mallchat.common.common.domain.vo.request.IdReqVO;
 import com.abin.mallchat.common.common.domain.vo.response.ApiResult;
@@ -35,6 +36,8 @@ import java.util.List;
 public class RoomController {
     @Autowired
     private RoomAppService roomService;
+    @Autowired
+    private IGroupMemberService groupMemberService;
 
     @GetMapping("/public/group")
     @ApiOperation("群组详情")
@@ -78,5 +81,12 @@ public class RoomController {
         roomService.addMember(uid, request);
         return ApiResult.success();
     }
-}
 
+    @PutMapping("/group/admin")
+    @ApiOperation("添加管理员")
+    public ApiResult<Boolean> addAdmin(@Valid @RequestBody AdminAddReq request) {
+        Long uid = RequestHolder.get().getUid();
+        groupMemberService.addAdmin(uid, request);
+        return ApiResult.success();
+    }
+}
