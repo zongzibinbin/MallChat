@@ -104,6 +104,23 @@ public class GroupMemberDao extends ServiceImpl<GroupMemberMapper, GroupMember> 
         GroupMember groupMember = this.lambdaQuery()
                 .eq(GroupMember::getGroupId, id)
                 .eq(GroupMember::getUid, uid)
+                .eq(GroupMember::getRole, GroupRoleEnum.LEADER.getType())
+                .one();
+        return ObjectUtil.isNotNull(groupMember);
+    }
+
+    /**
+     * 是否是管理员
+     *
+     * @param id  群组ID
+     * @param uid 用户ID
+     * @return 是否是管理员
+     */
+    public Boolean isManager(Long id, Long uid) {
+        GroupMember groupMember = this.lambdaQuery()
+                .eq(GroupMember::getGroupId, id)
+                .eq(GroupMember::getUid, uid)
+                .eq(GroupMember::getRole, GroupRoleEnum.MANAGER.getType())
                 .one();
         return ObjectUtil.isNotNull(groupMember);
     }

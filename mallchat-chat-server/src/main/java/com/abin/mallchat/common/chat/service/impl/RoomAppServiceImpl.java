@@ -28,6 +28,7 @@ import com.abin.mallchat.common.common.annotation.RedissonLock;
 import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
 import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
 import com.abin.mallchat.common.common.event.GroupMemberAddEvent;
+import com.abin.mallchat.common.common.exception.GroupErrorEnum;
 import com.abin.mallchat.common.common.utils.AssertUtil;
 import com.abin.mallchat.common.user.dao.UserDao;
 import com.abin.mallchat.common.user.domain.entity.User;
@@ -95,29 +96,29 @@ public class RoomAppServiceImpl implements RoomAppService {
 
     @Override
     public CursorPageBaseResp<ChatRoomResp> getContactPage(CursorPageBaseReq request, Long uid) {
-        //查出用户要展示的会话列表
+        // 查出用户要展示的会话列表
         CursorPageBaseResp<Long> page;
         if (Objects.nonNull(uid)) {
             Double hotEnd = getCursorOrNull(request.getCursor());
             Double hotStart = null;
-            //用户基础会话
+            // 用户基础会话
             CursorPageBaseResp<Contact> contactPage = contactDao.getContactPage(uid, request);
             List<Long> baseRoomIds = contactPage.getList().stream().map(Contact::getRoomId).collect(Collectors.toList());
             if (!contactPage.getIsLast()) {
                 hotStart = getCursorOrNull(contactPage.getCursor());
             }
-            //热门房间
+            // 热门房间
             Set<ZSetOperations.TypedTuple<String>> typedTuples = hotRoomCache.getRoomRange(hotStart, hotEnd);
             List<Long> hotRoomIds = typedTuples.stream().map(ZSetOperations.TypedTuple::getValue).filter(Objects::nonNull).map(Long::parseLong).collect(Collectors.toList());
             baseRoomIds.addAll(hotRoomIds);
-            //基础会话和热门房间合并
+            // 基础会话和热门房间合并
             page = CursorPageBaseResp.init(contactPage, baseRoomIds);
-        } else {//用户未登录，只查全局房间
+        } else {// 用户未登录，只查全局房间
             CursorPageBaseResp<Pair<Long, Double>> roomCursorPage = hotRoomCache.getRoomCursorPage(request);
             List<Long> roomIds = roomCursorPage.getList().stream().map(Pair::getKey).collect(Collectors.toList());
             page = CursorPageBaseResp.init(roomCursorPage, roomIds);
         }
-        //最后组装会话信息（名称，头像，未读数等）
+        // 最后组装会话信息（名称，头像，未读数等）
         List<ChatRoomResp> result = buildContactResp(uid, page.getList());
         return CursorPageBaseResp.init(page, result);
     }
@@ -142,7 +143,7 @@ public class RoomAppServiceImpl implements RoomAppService {
         Room room = roomCache.get(roomId);
         AssertUtil.isNotEmpty(roomGroup, "roomId有误");
         Long onlineNum;
-        if (isHotGroup(room)) {//热点群从redis取人数
+        if (isHotGroup(room)) {// 热点群从redis取人数
             onlineNum = userCache.getOnlineNum();
         } else {
             List<Long> memberUidList = groupMemberDao.getMemberUidList(roomGroup.getId());
@@ -163,9 +164,9 @@ public class RoomAppServiceImpl implements RoomAppService {
         Room room = roomCache.get(request.getRoomId());
         AssertUtil.isNotEmpty(room, "房间号有误");
         List<Long> memberUidList;
-        if (isHotGroup(room)) {//全员群展示所有用户
+        if (isHotGroup(room)) {// 全员群展示所有用户
             memberUidList = null;
-        } else {//只展示房间内的群成员
+        } else {// 只展示房间内的群成员
             RoomGroup roomGroup = roomGroupCache.get(request.getRoomId());
             memberUidList = groupMemberDao.getMemberUidList(roomGroup.getId());
         }
@@ -177,7 +178,7 @@ public class RoomAppServiceImpl implements RoomAppService {
     public List<ChatMemberListResp> getMemberList(ChatMessageMemberReq request) {
         Room room = roomCache.get(request.getRoomId());
         AssertUtil.isNotEmpty(room, "房间号有误");
-        if (isHotGroup(room)) {//全员群展示所有用户100名
+        if (isHotGroup(room)) {// 全员群展示所有用户100名
             List<User> memberList = userDao.getMemberList();
             return MemberAdapter.buildMemberList(memberList);
         } else {
@@ -196,12 +197,22 @@ public class RoomAppServiceImpl implements RoomAppService {
         RoomGroup roomGroup = roomGroupCache.get(request.getRoomId());
         AssertUtil.isNotEmpty(roomGroup, "房间号有误");
         GroupMember self = groupMemberDao.getMember(roomGroup.getId(), uid);
-        AssertUtil.isNotEmpty(self, "您不是群管理");
-        AssertUtil.isTrue(hasPower(self), "您不是群管理");
-        GroupMember member = groupMemberDao.getMember(roomGroup.getId(), request.getUid());
-        AssertUtil.isNotEmpty(self, "用户已经移除");
+        AssertUtil.isNotEmpty(self, GroupErrorEnum.USER_NOT_IN_GROUP);
+        // 1. 判断被移除的人是否是群主或者管理员  （群主不可以被移除，管理员只能被群主移除）
+        Long removedUid = request.getUid();
+        // 1.1 群主 非法操作
+        AssertUtil.isFalse(groupMemberDao.isLord(roomGroup.getId(), removedUid), GroupErrorEnum.NOT_ALLOWED_FOR_REMOVE);
+        // 1.2 管理员 判断是否是群主操作
+        if (groupMemberDao.isManager(roomGroup.getId(), removedUid)) {
+            Boolean isLord = groupMemberDao.isLord(roomGroup.getId(), uid);
+            AssertUtil.isTrue(isLord, GroupErrorEnum.NOT_ALLOWED_FOR_REMOVE);
+        }
+        // 1.3 普通成员 判断是否有权限操作
+        AssertUtil.isTrue(hasPower(self), GroupErrorEnum.NOT_ALLOWED_FOR_REMOVE);
+        GroupMember member = groupMemberDao.getMember(roomGroup.getId(), removedUid);
+        AssertUtil.isNotEmpty(member, "用户已经移除");
         groupMemberDao.removeById(member.getId());
-        //发送移除事件告知群成员
+        // 发送移除事件告知群成员
         List<Long> memberUidList = groupMemberCache.getMemberUidList(roomGroup.getRoomId());
         WSBaseResp<WSMemberChange> ws = MemberAdapter.buildMemberRemoveWS(roomGroup.getRoomId(), member.getUid());
         pushService.sendPushMsg(ws, memberUidList);
@@ -235,10 +246,10 @@ public class RoomAppServiceImpl implements RoomAppService {
     @Transactional
     public Long addGroup(Long uid, GroupAddReq request) {
         RoomGroup roomGroup = roomService.createGroupRoom(uid);
-        //批量保存群成员
+        // 批量保存群成员
         List<GroupMember> groupMembers = RoomAdapter.buildGroupMemberBatch(request.getUidList(), roomGroup.getId());
         groupMemberDao.saveBatch(groupMembers);
-        //发送邀请加群消息==》触发每个人的会话
+        // 发送邀请加群消息==》触发每个人的会话
         applicationEventPublisher.publishEvent(new GroupMemberAddEvent(this, roomGroup, groupMembers, uid));
         return roomGroup.getRoomId();
     }
@@ -294,32 +305,32 @@ public class RoomAppServiceImpl implements RoomAppService {
 
     @NotNull
     private List<ChatRoomResp> buildContactResp(Long uid, List<Long> roomIds) {
-        //表情和头像
+        // 表情和头像
         Map<Long, RoomBaseInfo> roomBaseInfoMap = getRoomBaseInfoMap(roomIds, uid);
-        //最后一条消息
+        // 最后一条消息
         List<Long> msgIds = roomBaseInfoMap.values().stream().map(RoomBaseInfo::getLastMsgId).collect(Collectors.toList());
         List<Message> messages = CollectionUtil.isEmpty(msgIds) ? new ArrayList<>() : messageDao.listByIds(msgIds);
         Map<Long, Message> msgMap = messages.stream().collect(Collectors.toMap(Message::getId, Function.identity()));
         Map<Long, User> lastMsgUidMap = userInfoCache.getBatch(messages.stream().map(Message::getFromUid).collect(Collectors.toList()));
-        //消息未读数
+        // 消息未读数
         Map<Long, Integer> unReadCountMap = getUnReadCountMap(uid, roomIds);
         return roomBaseInfoMap.values().stream().map(room -> {
-            ChatRoomResp resp = new ChatRoomResp();
-            RoomBaseInfo roomBaseInfo = roomBaseInfoMap.get(room.getRoomId());
-            resp.setAvatar(roomBaseInfo.getAvatar());
-            resp.setRoomId(room.getRoomId());
-            resp.setActiveTime(room.getActiveTime());
-            resp.setHot_Flag(roomBaseInfo.getHotFlag());
-            resp.setType(roomBaseInfo.getType());
-            resp.setName(roomBaseInfo.getName());
-            Message message = msgMap.get(room.getLastMsgId());
-            if (Objects.nonNull(message)) {
-                AbstractMsgHandler strategyNoNull = MsgHandlerFactory.getStrategyNoNull(message.getType());
-                resp.setText(lastMsgUidMap.get(message.getFromUid()).getName() + ":" + strategyNoNull.showContactMsg(message));
-            }
-            resp.setUnreadCount(unReadCountMap.getOrDefault(room.getRoomId(), 0));
-            return resp;
-        }).sorted(Comparator.comparing(ChatRoomResp::getActiveTime).reversed())
+                    ChatRoomResp resp = new ChatRoomResp();
+                    RoomBaseInfo roomBaseInfo = roomBaseInfoMap.get(room.getRoomId());
+                    resp.setAvatar(roomBaseInfo.getAvatar());
+                    resp.setRoomId(room.getRoomId());
+                    resp.setActiveTime(room.getActiveTime());
+                    resp.setHot_Flag(roomBaseInfo.getHotFlag());
+                    resp.setType(roomBaseInfo.getType());
+                    resp.setName(roomBaseInfo.getName());
+                    Message message = msgMap.get(room.getLastMsgId());
+                    if (Objects.nonNull(message)) {
+                        AbstractMsgHandler strategyNoNull = MsgHandlerFactory.getStrategyNoNull(message.getType());
+                        resp.setText(lastMsgUidMap.get(message.getFromUid()).getName() + ":" + strategyNoNull.showContactMsg(message));
+                    }
+                    resp.setUnreadCount(unReadCountMap.getOrDefault(room.getRoomId(), 0));
+                    return resp;
+                }).sorted(Comparator.comparing(ChatRoomResp::getActiveTime).reversed())
                 .collect(Collectors.toList());
     }
 
@@ -350,15 +361,16 @@ public class RoomAppServiceImpl implements RoomAppService {
                     return userBatch.get(friendUid);
                 }));
     }
+
     private Map<Long, RoomBaseInfo> getRoomBaseInfoMap(List<Long> roomIds, Long uid) {
         Map<Long, Room> roomMap = roomCache.getBatch(roomIds);
-        //房间根据好友和群组类型分组
+        // 房间根据好友和群组类型分组
         Map<Integer, List<Long>> groupRoomIdMap = roomMap.values().stream().collect(Collectors.groupingBy(Room::getType,
                 Collectors.mapping(Room::getId, Collectors.toList())));
-        //获取群组信息
+        // 获取群组信息
         List<Long> groupRoomId = groupRoomIdMap.get(RoomTypeEnum.GROUP.getType());
         Map<Long, RoomGroup> roomInfoBatch = roomGroupCache.getBatch(groupRoomId);
-        //获取好友信息
+        // 获取好友信息
         List<Long> friendRoomId = groupRoomIdMap.get(RoomTypeEnum.FRIEND.getType());
         Map<Long, User> friendRoomMap = getFriendRoomMap(friendRoomId, uid);
 
