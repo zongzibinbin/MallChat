@@ -101,6 +101,7 @@ public class FriendServiceImpl implements FriendService {
      * @param request 请求
      */
     @Override
+    @RedissonLock(key = "#uid")
     public void apply(Long uid, FriendApplyReq request) {
         //是否有好友关系
         UserFriend friend = userFriendDao.getByFriend(uid, request.getTargetUid());
