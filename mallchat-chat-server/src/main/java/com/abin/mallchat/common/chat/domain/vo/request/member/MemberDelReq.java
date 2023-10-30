@@ -1,4 +1,4 @@
-package com.abin.mallchat.common.chat.domain.vo.request;
+package com.abin.mallchat.common.chat.domain.vo.request.member;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -7,8 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import java.util.List;
 
 /**
  * Description: 移除群成员
@@ -19,13 +17,12 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class MemberAddReq {
+public class MemberDelReq {
     @NotNull
-    @ApiModelProperty("房间id")
+    @ApiModelProperty("会话id")
     private Long roomId;
 
     @NotNull
-    @Size(min = 1, max = 50)
-    @ApiModelProperty("邀请的uid")
-    private List<Long> uidList;
+    @ApiModelProperty("被移除的uid（主动退群填自己）")
+    private Long uid;
 }

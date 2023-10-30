@@ -1,11 +1,16 @@
 package com.abin.mallchat.common.chat.dao;
 
+import com.abin.mallchat.common.chat.domain.entity.Contact;
 import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.chat.domain.enums.MessageStatusEnum;
 import com.abin.mallchat.common.chat.mapper.MessageMapper;
 import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
 import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
 import com.abin.mallchat.common.common.utils.CursorUtils;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
+import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
@@ -62,5 +67,18 @@ public class MessageDao extends ServiceImpl<MessageMapper, Message> {
                 .eq(Message::getRoomId, roomId)
                 .gt(Objects.nonNull(readTime), Message::getCreateTime, readTime)
                 .count();
+    }
+
+    /**
+     * 根据房间ID逻辑删除消息
+     *
+     * @param roomId 房间ID
+     * @return 是否删除成功
+     */
+    public Boolean removeByRoomId(Long roomId) {
+        LambdaUpdateWrapper<Message> wrapper = new UpdateWrapper<Message>().lambda()
+                .eq(Message::getRoomId, roomId)
+                .set(Message::getStatus, MessageStatusEnum.DELETE.getStatus());
+        return this.update(wrapper);
     }
 }

@@ -108,4 +108,10 @@ public class DaoTest {
         String url = wxMpQrCodeTicket.getUrl();
         System.out.println(url);
     }
+
+    @Test
+    public void testCreateToken() {
+        String token = loginService.login(10276L);
+        System.out.println("token = " + token);
+    }
 }

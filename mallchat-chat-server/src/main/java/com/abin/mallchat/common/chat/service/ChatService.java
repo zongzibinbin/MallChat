@@ -3,11 +3,11 @@ package com.abin.mallchat.common.chat.service;
 import com.abin.mallchat.common.chat.domain.dto.MsgReadInfoDTO;
 import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.chat.domain.vo.request.*;
+import com.abin.mallchat.common.chat.domain.vo.request.member.MemberReq;
 import com.abin.mallchat.common.chat.domain.vo.response.ChatMemberListResp;
 import com.abin.mallchat.common.chat.domain.vo.response.ChatMemberStatisticResp;
 import com.abin.mallchat.common.chat.domain.vo.response.ChatMessageReadResp;
 import com.abin.mallchat.common.chat.domain.vo.response.ChatMessageResp;
-import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
 import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
 import com.abin.mallchat.common.user.domain.vo.response.ws.ChatMemberResp;
 

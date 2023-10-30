@@ -1,8 +1,8 @@
 package com.abin.mallchat.common.chat.service;
 
-import com.abin.mallchat.common.chat.domain.entity.GroupMember;
-import com.abin.mallchat.common.chat.domain.vo.request.AdminAddReq;
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.abin.mallchat.common.chat.domain.vo.request.admin.AdminAddReq;
+import com.abin.mallchat.common.chat.domain.vo.request.admin.AdminRevokeReq;
+import com.abin.mallchat.common.chat.domain.vo.request.member.MemberExitReq;
 
 /**
  * <p>
@@ -20,4 +20,14 @@ public interface IGroupMemberService {
      * @param request 请求信息
      */
     void addAdmin(Long uid, AdminAddReq request);
+
+    /**
+     * 撤销管理员
+     *
+     * @param uid     用户ID
+     * @param request 请求信息
+     */
+    void revokeAdmin(Long uid, AdminRevokeReq request);
+
+    void exitGroup(Long uid, MemberExitReq request);
 }

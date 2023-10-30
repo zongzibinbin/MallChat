@@ -2,6 +2,12 @@ package com.abin.mallchat.common.chat.controller;
 
 
 import com.abin.mallchat.common.chat.domain.vo.request.*;
+import com.abin.mallchat.common.chat.domain.vo.request.admin.AdminAddReq;
+import com.abin.mallchat.common.chat.domain.vo.request.admin.AdminRevokeReq;
+import com.abin.mallchat.common.chat.domain.vo.request.member.MemberAddReq;
+import com.abin.mallchat.common.chat.domain.vo.request.member.MemberDelReq;
+import com.abin.mallchat.common.chat.domain.vo.request.member.MemberExitReq;
+import com.abin.mallchat.common.chat.domain.vo.request.member.MemberReq;
 import com.abin.mallchat.common.chat.domain.vo.response.ChatMemberListResp;
 import com.abin.mallchat.common.chat.domain.vo.response.MemberResp;
 import com.abin.mallchat.common.chat.service.IGroupMemberService;
@@ -66,6 +72,14 @@ public class RoomController {
         return ApiResult.success();
     }
 
+    @DeleteMapping("/group/member/exit")
+    @ApiOperation("退出群聊")
+    public ApiResult<Boolean> exitGroup(@Valid @RequestBody MemberExitReq request) {
+        Long uid = RequestHolder.get().getUid();
+        groupMemberService.exitGroup(uid, request);
+        return ApiResult.success();
+    }
+
     @PostMapping("/group")
     @ApiOperation("新增群组")
     public ApiResult<IdRespVO> addGroup(@Valid @RequestBody GroupAddReq request) {
@@ -87,6 +101,14 @@ public class RoomController {
     public ApiResult<Boolean> addAdmin(@Valid @RequestBody AdminAddReq request) {
         Long uid = RequestHolder.get().getUid();
         groupMemberService.addAdmin(uid, request);
+        return ApiResult.success();
+    }
+
+    @DeleteMapping("/group/admin")
+    @ApiOperation("撤销管理员")
+    public ApiResult<Boolean> revokeAdmin(@Valid @RequestBody AdminRevokeReq request) {
+        Long uid = RequestHolder.get().getUid();
+        groupMemberService.revokeAdmin(uid, request);
         return ApiResult.success();
     }
 }
