@@ -1,12 +1,16 @@
 package com.abin.mallchat.common.chat.dao;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.abin.mallchat.common.chat.domain.entity.Contact;
 import com.abin.mallchat.common.chat.domain.entity.GroupMember;
 import com.abin.mallchat.common.chat.domain.enums.GroupRoleEnum;
 import com.abin.mallchat.common.chat.mapper.GroupMemberMapper;
 import com.abin.mallchat.common.chat.service.cache.GroupMemberCache;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -144,7 +148,7 @@ public class GroupMemberDao extends ServiceImpl<GroupMemberMapper, GroupMember> 
     /**
      * 增加管理员
      *
-     * @param id      群主ID
+     * @param id      群组ID
      * @param uidList 用户列表
      */
     public void addAdmin(Long id, List<Long> uidList) {
@@ -153,5 +157,32 @@ public class GroupMemberDao extends ServiceImpl<GroupMemberMapper, GroupMember> 
                 .in(GroupMember::getUid, uidList)
                 .set(GroupMember::getRole, GroupRoleEnum.MANAGER.getType());
         this.update(wrapper);
+    }
+
+    /**
+     * 撤销管理员
+     *
+     * @param id      群组ID
+     * @param uidList 用户列表
+     */
+    public void revokeAdmin(Long id, List<Long> uidList) {
+        LambdaUpdateWrapper<GroupMember> wrapper = new UpdateWrapper<GroupMember>().lambda()
+                .eq(GroupMember::getGroupId, id)
+                .in(GroupMember::getUid, uidList)
+                .set(GroupMember::getRole, GroupRoleEnum.MEMBER.getType());
+        this.update(wrapper);
+    }
+
+    /**
+     * 根据群组ID删除群成员
+     *
+     * @param groupId 群组ID
+     * @return 是否删除成功
+     */
+    public Boolean removeByGroupId(Long groupId) {
+        LambdaQueryWrapper<GroupMember> wrapper = new QueryWrapper<GroupMember>()
+                .lambda()
+                .eq(GroupMember::getGroupId, groupId);
+        return this.remove(wrapper);
     }
 }

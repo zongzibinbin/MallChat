@@ -1,4 +1,4 @@
-package com.abin.mallchat.common.chat.domain.vo.request;
+package com.abin.mallchat.common.chat.domain.vo.request.member;
 
 import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
 import io.swagger.annotations.ApiModelProperty;
