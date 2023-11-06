@@ -48,10 +48,10 @@ wx:
         #    callback: http://f4cd-113-92-129-127.ngrok.io
         callback: ${mallchat.wx.callback}
         configs:
-            -   appId: ${mallchat.wx.appId} # 第一个公众号的appid
-                secret: ${mallchat.wx.secret} # 公众号的appsecret
-                token: ${mallchat.wx.token} # 接口配置里的Token值
-                aesKey: ${mallchat.wx.aesKey} # 接口配置里的EncodingAESKey值
+            - appId: ${mallchat.wx.appId} # 第一个公众号的appid
+              secret: ${mallchat.wx.secret} # 公众号的appsecret
+              token: ${mallchat.wx.token} # 接口配置里的Token值
+              aesKey: ${mallchat.wx.aesKey} # 接口配置里的EncodingAESKey值
 chatai:
     chatgpt:
         use: ${mallchat.chatgpt.use}
