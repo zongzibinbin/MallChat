@@ -1,6 +1,8 @@
 package com.abin.mallchat.common.chat.dao;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.abin.mallchat.common.chat.domain.entity.Contact;
+import com.abin.mallchat.common.chat.domain.entity.GroupMember;
 import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.chat.mapper.ContactMapper;
 import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
@@ -96,12 +98,14 @@ public class ContactDao extends ServiceImpl<ContactMapper, Contact> {
     /**
      * 根据房间ID删除会话
      *
-     * @param roomId 房间ID
+     * @param roomId  房间ID
+     * @param uidList 群成员列表
      * @return 是否删除成功
      */
-    public Boolean removeByRoomId(Long roomId) {
+    public Boolean removeByRoomId(Long roomId, List<Long> uidList) {
         LambdaQueryWrapper<Contact> wrapper = new QueryWrapper<Contact>().lambda()
-                .eq(Contact::getRoomId, roomId);
+                .eq(Contact::getRoomId, roomId)
+                .in(CollectionUtil.isNotEmpty(uidList), Contact::getUid, uidList);
         return this.remove(wrapper);
     }
 }

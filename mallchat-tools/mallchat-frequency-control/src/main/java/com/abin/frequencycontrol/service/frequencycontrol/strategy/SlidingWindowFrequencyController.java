@@ -51,7 +51,6 @@ public class SlidingWindowFrequencyController extends AbstractFrequencyControlSe
             // 窗口大小 单位 秒
             long length = period * controlDTO.getWindowSize();
             long start = current - length;
-//            long expireTime = length + period;
             RedisUtils.ZSetAddAndExpire(key, start, length, current);
         }
     }
