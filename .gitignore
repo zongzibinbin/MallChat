@@ -11,7 +11,6 @@
 .flattened-pom.xml
 demo-api/.flattened-pom.xml
 demo-client/.flattened-pom.xml
-*-test
 
 # Log file
 *.log
