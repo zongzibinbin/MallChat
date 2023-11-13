@@ -1,5 +1,6 @@
 package com.abin.mallchat.common.chat.dao;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.abin.mallchat.common.chat.domain.entity.Contact;
 import com.abin.mallchat.common.chat.domain.entity.GroupMember;
@@ -177,12 +178,17 @@ public class GroupMemberDao extends ServiceImpl<GroupMemberMapper, GroupMember> 
      * 根据群组ID删除群成员
      *
      * @param groupId 群组ID
+     * @param uidList 群成员列表
      * @return 是否删除成功
      */
-    public Boolean removeByGroupId(Long groupId) {
-        LambdaQueryWrapper<GroupMember> wrapper = new QueryWrapper<GroupMember>()
-                .lambda()
-                .eq(GroupMember::getGroupId, groupId);
-        return this.remove(wrapper);
+    public Boolean removeByGroupId(Long groupId, List<Long> uidList) {
+        if (CollectionUtil.isNotEmpty(uidList)) {
+            LambdaQueryWrapper<GroupMember> wrapper = new QueryWrapper<GroupMember>()
+                    .lambda()
+                    .eq(GroupMember::getGroupId, groupId)
+                    .in(GroupMember::getUid, uidList);
+            return this.remove(wrapper);
+        }
+        return false;
     }
 }
