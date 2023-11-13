@@ -29,5 +29,11 @@ public interface IGroupMemberService {
      */
     void revokeAdmin(Long uid, AdminRevokeReq request);
 
+    /**
+     * 退出群聊
+     *
+     * @param uid     用户ID
+     * @param request 请求信息
+     */
     void exitGroup(Long uid, MemberExitReq request);
 }
