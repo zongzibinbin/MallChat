@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class FrequencyControlStrategyFactory {
 
     /**
-     * 限流策略集合
+     * 限流策略map集合   策略名字 -> 策略类
      */
     static Map<String, AbstractFrequencyControlService<?>> frequencyControlServiceStrategyMap = new ConcurrentHashMap<>(8);
 

@@ -34,14 +34,20 @@ public class FrequencyControlAspect {
     @Around("@annotation(com.abin.frequencycontrol.annotation.FrequencyControl)||@annotation(com.abin.frequencycontrol.annotation.FrequencyControlContainer)")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
         Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
+        // 获取方法上的所有频控注解方式
         FrequencyControl[] annotationsByType = method.getAnnotationsByType(FrequencyControl.class);
+        // 利用Key-Value形式存储每个频控方式，key为频控对象，value为策略
         Map<String, FrequencyControl> keyMap = new HashMap<>();
+        // 设置默认策略为计数器策略
         String strategy = FrequencyControlConstant.TOTAL_COUNT_WITH_IN_FIX_TIME;
+        // 遍历所有的频控方式
         for (int i = 0; i < annotationsByType.length; i++) {
             // 获取频控注解
             FrequencyControl frequencyControl = annotationsByType[i];
-            String prefix = StrUtil.isBlank(frequencyControl.prefixKey()) ? /* 默认方法限定名 + 注解排名（可能多个）*/method.toGenericString() + ":index:" + i : frequencyControl.prefixKey();
+            // 获取频控前缀（默认为全限定名）
+            String prefix = StrUtil.isBlank(frequencyControl.prefixKey()) ? method.toGenericString() + ":index:" + i : frequencyControl.prefixKey();
             String key = "";
+            // 根据频控对象进行相应的key获取
             switch (frequencyControl.target()) {
                 case EL:
                     key = SpElUtils.parseSpEl(method, joinPoint.getArgs(), frequencyControl.spEl());
