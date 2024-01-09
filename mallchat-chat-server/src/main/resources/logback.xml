@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <!--日志路径 -->
-    <property name="LOG_PATH" value="/data/logs/mallchat-chat-server"/>
+    <property name="LOG_PATH" value="/Users/chaos/Desktop/workspace/logs"/>
     <property name="LOG_FILE" value="mallchat-chat-server"/>
     <!-- 格式化-->
     <property name="CONSOLE_LOG_PATTERN"
