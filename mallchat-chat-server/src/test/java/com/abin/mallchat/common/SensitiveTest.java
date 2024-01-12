@@ -1,11 +1,13 @@
 package com.abin.mallchat.common;
 
-import com.abin.mallchat.common.common.utils.sensitiveWord.ACFilter;
-import com.abin.mallchat.common.common.utils.sensitiveWord.DFAFilter;
+import com.abin.mallchat.common.common.algorithm.sensitiveWord.ACFilter;
+import com.abin.mallchat.common.common.algorithm.sensitiveWord.ACProFilter;
+import com.abin.mallchat.common.common.algorithm.sensitiveWord.DFAFilter;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.*;
 
 /**
  * Description:
@@ -21,6 +23,7 @@ public class SensitiveTest {
         System.out.println(instance.hasSensitiveWord("adabcd"));
     }
 
+
     @Test
     public void AC() {
         List<String> sensitiveList = Arrays.asList("abcd", "abcbba", "adabca");
@@ -29,6 +32,14 @@ public class SensitiveTest {
         instance.hasSensitiveWord("adabcd");
     }
 
+    @Test
+    public void ACPro()
+    {
+        List<String> sensitiveList = Arrays.asList("白痴", "你是白痴", "白痴吗");
+        ACProFilter acProFilter=new ACProFilter();
+        acProFilter.loadWord(sensitiveList);
+        System.out.println(acProFilter.filter("你是白痴吗"));
+    }
     @Test
     public void DFAMulti() {
         List<String> sensitiveList = Arrays.asList("白痴", "你是白痴", "白痴吗");
