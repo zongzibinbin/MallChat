@@ -4,9 +4,6 @@ import com.abin.mallchat.common.common.algorithm.sensitiveWord.ACFilter;
 import com.abin.mallchat.common.common.algorithm.sensitiveWord.ACProFilter;
 import com.abin.mallchat.common.common.algorithm.sensitiveWord.DFAFilter;
 import org.junit.Test;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.util.*;
 
 /**
@@ -50,7 +47,7 @@ public class SensitiveTest {
 
     @Test
     public void ACMulti() {
-        List<String> sensitiveList = Arrays.asList("白痴", "你是白痴", "白痴吗");
+        List<String> sensitiveList = Arrays.asList("你是白痴","你是");
         ACFilter instance = new ACFilter();
         instance.loadWord(sensitiveList);
         System.out.println(instance.filter("你是白痴吗"));
