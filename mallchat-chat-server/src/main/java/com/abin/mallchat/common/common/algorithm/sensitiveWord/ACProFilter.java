@@ -1,7 +1,6 @@
 package com.abin.mallchat.common.common.algorithm.sensitiveWord;
 
-import com.abin.mallchat.common.common.algorithm.ac.ACTrie;
-import com.abin.mallchat.common.common.algorithm.acpro.ACProTrie;
+import com.abin.mallchat.common.common.algorithm.sensitiveWord.acpro.ACProTrie;
 import io.micrometer.core.instrument.util.StringUtils;
 
 import java.util.List;
@@ -13,6 +12,7 @@ import java.util.Objects;
  *@description:  基于ACFilter的优化增强版本
  */
 public class ACProFilter implements SensitiveWordFilter{
+
     private ACProTrie acProTrie;
 
     @Override

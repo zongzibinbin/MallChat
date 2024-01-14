@@ -1,4 +1,4 @@
-package com.abin.mallchat.common.common.algorithm.acpro;
+package com.abin.mallchat.common.common.algorithm.sensitiveWord.acpro;
 
 import java.util.*;
 
@@ -87,52 +87,42 @@ public class ACProTrie {
     // 匹配
     public  String match(String matchWord)
     {
-        Word walkNode=root;
-        char[] wordArray=matchWord.toCharArray();
-        for(int i=0;i<wordArray.length;i++)
-        {
-            // 失败回调状态
-            while(!walkNode.hasChild(wordArray[i]) && walkNode.failOver!=null)
-            {
-                walkNode=walkNode.failOver;
+        Word walkNode = root;
+        char[] wordArray = matchWord.toCharArray();
+        for (int i = 0; i < wordArray.length; i++) {
+            // 失败"回溯"
+            while (!walkNode.hasChild(wordArray[i]) && walkNode.failOver != null) {
+                walkNode = walkNode.failOver;
             }
-            if(walkNode.hasChild(wordArray[i])) {
-                walkNode=walkNode.next.get(wordArray[i]);
-                if(walkNode.end){
+            if (walkNode.hasChild(wordArray[i])) {
+                walkNode = walkNode.next.get(wordArray[i]);
+                if (walkNode.end) {
                     // sentinelA和sentinelB作为哨兵节点，去后面探测是否仍存在end
                     Word sentinelA = walkNode; // 记录当前节点
                     Word sentinelB = walkNode; //记录end节点
-                    int k = i+1;
-                    boolean flag=false;
+                    int k = i + 1;
+                    boolean flag = false;
                     //判断end是不是最终end即敏感词是否存在包含关系(abc,abcd)
-                    while(k < wordArray.length && sentinelA.hasChild(wordArray[k])) {
+                    while (k < wordArray.length && sentinelA.hasChild(wordArray[k])) {
                         sentinelA = sentinelA.next.get(wordArray[k]);
                         k++;
-                        if(sentinelA.end)
-                        {
-                            sentinelB=sentinelA;
-                            flag=true;
+                        if (sentinelA.end) {
+                            sentinelB = sentinelA;
+                            flag = true;
                         }
                     }
                     // 根据结果去替换*
-                    if(flag){
-                        int length=sentinelB.depth;
-                        while(length>0)
-                        {
-                            length--;
-                            wordArray[i+length]=MASK;
-                        }
-                        // 直接跳到最后的end节点failOver
-                        i=i+length;
-                        walkNode = sentinelB.failOver;
-                    }else{
-                        int length=walkNode.depth;
-                        while (length>0){
-                            length--;
-                            wordArray[i-length]=MASK;
-                        }
-                        walkNode = walkNode.failOver;
+                    // 计算替换长度
+                    int len = flag ? sentinelB.depth : walkNode.depth;
+                    while (len > 0) {
+                        len--;
+                        int index = flag ? i - walkNode.depth + 1 + len : i - len;
+                        wordArray[index] = MASK;
                     }
+                    // 更新i
+                    i += flag ? sentinelB.depth : 0;
+                    // 更新node
+                    walkNode = flag ? sentinelB.failOver : walkNode.failOver;
                 }
             }
         }
