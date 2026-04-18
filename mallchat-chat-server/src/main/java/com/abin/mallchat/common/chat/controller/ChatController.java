@@ -54,6 +54,15 @@ public class ChatController {
         return ApiResult.success(msgPage);
     }
 
+    @GetMapping("/public/msg/search")
+    @ApiOperation("搜索消息")
+//    @FrequencyControl(time = 120, count = 20, target = FrequencyControl.Target.IP)
+    public ApiResult<CursorPageBaseResp<ChatMessageResp>> searchMsg(@Valid ChatMessageSearchReq request) {
+        CursorPageBaseResp<ChatMessageResp> msgPage = chatService.searchMsgPage(request, RequestHolder.get().getUid());
+        filterBlackMsg(msgPage);
+        return ApiResult.success(msgPage);
+    }
+
     private void filterBlackMsg(CursorPageBaseResp<ChatMessageResp> memberPage) {
         Set<String> blackMembers = getBlackUidSet();
         memberPage.getList().removeIf(a -> blackMembers.contains(a.getFromUser().getUid().toString()));
