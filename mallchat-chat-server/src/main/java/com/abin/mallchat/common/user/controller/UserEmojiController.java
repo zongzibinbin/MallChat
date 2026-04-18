@@ -51,14 +51,14 @@ public class UserEmojiController {
      * 新增表情包
      *
      * @param req 用户表情包
-     * @return 表情包
+     * @return 表情包ID
      * @author WuShiJie
      * @createTime 2023/7/3 14:46
      **/
     @PostMapping()
     @ApiOperation("新增表情包")
     public ApiResult<IdRespVO> insertEmojis(@Valid @RequestBody UserEmojiReq req) {
-        return emojiService.insert(req, RequestHolder.get().getUid());
+        return ApiResult.success(emojiService.insert(req, RequestHolder.get().getUid()));
     }
 
     /**
