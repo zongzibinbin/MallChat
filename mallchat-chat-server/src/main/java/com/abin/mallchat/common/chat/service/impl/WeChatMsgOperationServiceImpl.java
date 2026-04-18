@@ -8,6 +8,7 @@ import com.abin.mallchat.common.common.handler.GlobalUncaughtExceptionHandler;
 import com.abin.mallchat.common.common.service.frequencycontrol.FrequencyControlUtil;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.service.cache.UserCache;
+import com.abin.mallchat.common.utils.MDCUtils;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateData;
@@ -52,10 +53,10 @@ public class WeChatMsgOperationServiceImpl implements WeChatMsgOperationService 
         Map<Long, User> userMap = userCache.getUserInfoBatch(uidSet);
         userMap.values().forEach(user -> {
             if (Objects.nonNull(user.getOpenId())) {
-                executor.execute(() -> {
+                executor.execute(MDCUtils.wrap(() -> {
                     WxMpTemplateMessage msgTemplate = getAtMsgTemplate(sender, user.getOpenId(), msg);
                     publishTemplateMsgCheckLimit(msgTemplate);
-                });
+                }));
             }
         });
     }

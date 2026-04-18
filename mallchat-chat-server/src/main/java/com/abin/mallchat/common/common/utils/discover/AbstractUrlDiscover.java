@@ -4,6 +4,7 @@ import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import com.abin.mallchat.common.common.utils.FutureUtils;
 import com.abin.mallchat.common.common.utils.discover.domain.UrlInfo;
+import com.abin.mallchat.common.utils.MDCUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 import org.jsoup.Connection;
@@ -41,10 +42,10 @@ public abstract class AbstractUrlDiscover implements UrlDiscover {
         List<String> matchList = ReUtil.findAll(PATTERN, content, 0);
 
         //并行请求
-        List<CompletableFuture<Pair<String, UrlInfo>>> futures = matchList.stream().map(match -> CompletableFuture.supplyAsync(() -> {
+        List<CompletableFuture<Pair<String, UrlInfo>>> futures = matchList.stream().map(match -> CompletableFuture.supplyAsync(MDCUtils.wrap(() -> {
             UrlInfo urlInfo = getContent(match);
             return Objects.isNull(urlInfo) ? null : Pair.of(match, urlInfo);
-        })).collect(Collectors.toList());
+        }))).collect(Collectors.toList());
         CompletableFuture<List<Pair<String, UrlInfo>>> future = FutureUtils.sequenceNonNull(futures);
         //结果组装
         return future.join().stream().collect(Collectors.toMap(Pair::getFirst, Pair::getSecond, (a, b) -> a));

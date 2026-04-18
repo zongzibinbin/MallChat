@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.net.InetSocketAddress;
 import java.util.Optional;
+import java.util.UUID;
 
 public class HttpHeadersHandler extends ChannelInboundHandlerAdapter {
 
@@ -31,6 +32,9 @@ public class HttpHeadersHandler extends ChannelInboundHandlerAdapter {
                 ip = address.getAddress().getHostAddress();
             }
             NettyUtil.setAttr(ctx.channel(), NettyUtil.IP, ip);
+            // 生成traceId并保存到Channel属性
+            String tid = UUID.randomUUID().toString();
+            NettyUtil.setAttr(ctx.channel(), NettyUtil.TID, tid);
             ctx.pipeline().remove(this);
             ctx.fireChannelRead(request);
         }else
