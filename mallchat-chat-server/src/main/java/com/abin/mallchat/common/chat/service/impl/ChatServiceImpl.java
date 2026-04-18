@@ -183,6 +183,41 @@ public class ChatServiceImpl implements ChatService {
         return CursorPageBaseResp.init(cursorPage, getMsgRespBatch(cursorPage.getList(), receiveUid));
     }
 
+    @Override
+    public CursorPageBaseResp<ChatMessageResp> searchMsgPage(ChatMessageSearchReq request, Long receiveUid) {
+        Room room = roomCache.get(request.getRoomId());
+        AssertUtil.isNotEmpty(room, "房间号有误");
+        if (!room.isHotRoom()) {
+            AssertUtil.isNotEmpty(receiveUid, "请先登录");
+            checkRoomAccess(request.getRoomId(), receiveUid);
+        }
+        CursorPageBaseResp<Message> cursorPage = messageDao.searchPage(
+                request.getRoomId(),
+                request.getKeyword(),
+                request.getStartTime(),
+                request.getEndTime(),
+                request
+        );
+        if (cursorPage.isEmpty()) {
+            return CursorPageBaseResp.empty();
+        }
+        return CursorPageBaseResp.init(cursorPage, getMsgRespBatch(cursorPage.getList(), receiveUid));
+    }
+
+    private void checkRoomAccess(Long roomId, Long uid) {
+        Room room = roomCache.get(roomId);
+        if (room.isRoomFriend()) {
+            RoomFriend roomFriend = roomFriendDao.getByRoomId(roomId);
+            AssertUtil.equal(NormalOrNoEnum.NORMAL.getStatus(), roomFriend.getStatus(), "您已经被对方拉黑");
+            AssertUtil.isTrue(uid.equals(roomFriend.getUid1()) || uid.equals(roomFriend.getUid2()), "您已经被对方拉黑");
+        }
+        if (room.isRoomGroup()) {
+            RoomGroup roomGroup = roomGroupCache.get(roomId);
+            GroupMember member = groupMemberDao.getMember(roomGroup.getId(), uid);
+            AssertUtil.isNotEmpty(member, "您已经被移除该群");
+        }
+    }
+
     private Long getLastMsgId(Long roomId, Long receiveUid) {
         Room room = roomCache.get(roomId);
         AssertUtil.isNotEmpty(room, "房间号有误");

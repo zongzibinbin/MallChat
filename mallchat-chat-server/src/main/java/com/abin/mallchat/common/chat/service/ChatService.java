@@ -64,6 +64,15 @@ public interface ChatService {
      */
     CursorPageBaseResp<ChatMessageResp> getMsgPage(ChatMessagePageReq request, @Nullable Long receiveUid);
 
+    /**
+     * 搜索消息
+     *
+     * @param request
+     * @param receiveUid
+     * @return
+     */
+    CursorPageBaseResp<ChatMessageResp> searchMsgPage(ChatMessageSearchReq request, @Nullable Long receiveUid);
+
     ChatMemberStatisticResp getMemberStatistic();
 
     void setMsgMark(Long uid, ChatMessageMarkReq request);
