@@ -1,7 +1,6 @@
 package com.abin.mallchat.common.user.service.impl;
 
 import com.abin.mallchat.common.common.annotation.RedissonLock;
-import com.abin.mallchat.common.common.domain.vo.response.ApiResult;
 import com.abin.mallchat.common.common.domain.vo.response.IdRespVO;
 import com.abin.mallchat.common.common.utils.AssertUtil;
 import com.abin.mallchat.common.user.dao.UserEmojiDao;
@@ -44,13 +43,13 @@ public class UserEmojiServiceImpl implements UserEmojiService {
      * 新增表情包
      *
      * @param uid 用户ID
-     * @return 表情包
+     * @return 表情包ID
      * @author WuShiJie
      * @createTime 2023/7/3 14:46
      **/
     @Override
     @RedissonLock(key = "#uid")
-    public ApiResult<IdRespVO> insert(UserEmojiReq req, Long uid) {
+    public IdRespVO insert(UserEmojiReq req, Long uid) {
         //校验表情数量是否超过30
         int count = userEmojiDao.countByUid(uid);
         AssertUtil.isFalse(count > 30, "最多只能添加30个表情哦~~");
@@ -62,7 +61,7 @@ public class UserEmojiServiceImpl implements UserEmojiService {
         AssertUtil.isFalse(existsCount > 0, "当前表情已存在哦~~");
         UserEmoji insert = UserEmoji.builder().uid(uid).expressionUrl(req.getExpressionUrl()).build();
         userEmojiDao.save(insert);
-        return ApiResult.success(IdRespVO.id(insert.getId()));
+        return IdRespVO.id(insert.getId());
     }
 
     @Override

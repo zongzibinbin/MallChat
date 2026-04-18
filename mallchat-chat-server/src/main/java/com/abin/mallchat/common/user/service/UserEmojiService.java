@@ -1,6 +1,5 @@
 package com.abin.mallchat.common.user.service;
 
-import com.abin.mallchat.common.common.domain.vo.response.ApiResult;
 import com.abin.mallchat.common.common.domain.vo.response.IdRespVO;
 import com.abin.mallchat.common.user.domain.vo.request.user.UserEmojiReq;
 import com.abin.mallchat.common.user.domain.vo.response.user.UserEmojiResp;
@@ -29,11 +28,11 @@ public interface UserEmojiService {
      *
      * @param emojis 用户表情包
      * @param uid    用户ID
-     * @return 表情包
+     * @return 表情包ID
      * @author WuShiJie
      * @createTime 2023/7/3 14:46
      **/
-    ApiResult<IdRespVO> insert(UserEmojiReq emojis, Long uid);
+    IdRespVO insert(UserEmojiReq emojis, Long uid);
 
     /**
      * 删除表情包
