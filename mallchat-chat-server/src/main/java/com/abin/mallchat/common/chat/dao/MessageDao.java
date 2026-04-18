@@ -1,6 +1,7 @@
 package com.abin.mallchat.common.chat.dao;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
 import com.abin.mallchat.common.chat.domain.entity.Contact;
 import com.abin.mallchat.common.chat.domain.entity.Message;
 import com.abin.mallchat.common.chat.domain.enums.MessageStatusEnum;
@@ -36,6 +37,22 @@ public class MessageDao extends ServiceImpl<MessageMapper, Message> {
             wrapper.eq(Message::getStatus, MessageStatusEnum.NORMAL.getStatus());
             wrapper.le(Objects.nonNull(lastMsgId), Message::getId, lastMsgId);
         }, Message::getId);
+    }
+
+    public CursorPageBaseResp<Message> searchPage(Long roomId, String keyword, Date startTime, Date endTime, CursorPageBaseReq request) {
+        return CursorUtils.getCursorPageByMysql(this, request, wrapper -> {
+            wrapper.eq(Message::getRoomId, roomId);
+            wrapper.eq(Message::getStatus, MessageStatusEnum.NORMAL.getStatus());
+            if (StrUtil.isNotBlank(keyword)) {
+                wrapper.like(Message::getContent, keyword);
+            }
+            if (Objects.nonNull(startTime)) {
+                wrapper.ge(Message::getCreateTime, startTime);
+            }
+            if (Objects.nonNull(endTime)) {
+                wrapper.le(Message::getCreateTime, endTime);
+            }
+        }, Message::getCreateTime);
     }
 
     /**

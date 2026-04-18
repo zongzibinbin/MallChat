@@ -1,11 +1,16 @@
 package com.abin.mallchat.common.chat.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.abin.mallchat.common.chat.dao.*;
+import com.abin.mallchat.common.chat.domain.entity.GroupMember;
 import com.abin.mallchat.common.chat.domain.entity.Room;
 import com.abin.mallchat.common.chat.domain.entity.RoomGroup;
+import com.abin.mallchat.common.chat.domain.enums.GroupRoleEnum;
 import com.abin.mallchat.common.chat.domain.vo.request.admin.AdminAddReq;
 import com.abin.mallchat.common.chat.domain.vo.request.admin.AdminRevokeReq;
+import com.abin.mallchat.common.chat.domain.vo.request.member.AllMuteReq;
 import com.abin.mallchat.common.chat.domain.vo.request.member.MemberExitReq;
+import com.abin.mallchat.common.chat.domain.vo.request.member.MemberMuteReq;
 import com.abin.mallchat.common.chat.service.IGroupMemberService;
 import com.abin.mallchat.common.chat.service.adapter.MemberAdapter;
 import com.abin.mallchat.common.chat.service.cache.GroupMemberCache;
@@ -20,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -161,5 +167,62 @@ public class GroupMemberServiceImpl implements IGroupMemberService {
             pushService.sendPushMsg(ws, memberUidList);
             groupMemberCache.evictMemberUidList(room.getId());
         }
+    }
+
+    /**
+     * 成员禁言/解除禁言
+     *
+     * @param uid     操作人用户ID
+     * @param request 禁言请求信息
+     */
+    @Override
+    public void muteMember(Long uid, MemberMuteReq request) {
+        Long roomId = request.getRoomId();
+        // 1. 判断群聊是否存在
+        RoomGroup roomGroup = roomGroupDao.getByRoomId(roomId);
+        AssertUtil.isNotEmpty(roomGroup, GroupErrorEnum.GROUP_NOT_EXIST);
+
+        // 2. 判断操作人是否有权限（群主或管理员）
+        Boolean isLord = groupMemberDao.isLord(roomGroup.getId(), uid);
+        Boolean isManager = groupMemberDao.isManager(roomGroup.getId(), uid);
+        AssertUtil.isTrue(isLord || isManager, GroupErrorEnum.NOT_ALLOWED_OPERATION);
+
+        // 3. 判断被禁言的用户是否在群中
+        GroupMember targetMember = groupMemberDao.getMember(roomGroup.getId(), request.getUid());
+        AssertUtil.isNotEmpty(targetMember, GroupErrorEnum.USER_NOT_IN_GROUP);
+
+        // 4. 校验不能禁言群主
+        AssertUtil.isFalse(GroupRoleEnum.LEADER.getType().equals(targetMember.getRole()), GroupErrorEnum.NOT_ALLOWED_OPERATION);
+
+        // 5. 计算禁言到期时间（如果 muteTime 为 null 或 0，则解除禁言）
+        Date muteEndTime = null;
+        if (ObjectUtil.isNotNull(request.getMuteTime()) && request.getMuteTime() > 0) {
+            muteEndTime = new Date(System.currentTimeMillis() + request.getMuteTime() * 60 * 1000L);
+        }
+
+        // 6. 更新禁言时间
+        groupMemberDao.updateMuteTime(roomGroup.getId(), request.getUid(), muteEndTime);
+    }
+
+    /**
+     * 全员禁言/解除全员禁言
+     *
+     * @param uid     操作人用户ID
+     * @param request 全员禁言请求信息
+     */
+    @Override
+    public void allMute(Long uid, AllMuteReq request) {
+        Long roomId = request.getRoomId();
+        // 1. 判断群聊是否存在
+        RoomGroup roomGroup = roomGroupDao.getByRoomId(roomId);
+        AssertUtil.isNotEmpty(roomGroup, GroupErrorEnum.GROUP_NOT_EXIST);
+
+        // 2. 判断操作人是否有权限（群主或管理员）
+        Boolean isLord = groupMemberDao.isLord(roomGroup.getId(), uid);
+        Boolean isManager = groupMemberDao.isManager(roomGroup.getId(), uid);
+        AssertUtil.isTrue(isLord || isManager, GroupErrorEnum.NOT_ALLOWED_OPERATION);
+
+        // 3. 更新全员禁言状态
+        roomGroupDao.updateAllMute(roomId, request.getIsAllMute());
     }
 }

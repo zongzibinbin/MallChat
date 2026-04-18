@@ -65,5 +65,11 @@ public class GroupMember implements Serializable {
     @TableField("update_time")
     private Date updateTime;
 
+    /**
+     * 禁言到期时间，null表示未禁言
+     */
+    @TableField("mute_end_time")
+    private Date muteEndTime;
+
 
 }

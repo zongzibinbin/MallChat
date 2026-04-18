@@ -8,6 +8,7 @@ import cn.hutool.core.lang.Pair;
 import com.abin.mallchat.common.chat.dao.*;
 import com.abin.mallchat.common.chat.domain.dto.MsgReadInfoDTO;
 import com.abin.mallchat.common.chat.domain.entity.*;
+import com.abin.mallchat.common.chat.domain.enums.GroupRoleEnum;
 import com.abin.mallchat.common.chat.domain.enums.MessageMarkActTypeEnum;
 import com.abin.mallchat.common.chat.domain.enums.MessageTypeEnum;
 import com.abin.mallchat.common.chat.domain.vo.request.*;
@@ -34,6 +35,7 @@ import com.abin.mallchat.common.common.domain.enums.NormalOrNoEnum;
 import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
 import com.abin.mallchat.common.common.domain.vo.response.CursorPageBaseResp;
 import com.abin.mallchat.common.common.event.MessageSendEvent;
+import com.abin.mallchat.common.common.exception.GroupErrorEnum;
 import com.abin.mallchat.common.common.utils.AssertUtil;
 import com.abin.mallchat.common.user.dao.UserDao;
 import com.abin.mallchat.common.user.domain.entity.User;
@@ -124,6 +126,21 @@ public class ChatServiceImpl implements ChatService {
             RoomGroup roomGroup = roomGroupCache.get(request.getRoomId());
             GroupMember member = groupMemberDao.getMember(roomGroup.getId(), uid);
             AssertUtil.isNotEmpty(member, "您已经被移除该群");
+
+            // 禁言校验
+            // 1. 校验是否开启全员禁言
+            boolean isAdmin = GroupRoleEnum.ADMIN_LIST.contains(member.getRole());
+            if (!isAdmin) {
+                // 非管理员，校验全员禁言
+                if (Objects.equals(1, roomGroup.getAllMute())) {
+                    AssertUtil.isTrue(false, GroupErrorEnum.GROUP_ALL_MUTED);
+                }
+                // 校验个人禁言
+                if (Objects.nonNull(member.getMuteEndTime())) {
+                    boolean isMuted = member.getMuteEndTime().after(new Date());
+                    AssertUtil.isFalse(isMuted, GroupErrorEnum.USER_MUTED);
+                }
+            }
         }
 
     }
@@ -181,6 +198,41 @@ public class ChatServiceImpl implements ChatService {
             return CursorPageBaseResp.empty();
         }
         return CursorPageBaseResp.init(cursorPage, getMsgRespBatch(cursorPage.getList(), receiveUid));
+    }
+
+    @Override
+    public CursorPageBaseResp<ChatMessageResp> searchMsgPage(ChatMessageSearchReq request, Long receiveUid) {
+        Room room = roomCache.get(request.getRoomId());
+        AssertUtil.isNotEmpty(room, "房间号有误");
+        if (!room.isHotRoom()) {
+            AssertUtil.isNotEmpty(receiveUid, "请先登录");
+            checkRoomAccess(request.getRoomId(), receiveUid);
+        }
+        CursorPageBaseResp<Message> cursorPage = messageDao.searchPage(
+                request.getRoomId(),
+                request.getKeyword(),
+                request.getStartTime(),
+                request.getEndTime(),
+                request
+        );
+        if (cursorPage.isEmpty()) {
+            return CursorPageBaseResp.empty();
+        }
+        return CursorPageBaseResp.init(cursorPage, getMsgRespBatch(cursorPage.getList(), receiveUid));
+    }
+
+    private void checkRoomAccess(Long roomId, Long uid) {
+        Room room = roomCache.get(roomId);
+        if (room.isRoomFriend()) {
+            RoomFriend roomFriend = roomFriendDao.getByRoomId(roomId);
+            AssertUtil.equal(NormalOrNoEnum.NORMAL.getStatus(), roomFriend.getStatus(), "您已经被对方拉黑");
+            AssertUtil.isTrue(uid.equals(roomFriend.getUid1()) || uid.equals(roomFriend.getUid2()), "您已经被对方拉黑");
+        }
+        if (room.isRoomGroup()) {
+            RoomGroup roomGroup = roomGroupCache.get(roomId);
+            GroupMember member = groupMemberDao.getMember(roomGroup.getId(), uid);
+            AssertUtil.isNotEmpty(member, "您已经被移除该群");
+        }
     }
 
     private Long getLastMsgId(Long roomId, Long receiveUid) {

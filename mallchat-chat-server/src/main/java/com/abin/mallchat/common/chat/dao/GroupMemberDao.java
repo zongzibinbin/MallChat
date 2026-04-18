@@ -175,6 +175,21 @@ public class GroupMemberDao extends ServiceImpl<GroupMemberMapper, GroupMember> 
     }
 
     /**
+     * 更新成员禁言时间
+     *
+     * @param groupId      群组ID
+     * @param uid          用户ID
+     * @param muteEndTime  禁言到期时间，null表示解除禁言
+     */
+    public void updateMuteTime(Long groupId, Long uid, Date muteEndTime) {
+        LambdaUpdateWrapper<GroupMember> wrapper = new UpdateWrapper<GroupMember>().lambda()
+                .eq(GroupMember::getGroupId, groupId)
+                .eq(GroupMember::getUid, uid)
+                .set(GroupMember::getMuteEndTime, muteEndTime);
+        this.update(wrapper);
+    }
+
+    /**
      * 根据群组ID删除群成员
      *
      * @param groupId 群组ID
