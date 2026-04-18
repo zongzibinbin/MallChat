@@ -52,9 +52,25 @@ public class ChatMessageResp {
         private Integer likeCount;
         @ApiModelProperty("该用户是否已经点赞 0否 1是")
         private Integer userLike;
-        @ApiModelProperty("举报数")
+        @ApiModelProperty("点踩数")
         private Integer dislikeCount;
-        @ApiModelProperty("该用户是否已经举报 0否 1是")
+        @ApiModelProperty("该用户是否已经点踩 0否 1是")
         private Integer userDislike;
+        @ApiModelProperty("爱心数")
+        private Integer loveCount;
+        @ApiModelProperty("该用户是否已经打爱心 0否 1是")
+        private Integer userLove;
+        @ApiModelProperty("大笑数")
+        private Integer hahaCount;
+        @ApiModelProperty("该用户是否已经打大笑 0否 1是")
+        private Integer userHaha;
+        @ApiModelProperty("惊讶数")
+        private Integer wowCount;
+        @ApiModelProperty("该用户是否已经打惊讶 0否 1是")
+        private Integer userWow;
+        @ApiModelProperty("哭数")
+        private Integer cryCount;
+        @ApiModelProperty("该用户是否已经打哭 0否 1是")
+        private Integer userCry;
     }
 }

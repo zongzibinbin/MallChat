@@ -26,7 +26,7 @@ public class ChatMessageMarkDTO {
     /**
      * @see com.abin.mallchat.common.chat.domain.enums.MessageMarkTypeEnum
      */
-    @ApiModelProperty("标记类型 1点赞 2举报")
+    @ApiModelProperty("标记类型 1点赞 2点踩 3爱心 4大笑 5惊讶 6哭")
     private Integer markType;
 
     /**

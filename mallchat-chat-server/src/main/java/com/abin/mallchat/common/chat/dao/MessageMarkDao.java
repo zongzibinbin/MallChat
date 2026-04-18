@@ -1,6 +1,7 @@
 package com.abin.mallchat.common.chat.dao;
 
 import com.abin.mallchat.common.chat.domain.entity.MessageMark;
+import com.abin.mallchat.common.chat.domain.enums.MessageMarkTypeEnum;
 import com.abin.mallchat.common.chat.mapper.MessageMarkMapper;
 import com.abin.mallchat.common.common.domain.enums.NormalOrNoEnum;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
