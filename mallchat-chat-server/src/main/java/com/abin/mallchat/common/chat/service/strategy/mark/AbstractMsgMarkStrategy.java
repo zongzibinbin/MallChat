@@ -13,8 +13,11 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Description: 消息标记抽象类
@@ -45,11 +48,32 @@ public abstract class AbstractMsgMarkStrategy {
     }
 
     protected void doMark(Long uid, Long msgId) {
+        unMarkOtherEmojis(uid, msgId);
         exec(uid, msgId, MessageMarkActTypeEnum.MARK);
     }
 
     protected void doUnMark(Long uid, Long msgId) {
         exec(uid, msgId, MessageMarkActTypeEnum.UN_MARK);
+    }
+
+    private void unMarkOtherEmojis(Long uid, Long msgId) {
+        Integer currentType = getTypeEnum().getType();
+        if (!MessageMarkTypeEnum.isEmojiMark(currentType)) {
+            return;
+        }
+        List<Integer> otherEmojiTypes = getOtherEmojiTypes(currentType);
+        for (Integer emojiType : otherEmojiTypes) {
+            AbstractMsgMarkStrategy strategy = MsgMarkFactory.getStrategyNoNull(emojiType);
+            strategy.unMark(uid, msgId);
+        }
+    }
+
+    private List<Integer> getOtherEmojiTypes(Integer currentType) {
+        return Arrays.stream(MessageMarkTypeEnum.values())
+                .filter(enumType -> MessageMarkTypeEnum.isEmojiMark(enumType.getType()))
+                .filter(enumType -> !Objects.equals(enumType.getType(), currentType))
+                .map(MessageMarkTypeEnum::getType)
+                .collect(Collectors.toList());
     }
 
     protected void exec(Long uid, Long msgId, MessageMarkActTypeEnum actTypeEnum) {

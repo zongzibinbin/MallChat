@@ -64,11 +64,23 @@ public class MessageAdapter {
         Map<Integer, List<MessageMark>> typeMap = marks.stream().collect(Collectors.groupingBy(MessageMark::getType));
         List<MessageMark> likeMarks = typeMap.getOrDefault(MessageMarkTypeEnum.LIKE.getType(), new ArrayList<>());
         List<MessageMark> dislikeMarks = typeMap.getOrDefault(MessageMarkTypeEnum.DISLIKE.getType(), new ArrayList<>());
+        List<MessageMark> loveMarks = typeMap.getOrDefault(MessageMarkTypeEnum.LOVE.getType(), new ArrayList<>());
+        List<MessageMark> hahaMarks = typeMap.getOrDefault(MessageMarkTypeEnum.HAHA.getType(), new ArrayList<>());
+        List<MessageMark> wowMarks = typeMap.getOrDefault(MessageMarkTypeEnum.WOW.getType(), new ArrayList<>());
+        List<MessageMark> cryMarks = typeMap.getOrDefault(MessageMarkTypeEnum.CRY.getType(), new ArrayList<>());
         ChatMessageResp.MessageMark mark = new ChatMessageResp.MessageMark();
         mark.setLikeCount(likeMarks.size());
         mark.setUserLike(Optional.ofNullable(receiveUid).filter(uid -> likeMarks.stream().anyMatch(a -> Objects.equals(a.getUid(), uid))).map(a -> YesOrNoEnum.YES.getStatus()).orElse(YesOrNoEnum.NO.getStatus()));
         mark.setDislikeCount(dislikeMarks.size());
         mark.setUserDislike(Optional.ofNullable(receiveUid).filter(uid -> dislikeMarks.stream().anyMatch(a -> Objects.equals(a.getUid(), uid))).map(a -> YesOrNoEnum.YES.getStatus()).orElse(YesOrNoEnum.NO.getStatus()));
+        mark.setLoveCount(loveMarks.size());
+        mark.setUserLove(Optional.ofNullable(receiveUid).filter(uid -> loveMarks.stream().anyMatch(a -> Objects.equals(a.getUid(), uid))).map(a -> YesOrNoEnum.YES.getStatus()).orElse(YesOrNoEnum.NO.getStatus()));
+        mark.setHahaCount(hahaMarks.size());
+        mark.setUserHaha(Optional.ofNullable(receiveUid).filter(uid -> hahaMarks.stream().anyMatch(a -> Objects.equals(a.getUid(), uid))).map(a -> YesOrNoEnum.YES.getStatus()).orElse(YesOrNoEnum.NO.getStatus()));
+        mark.setWowCount(wowMarks.size());
+        mark.setUserWow(Optional.ofNullable(receiveUid).filter(uid -> wowMarks.stream().anyMatch(a -> Objects.equals(a.getUid(), uid))).map(a -> YesOrNoEnum.YES.getStatus()).orElse(YesOrNoEnum.NO.getStatus()));
+        mark.setCryCount(cryMarks.size());
+        mark.setUserCry(Optional.ofNullable(receiveUid).filter(uid -> cryMarks.stream().anyMatch(a -> Objects.equals(a.getUid(), uid))).map(a -> YesOrNoEnum.YES.getStatus()).orElse(YesOrNoEnum.NO.getStatus()));
         return mark;
     }
 
