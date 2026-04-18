@@ -28,6 +28,7 @@ public enum WSRespTypeEnum {
     RECALL(9, "消息撤回", WSMsgRecall.class),
     APPLY(10, "好友申请", WSFriendApply.class),
     MEMBER_CHANGE(11, "成员变动", WSMemberChange.class),
+    ANNOUNCEMENT(12, "群公告通知", WSAnnouncement.class),
     ;
 
     private final Integer type;
