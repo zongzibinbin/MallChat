@@ -16,6 +16,7 @@ public class NettyUtil {
     public static AttributeKey<String> TOKEN = AttributeKey.valueOf("token");
     public static AttributeKey<String> IP = AttributeKey.valueOf("ip");
     public static AttributeKey<Long> UID = AttributeKey.valueOf("uid");
+    public static AttributeKey<String> TID = AttributeKey.valueOf("tid");
     public static AttributeKey<WebSocketServerHandshaker> HANDSHAKER_ATTR_KEY = AttributeKey.valueOf(WebSocketServerHandshaker.class, "HANDSHAKER");
 
     public static <T> void setAttr(Channel channel, AttributeKey<T> attributeKey, T data) {

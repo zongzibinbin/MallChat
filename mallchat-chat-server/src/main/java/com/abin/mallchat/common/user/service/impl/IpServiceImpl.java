@@ -13,6 +13,7 @@ import com.abin.mallchat.common.user.domain.entity.IpInfo;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.service.IpService;
 import com.abin.mallchat.common.user.service.cache.UserCache;
+import com.abin.mallchat.common.utils.MDCUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,7 @@ public class IpServiceImpl implements IpService, DisposableBean {
 
     @Override
     public void refreshIpDetailAsync(Long uid) {
-        EXECUTOR.execute(() -> {
+        EXECUTOR.execute(MDCUtils.wrap(() -> {
             User user = userDao.getById(uid);
             IpInfo ipInfo = user.getIpInfo();
             if (Objects.isNull(ipInfo)) {
@@ -69,7 +70,7 @@ public class IpServiceImpl implements IpService, DisposableBean {
                 log.error("get ip detail fail ip:{},uid:{}", ip, uid);
             }
 
-        });
+        }));
     }
 
     private static IpDetail TryGetIpDetailOrNullTreeTimes(String ip) {
