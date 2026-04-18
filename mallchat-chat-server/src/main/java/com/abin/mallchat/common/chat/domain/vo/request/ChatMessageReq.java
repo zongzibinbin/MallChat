@@ -27,7 +27,7 @@ public class ChatMessageReq {
     @ApiModelProperty("房间id")
     private Long roomId;
 
-    @ApiModelProperty("消息类型")
+    @ApiModelProperty("消息类型 1-正常消息,2-撤回消息,3-图片,4-文件,5-语音,6-视频,7-表情,8-系统消息")
     @NotNull
     private Integer msgType;
 

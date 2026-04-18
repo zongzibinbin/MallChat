@@ -19,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatMessageReadInfoReq {
-    @ApiModelProperty("消息id集合（只查本人）")
+    @ApiModelProperty("消息id集合（只查本人，最大长度20）")
     @Size(max = 20)
     private List<Long> msgIds;
 }
