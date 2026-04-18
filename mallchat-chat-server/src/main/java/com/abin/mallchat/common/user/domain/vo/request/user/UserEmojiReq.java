@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
+
 
 /**
  * Description: 表情包反参
@@ -21,6 +23,7 @@ public class UserEmojiReq {
      * 表情地址
      */
     @ApiModelProperty(value = "新增的表情url")
+    @NotBlank(message = "表情地址不能为空")
     private String expressionUrl;
 
 }
