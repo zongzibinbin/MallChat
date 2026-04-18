@@ -2,14 +2,10 @@ package com.abin.mallchat.common.chat.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.date.DateUnit;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Pair;
 import com.abin.mallchat.common.chat.dao.*;
 import com.abin.mallchat.common.chat.domain.dto.MsgReadInfoDTO;
 import com.abin.mallchat.common.chat.domain.entity.*;
-import com.abin.mallchat.common.chat.domain.enums.MessageMarkActTypeEnum;
-import com.abin.mallchat.common.chat.domain.enums.MessageTypeEnum;
 import com.abin.mallchat.common.chat.domain.vo.request.*;
 import com.abin.mallchat.common.chat.domain.vo.request.member.MemberReq;
 import com.abin.mallchat.common.chat.domain.vo.response.ChatMemberListResp;
@@ -18,17 +14,16 @@ import com.abin.mallchat.common.chat.domain.vo.response.ChatMessageReadResp;
 import com.abin.mallchat.common.chat.domain.vo.response.ChatMessageResp;
 import com.abin.mallchat.common.chat.service.ChatService;
 import com.abin.mallchat.common.chat.service.ContactService;
+import com.abin.mallchat.common.chat.service.MessageMarkService;
+import com.abin.mallchat.common.chat.service.MessageRecallService;
 import com.abin.mallchat.common.chat.service.adapter.MemberAdapter;
 import com.abin.mallchat.common.chat.service.adapter.MessageAdapter;
 import com.abin.mallchat.common.chat.service.adapter.RoomAdapter;
 import com.abin.mallchat.common.chat.service.cache.RoomCache;
 import com.abin.mallchat.common.chat.service.cache.RoomGroupCache;
 import com.abin.mallchat.common.chat.service.helper.ChatMemberHelper;
-import com.abin.mallchat.common.chat.service.strategy.mark.AbstractMsgMarkStrategy;
-import com.abin.mallchat.common.chat.service.strategy.mark.MsgMarkFactory;
 import com.abin.mallchat.common.chat.service.strategy.msg.AbstractMsgHandler;
 import com.abin.mallchat.common.chat.service.strategy.msg.MsgHandlerFactory;
-import com.abin.mallchat.common.chat.service.strategy.msg.RecallMsgHandler;
 import com.abin.mallchat.common.common.annotation.RedissonLock;
 import com.abin.mallchat.common.common.domain.enums.NormalOrNoEnum;
 import com.abin.mallchat.common.common.domain.vo.request.CursorPageBaseReq;
@@ -38,9 +33,7 @@ import com.abin.mallchat.common.common.utils.AssertUtil;
 import com.abin.mallchat.common.user.dao.UserDao;
 import com.abin.mallchat.common.user.domain.entity.User;
 import com.abin.mallchat.common.user.domain.enums.ChatActiveStatusEnum;
-import com.abin.mallchat.common.user.domain.enums.RoleEnum;
 import com.abin.mallchat.common.user.domain.vo.response.ws.ChatMemberResp;
-import com.abin.mallchat.common.user.service.IRoleService;
 import com.abin.mallchat.common.user.service.cache.UserCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -80,10 +73,6 @@ public class ChatServiceImpl implements ChatService {
     @Autowired
     private RoomFriendDao roomFriendDao;
     @Autowired
-    private IRoleService iRoleService;
-    @Autowired
-    private RecallMsgHandler recallMsgHandler;
-    @Autowired
     private ContactService contactService;
     @Autowired
     private ContactDao contactDao;
@@ -95,6 +84,10 @@ public class ChatServiceImpl implements ChatService {
     private RoomGroupCache roomGroupCache;
     @Autowired
     private RoomGroupDao roomGroupDao;
+    @Autowired
+    private MessageMarkService messageMarkService;
+    @Autowired
+    private MessageRecallService messageRecallService;
 
     /**
      * 发送消息
@@ -206,26 +199,13 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    @RedissonLock(key = "#uid")
     public void setMsgMark(Long uid, ChatMessageMarkReq request) {
-        AbstractMsgMarkStrategy strategy = MsgMarkFactory.getStrategyNoNull(request.getMarkType());
-        switch (MessageMarkActTypeEnum.of(request.getActType())) {
-            case MARK:
-                strategy.mark(uid, request.getMsgId());
-                break;
-            case UN_MARK:
-                strategy.unMark(uid, request.getMsgId());
-                break;
-        }
+        messageMarkService.setMsgMark(uid, request);
     }
 
     @Override
     public void recallMsg(Long uid, ChatMessageBaseReq request) {
-        Message message = messageDao.getById(request.getMsgId());
-        //校验能不能执行撤回
-        checkRecall(uid, message);
-        //执行消息撤回
-        recallMsgHandler.recall(uid, message);
+        messageRecallService.recallMsg(uid, request);
     }
 
     @Override
@@ -286,19 +266,6 @@ public class ChatServiceImpl implements ChatService {
             insert.setReadTime(new Date());
             contactDao.save(insert);
         }
-    }
-
-    private void checkRecall(Long uid, Message message) {
-        AssertUtil.isNotEmpty(message, "消息有误");
-        AssertUtil.notEqual(message.getType(), MessageTypeEnum.RECALL.getType(), "消息无法撤回");
-        boolean hasPower = iRoleService.hasPower(uid, RoleEnum.CHAT_MANAGER);
-        if (hasPower) {
-            return;
-        }
-        boolean self = Objects.equals(uid, message.getFromUid());
-        AssertUtil.isTrue(self, "抱歉,您没有权限");
-        long between = DateUtil.between(message.getCreateTime(), new Date(), DateUnit.MINUTE);
-        AssertUtil.isTrue(between < 2, "覆水难收，超过2分钟的消息不能撤回哦~~");
     }
 
     public List<ChatMessageResp> getMsgRespBatch(List<Message> messages, Long receiveUid) {
