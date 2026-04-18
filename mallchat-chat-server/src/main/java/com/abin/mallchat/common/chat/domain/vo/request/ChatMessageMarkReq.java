@@ -23,10 +23,10 @@ public class ChatMessageMarkReq {
     private Long msgId;
 
     @NotNull
-    @ApiModelProperty("标记类型 1点赞 2举报")
+    @ApiModelProperty("标记类型 1-点赞,2-举报")
     private Integer markType;
 
     @NotNull
-    @ApiModelProperty("动作类型 1确认 2取消")
+    @ApiModelProperty("动作类型 1-确认,2-取消")
     private Integer actType;
 }

@@ -23,7 +23,7 @@ public class ChatMessageReadReq extends CursorPageBaseReq {
     @NotNull
     private Long msgId;
 
-    @ApiModelProperty("查询类型 1已读 2未读")
+    @ApiModelProperty("查询类型 1-已读,2-未读")
     @NotNull
     private Long searchType;
 }
