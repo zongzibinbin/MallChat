@@ -32,6 +32,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -121,6 +122,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void register(User user) {
+        if (StrUtil.isBlank(user.getOpenId())) {
+            user.setOpenId(UUID.randomUUID().toString().replace("-", ""));
+        }
         userDao.save(user);
         applicationEventPublisher.publishEvent(new UserRegisterEvent(this, user));
     }

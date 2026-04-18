@@ -1,0 +1,72 @@
+name: CI
+
+env:
+  BACKEND_DEPLOY_PATH: /home/ubuntu/project/MallChat
+  BACKEND_JAR_NAME: mallchat-chat-server.jar
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Maven Build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 JDK 8
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '8'
+          cache: maven
+
+      - name: Maven 打包
+        run: mvn -B -ntp -DskipTests package --file pom.xml
+
+      - name: 准备部署产物
+        run: |
+          JAR_FILE=$(find mallchat-chat-server/target -maxdepth 1 -type f -name 'mallchat-chat-server-*.jar' ! -name '*.original' | head -n 1)
+          cp "$JAR_FILE" "mallchat-chat-server/target/${BACKEND_JAR_NAME}"
+
+      - name: 上传服务端产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: mallchat-chat-server
+          path: mallchat-chat-server/target/${{ env.BACKEND_JAR_NAME }}
+          if-no-files-found: error
+
+      - name: 准备服务器目录
+        if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            mkdir -p "${{ env.BACKEND_DEPLOY_PATH }}"
+            find "${{ env.BACKEND_DEPLOY_PATH }}" -maxdepth 1 -type f -name 'mallchat-chat-server*.jar' -delete
+
+      - name: 上传服务端到服务器
+        if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          source: mallchat-chat-server/target/${{ env.BACKEND_JAR_NAME }}
+          target: ${{ env.BACKEND_DEPLOY_PATH }}
+          strip_components: 2
+          overwrite: true

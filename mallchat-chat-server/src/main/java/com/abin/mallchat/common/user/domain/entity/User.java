@@ -43,6 +43,18 @@ public class User implements Serializable {
     private String name;
 
     /**
+     * 登录账号
+     */
+    @TableField("username")
+    private String username;
+
+    /**
+     * 密码哈希
+     */
+    @TableField(value = "password_hash", select = false)
+    private String passwordHash;
+
+    /**
      * 用户头像
      */
     @TableField("avatar")

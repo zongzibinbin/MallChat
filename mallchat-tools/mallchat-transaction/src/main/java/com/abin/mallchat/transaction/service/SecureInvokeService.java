@@ -37,7 +37,7 @@ public class SecureInvokeService {
 
     private final Executor executor;
 
-    @Scheduled(cron = "*/5 * * * * ?")
+//    @Scheduled(cron = "*/5 * * * * ?")
     public void retry() {
         List<SecureInvokeRecord> secureInvokeRecords = secureInvokeRecordDao.getWaitRetryRecords();
         for (SecureInvokeRecord secureInvokeRecord : secureInvokeRecords) {

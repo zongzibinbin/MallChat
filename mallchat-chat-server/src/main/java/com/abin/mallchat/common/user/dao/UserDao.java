@@ -32,6 +32,13 @@ public class UserDao extends ServiceImpl<UserMapper, User> {
         return getOne(wrapper);
     }
 
+    public User getByUsername(String username) {
+        return lambdaQuery()
+                .select(User::getId, User::getName, User::getUsername, User::getPasswordHash, User::getAvatar, User::getStatus)
+                .eq(User::getUsername, username)
+                .one();
+    }
+
     public void modifyName(Long uid, String name) {
         User update = new User();
         update.setId(uid);
