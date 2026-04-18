@@ -53,6 +53,12 @@ public class RoomGroup implements Serializable {
     private String extJson;
 
     /**
+     * 全员禁言标志(0-未禁言,1-禁言)
+     */
+    @TableField("all_mute")
+    private Integer allMute;
+
+    /**
      * 逻辑删除(0-正常,1-删除)
      */
     @TableField("delete_status")

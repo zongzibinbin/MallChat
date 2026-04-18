@@ -2,7 +2,9 @@ package com.abin.mallchat.common.chat.service;
 
 import com.abin.mallchat.common.chat.domain.vo.request.admin.AdminAddReq;
 import com.abin.mallchat.common.chat.domain.vo.request.admin.AdminRevokeReq;
+import com.abin.mallchat.common.chat.domain.vo.request.member.AllMuteReq;
 import com.abin.mallchat.common.chat.domain.vo.request.member.MemberExitReq;
+import com.abin.mallchat.common.chat.domain.vo.request.member.MemberMuteReq;
 
 /**
  * <p>
@@ -36,4 +38,20 @@ public interface IGroupMemberService {
      * @param request 请求信息
      */
     void exitGroup(Long uid, MemberExitReq request);
+
+    /**
+     * 成员禁言/解除禁言
+     *
+     * @param uid     操作人用户ID
+     * @param request 禁言请求信息
+     */
+    void muteMember(Long uid, MemberMuteReq request);
+
+    /**
+     * 全员禁言/解除全员禁言
+     *
+     * @param uid     操作人用户ID
+     * @param request 全员禁言请求信息
+     */
+    void allMute(Long uid, AllMuteReq request);
 }

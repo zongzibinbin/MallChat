@@ -4,9 +4,11 @@ package com.abin.mallchat.common.chat.controller;
 import com.abin.mallchat.common.chat.domain.vo.request.*;
 import com.abin.mallchat.common.chat.domain.vo.request.admin.AdminAddReq;
 import com.abin.mallchat.common.chat.domain.vo.request.admin.AdminRevokeReq;
+import com.abin.mallchat.common.chat.domain.vo.request.member.AllMuteReq;
 import com.abin.mallchat.common.chat.domain.vo.request.member.MemberAddReq;
 import com.abin.mallchat.common.chat.domain.vo.request.member.MemberDelReq;
 import com.abin.mallchat.common.chat.domain.vo.request.member.MemberExitReq;
+import com.abin.mallchat.common.chat.domain.vo.request.member.MemberMuteReq;
 import com.abin.mallchat.common.chat.domain.vo.request.member.MemberReq;
 import com.abin.mallchat.common.chat.domain.vo.response.ChatMemberListResp;
 import com.abin.mallchat.common.chat.domain.vo.response.MemberResp;
@@ -109,6 +111,22 @@ public class RoomController {
     public ApiResult<Boolean> revokeAdmin(@Valid @RequestBody AdminRevokeReq request) {
         Long uid = RequestHolder.get().getUid();
         groupMemberService.revokeAdmin(uid, request);
+        return ApiResult.success();
+    }
+
+    @PutMapping("/group/mute")
+    @ApiOperation("成员禁言/解除禁言")
+    public ApiResult<Boolean> muteMember(@Valid @RequestBody MemberMuteReq request) {
+        Long uid = RequestHolder.get().getUid();
+        groupMemberService.muteMember(uid, request);
+        return ApiResult.success();
+    }
+
+    @PutMapping("/group/allMute")
+    @ApiOperation("全员禁言/解除全员禁言")
+    public ApiResult<Boolean> allMute(@Valid @RequestBody AllMuteReq request) {
+        Long uid = RequestHolder.get().getUid();
+        groupMemberService.allMute(uid, request);
         return ApiResult.success();
     }
 }
