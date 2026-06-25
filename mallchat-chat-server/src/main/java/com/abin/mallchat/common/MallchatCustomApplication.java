@@ -16,6 +16,7 @@ public class MallchatCustomApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(MallchatCustomApplication.class,args);
+        System.out.println("已启动@!!!!!");
     }
 
 }

@@ -11,6 +11,7 @@ import com.abin.mallchat.common.user.domain.vo.request.user.*;
 import com.abin.mallchat.common.user.domain.vo.response.user.BadgeResp;
 import com.abin.mallchat.common.user.domain.vo.response.user.UserInfoResp;
 import com.abin.mallchat.common.user.service.IRoleService;
+import com.abin.mallchat.common.user.service.LoginService;
 import com.abin.mallchat.common.user.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -32,10 +33,14 @@ import java.util.List;
 @RequestMapping("/capi/user")
 @Api(tags = "用户管理相关接口")
 public class UserController {
+    private static final Long TEST_UID = 12717L;
+
     @Autowired
     private UserService userService;
     @Autowired
     private IRoleService iRoleService;
+    @Autowired
+    private LoginService loginService;
 
     @GetMapping("/userInfo")
     @ApiOperation("用户详情")
@@ -53,6 +58,12 @@ public class UserController {
     @ApiOperation("徽章聚合信息-返回的代表需要刷新的")
     public ApiResult<List<ItemInfoDTO>> getItemInfo(@Valid @RequestBody ItemInfoReq req) {
         return ApiResult.success(userService.getItemInfo(req));
+    }
+
+    @GetMapping("/public/test/token")
+    @ApiOperation("获取测试账号token")
+    public ApiResult<String> getTestToken() {
+        return ApiResult.success(loginService.login(TEST_UID));
     }
 
     @PutMapping("/name")
@@ -85,4 +96,3 @@ public class UserController {
         return ApiResult.success();
     }
 }
-
